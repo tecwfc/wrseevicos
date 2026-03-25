@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WR Manutenção e Serviços | Sistema de Ordens de Serviço</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0066CC">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WR OS">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="WR OS">
+    
+    <!-- Bibliotecas Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="logo-circle">
+                    <img src="assets/logo_marca.png" alt="WR Manutenção e Serviços" class="logo-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%230066CC%27/%3E%3Ctext x=%2750%27 y=%2765%27 font-size=%2740%27 text-anchor=%27middle%27 fill=%27white%27 font-weight=%27bold%27%3EWR%3C/text%3E%3C/svg%3E'">
+                </div>
+                <h1>WR Manutenção e Serviços</h1>
+                <p>Sistema de Ordens de Serviço</p>
+            </div>
+            <div class="form-group">
+                <label>USUÁRIO</label>
+                <input type="text" id="loginUsuario" placeholder="Digite seu usuário" value="admin">
+            </div>
+            <div class="form-group">
+                <label>SENHA</label>
+                <input type="password" id="loginSenha" placeholder="Digite sua senha" value="wr@2024">
+            </div>
+            <button class="btn-login" onclick="realizarLogin()">
+                <span class="btn-icon">🔐</span>
+                Entrar no Sistema
+            </button>
+            <div class="login-info">
+                <p>Usuário: admin | Senha: wr@2024</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Carregando dados...</p>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app">
+        <!-- Sidebar Desktop -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle-small">
+                    <img src="assets/logo_marca.png" alt="WR Manutenção e Serviços" class="logo-img-sidebar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%230066CC%27/%3E%3Ctext x=%2750%27 y=%2765%27 font-size=%2740%27 text-anchor=%27middle%27 fill=%27white%27%3EWR%3C/text%3E%3C/svg%3E'">
+                </div>
+                <h2>WR Manutenção e Serviços</h2>
+                <p>Sistema de Ordens de Serviço</p>
+            </div>
+            <nav>
+                <div class="nav-item active" data-tab="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-tab="clientes">
+                    <span class="nav-icon">👥</span>
+                    <span>Clientes</span>
+                </div>
+                <div class="nav-item" data-tab="catalogo">
+                    <span class="nav-icon">🛠️</span>
+                    <span>Materiais/Serviços</span>
+                </div>
+                <div class="nav-item" data-tab="ordens">
+                    <span class="nav-icon">📋</span>
+                    <span>Ordens de Serviço</span>
+                </div>
+                <div class="nav-item" data-tab="config">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Configurações</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <div class="user-info">
+                    <span class="user-name" id="userName">Carregando...</span>
+                    <button class="btn-logout" onclick="fazerLogout()">
+                        <span class="btn-icon">🚪</span>
+                        Sair
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conteúdo das Tabs -->
+            <div id="tabDashboard" class="tab-content active">
+                <div class="welcome-card">
+                    <h2>Olá, <span id="welcomeName">Usuário</span>! 👋</h2>
+                    <p>Bem-vindo ao sistema de gestão de Ordens de Serviço</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <div class="label">Total de OS</div>
+                            <div class="value" id="statTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">🟡</div>
+                        <div class="stat-info">
+                            <div class="label">Abertas</div>
+                            <div class="value" id="statAbertas">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card info">
+                        <div class="stat-icon">🔵</div>
+                        <div class="stat-info">
+                            <div class="label">Em Andamento</div>
+                            <div class="value" id="statAndamento">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="label">Concluídas</div>
+                            <div class="value" id="statConcluidas">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card primary">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <div class="label">Faturamento</div>
+                            <div class="value" id="statFaturamento">R$ 0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Distribuição por Status</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Desempenho Mensal</h3>
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabClientes" class="tab-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>➕ Novo Cliente</h3>
+                        <p>Cadastre um novo cliente no sistema</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Nome *</label>
+                            <input type="text" id="clienteNome" placeholder="Nome completo">
+                        </div>
+                        <div class="input-group">
+                            <label>CPF/CNPJ</label>
+                            <input type="text" id="clienteDocumento" placeholder="CPF ou CNPJ">
+                        </div>
+                        <div class="input-group">
+                            <label>Telefone</label>
+                            <input type="text" id="clienteTelefone" placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" id="clienteEmail" placeholder="email@exemplo.com">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Endereço</label>
+                            <input type="text" id="clienteEndereco" placeholder="Endereço completo">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="cadastrarCliente()">
+                        <span class="btn-icon">💾</span>
+                        Salvar Cliente
+                    </button>
+                </div>
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>📋 Lista de Clientes</h3>
+                        <p>Clientes cadastrados no sistema</p>
+                    </div>
+                    <div id="clientesList"></div>
+                </div>
+            </div>
+
+            <div id="tabCatalogo" class="tab-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>➕ Novo Item</h3>
+                        <p>Cadastre materiais ou serviços no catálogo</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Tipo</label>
+                            <select id="itemTipo">
+                                <option value="material">📦 Material</option>
+                                <option value="servico">🔧 Serviço</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Nome *</label>
+                            <input type="text" id="itemNome" placeholder="Nome do item">
+                        </div>
+                        <div class="input-group">
+                            <label>Valor (R$) *</label>
+                            <input type="number" step="0.01" id="itemValor" placeholder="0,00">
+                        </div>
+                        <div class="input-group">
+                            <label>Estoque</label>
+                            <input type="number" id="itemEstoque" placeholder="Quantidade em estoque" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Categoria</label>
+                            <input type="text" id="itemCategoria" placeholder="Ex: Ar Condicionado, Elétrica">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Descrição</label>
+                            <input type="text" id="itemDescricao" placeholder="Descrição opcional">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="cadastrarItem()">
+                        <span class="btn-icon">💾</span>
+                        Salvar Item
+                    </button>
+                </div>
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>📋 Materiais e Serviços</h3>
+                        <p>Itens disponíveis para uso nas OS</p>
+                    </div>
+                    <div id="catalogoList"></div>
+                </div>
+            </div>
+
+            <div id="tabOrdens" class="tab-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>➕ Nova Ordem de Serviço</h3>
+                        <p>Crie uma nova ordem de serviço</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Cliente *</label>
+                            <select id="osCliente"></select>
+                        </div>
+                        <div class="input-group">
+                            <label>Data Abertura *</label>
+                            <input type="date" id="osData">
+                        </div>
+                        <div class="input-group">
+                            <label>Status</label>
+                            <select id="osStatus">
+                                <option value="aberta">🟡 Aberta</option>
+                                <option value="em_andamento">🔵 Em Andamento</option>
+                                <option value="concluida">✅ Concluída</option>
+                                <option value="cancelada">❌ Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Prazo</label>
+                            <input type="date" id="osPrazo">
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">
+                        <h4>📦 Materiais e Serviços</h4>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Selecionar Item</label>
+                            <select id="osItemSelect"></select>
+                        </div>
+                        <div class="input-group">
+                            <label>Quantidade</label>
+                            <input type="number" id="osItemQtd" value="1" min="1">
+                        </div>
+                        <div class="input-group">
+                            <button class="btn-secondary" onclick="adicionarItemOS()">
+                                <span class="btn-icon">➕</span>
+                                Adicionar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="osItensList"></div>
+                    
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Valor Mão de Obra (R$)</label>
+                            <input type="number" step="0.01" id="osMaoObra" placeholder="0,00">
+                        </div>
+                        <div class="input-group">
+                            <label>Desconto (R$)</label>
+                            <input type="number" step="0.01" id="osDesconto" placeholder="0,00">
+                        </div>
+                        <div class="input-group total-preview">
+                            <label>Total:</label>
+                            <strong id="osTotalPreview">R$ 0,00</strong>
+                        </div>
+                    </div>
+                    <div class="input-group full-width">
+                        <label>Descrição do Serviço</label>
+                        <textarea id="osDescricao" rows="3" placeholder="Descrição detalhada do serviço a ser realizado..."></textarea>
+                    </div>
+                    <button class="btn-primary btn-large" onclick="criarOS()">
+                        <span class="btn-icon">📝</span>
+                        Criar Ordem de Serviço
+                    </button>
+                </div>
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>📋 Ordens de Serviço</h3>
+                        <p>Lista de todas as ordens de serviço</p>
+                    </div>
+                    <div class="filter-bar">
+                        <div class="input-group filter-group">
+                            <label>Filtrar por Status</label>
+                            <select id="filtroStatusOS" onchange="filtrarOS()">
+                                <option value="todos">Todos</option>
+                                <option value="aberta">🟡 Abertas</option>
+                                <option value="em_andamento">🔵 Em Andamento</option>
+                                <option value="concluida">✅ Concluídas</option>
+                                <option value="cancelada">❌ Canceladas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="ordensList"></div>
+                </div>
+            </div>
+
+            <div id="tabConfig" class="tab-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>⚙️ Informações da Empresa</h3>
+                        <p>Configure os dados da sua empresa</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group full-width">
+                            <label>Nome da Empresa</label>
+                            <input type="text" id="configEmpresaNome" placeholder="WR Manutenção e Serviços" value="WR Manutenção e Serviços">
+                        </div>
+                        <div class="input-group">
+                            <label>CNPJ</label>
+                            <input type="text" id="configEmpresaCnpj" placeholder="00.000.000/0001-00">
+                        </div>
+                        <div class="input-group">
+                            <label>Telefone</label>
+                            <input type="text" id="configEmpresaTelefone" placeholder="(11) 4444-5555">
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" id="configEmpresaEmail" placeholder="contato@wrmanutencao.com.br">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Endereço</label>
+                            <input type="text" id="configEmpresaEndereco" placeholder="Endereço completo">
+                        </div>
+                        <div class="input-group">
+                            <label>Site</label>
+                            <input type="text" id="configEmpresaSite" placeholder="www.wrmanutencao.com.br">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="salvarConfiguracoes()">
+                        <span class="btn-icon">💾</span>
+                        Salvar Configurações
+                    </button>
+                </div>
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>🔐 Segurança</h3>
+                        <p>Operações administrativas</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Senha Administrativa</label>
+                        <input type="password" id="senhaAdminConfig" placeholder="Senha para limpar dados">
+                    </div>
+                    <button class="btn-danger" onclick="limparTodosDados()">
+                        <span class="btn-icon">🗑️</span>
+                        Limpar Todos os Dados
+                    </button>
+                </div>
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3>📱 Instalar como App</h3>
+                        <p>Instale este sistema no seu celular</p>
+                    </div>
+                    <button class="btn-primary" id="installButton" style="display: none;">
+                        <span class="btn-icon">📲</span>
+                        Instalar App
+                    </button>
+                    <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+                        No Android/Chrome: clique no menu ⋮ e selecione "Instalar aplicativo"<br>
+                        No iPhone/Safari: clique em compartilhar 📤 e "Adicionar à Tela de Início"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar (Mobile) -->
+        <div class="bottom-nav">
+            <button class="bottom-nav-item active" data-tab="dashboard">
+                <span class="bottom-nav-icon">📊</span>
+                <span class="bottom-nav-label">Dashboard</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="clientes">
+                <span class="bottom-nav-icon">👥</span>
+                <span class="bottom-nav-label">Clientes</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="catalogo">
+                <span class="bottom-nav-icon">🛠️</span>
+                <span class="bottom-nav-label">Catálogo</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="ordens">
+                <span class="bottom-nav-icon">📋</span>
+                <span class="bottom-nav-label">OS</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="config">
+                <span class="bottom-nav-icon">⚙️</span>
+                <span class="bottom-nav-label">Config</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modais (mesmos do código anterior) -->
+    <div id="modalEditarCliente" class="modal" onclick="if(event.target===this) fecharModalEditarCliente()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar Cliente</h3>
+                <button class="modal-close" onclick="fecharModalEditarCliente()">×</button>
+            </div>
+            <input type="hidden" id="editClienteId">
+            <div class="input-group"><label>Nome</label><input type="text" id="editClienteNome"></div>
+            <div class="input-group"><label>CPF/CNPJ</label><input type="text" id="editClienteDocumento"></div>
+            <div class="input-group"><label>Telefone</label><input type="text" id="editClienteTelefone"></div>
+            <div class="input-group"><label>Email</label><input type="email" id="editClienteEmail"></div>
+            <div class="input-group"><label>Endereço</label><input type="text" id="editClienteEndereco"></div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="salvarEdicaoCliente()">Salvar</button>
+                <button class="btn-secondary" onclick="fecharModalEditarCliente()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEditarItem" class="modal" onclick="if(event.target===this) fecharModalEditarItem()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar Item</h3>
+                <button class="modal-close" onclick="fecharModalEditarItem()">×</button>
+            </div>
+            <input type="hidden" id="editItemId">
+            <div class="input-group"><label>Tipo</label>
+                <select id="editItemTipo"><option value="material">Material</option><option value="servico">Serviço</option></select>
+            </div>
+            <div class="input-group"><label>Nome</label><input type="text" id="editItemNome"></div>
+            <div class="input-group"><label>Valor (R$)</label><input type="number" step="0.01" id="editItemValor"></div>
+            <div class="input-group"><label>Estoque</label><input type="number" id="editItemEstoque"></div>
+            <div class="input-group"><label>Categoria</label><input type="text" id="editItemCategoria"></div>
+            <div class="input-group"><label>Descrição</label><input type="text" id="editItemDescricao"></div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="salvarEdicaoItem()">Salvar</button>
+                <button class="btn-secondary" onclick="fecharModalEditarItem()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEditarOS" class="modal" onclick="if(event.target===this) fecharModalEditarOS()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar Ordem de Serviço</h3>
+                <button class="modal-close" onclick="fecharModalEditarOS()">×</button>
+            </div>
+            <input type="hidden" id="editOSId">
+            <div class="input-group"><label>Cliente</label><select id="editOSCliente"></select></div>
+            <div class="input-group"><label>Data Abertura</label><input type="date" id="editOSData"></div>
+            <div class="input-group"><label>Status</label>
+                <select id="editOSStatus">
+                    <option value="aberta">Aberta</option>
+                    <option value="em_andamento">Em Andamento</option>
+                    <option value="concluida">Concluída</option>
+                    <option value="cancelada">Cancelada</option>
+                </select>
+            </div>
+            <div class="input-group"><label>Prazo</label><input type="date" id="editOSPrazo"></div>
+            <div class="input-group"><label>Descrição</label><textarea id="editOSDescricao" rows="3"></textarea></div>
+            <div class="input-group"><label>Mão de Obra (R$)</label><input type="number" step="0.01" id="editOSMaoObra"></div>
+            <div class="input-group"><label>Desconto (R$)</label><input type="number" step="0.01" id="editOSDesconto"></div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="salvarEdicaoOS()">Salvar</button>
+                <button class="btn-secondary" onclick="fecharModalEditarOS()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalFinalizarOS" class="modal" onclick="if(event.target===this) fecharModalFinalizarOS()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✅ Finalizar Ordem de Serviço</h3>
+                <button class="modal-close" onclick="fecharModalFinalizarOS()">×</button>
+            </div>
+            <div id="finalizarOSContent"></div>
+            <div class="input-group">
+                <label>Data de Conclusão</label>
+                <input type="date" id="finalizarDataConclusao">
+            </div>
+            <div class="input-group">
+                <label>Observações Finais</label>
+                <textarea id="finalizarObservacoes" rows="3" placeholder="Registre observações sobre o serviço realizado..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="confirmarFinalizarOS()">✅ Confirmar Finalização</button>
+                <button class="btn-secondary" onclick="fecharModalFinalizarOS()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalOS" class="modal" onclick="if(event.target===this) fecharModalOS()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📄 Detalhes da Ordem de Serviço</h3>
+                <button class="modal-close" onclick="fecharModalOS()">×</button>
+            </div>
+            <div id="modalOSContent"></div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="gerarPDFAtual()">📄 Gerar PDF</button>
+                <button class="btn-secondary" onclick="fecharModalOS()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
