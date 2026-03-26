@@ -1,17 +1,6 @@
-// ============================================
-// WR Manutenção e Serviços - Script Principal
-// ============================================
 
-// ============================================
-// CONFIGURAÇÕES
-// ============================================
-const API_URL = "https://script.google.com/macros/s/AKfycbzjzjv857Bz93XII5kGiWJq0iw8XTZ1c-sPxkr081uQ62E7Uy5r2WSmtcgL4ubwTpI7lA/exec";
-
-// Credenciais locais
-const USUARIOS_LOCAIS = {
-    admin: { senha: "wr@2024", nome: "Administrador" },
-    tecnico: { senha: "tec123", nome: "Técnico João" }
-};
+// URL DO SEU APPS SCRIPT - SUBSTITUA PELA SUA!
+const API_URL = "https://script.google.com/macros/s/AKfycbztW9LS1vkMx-M6QhBvylBlmUxzKBkgBn5tBERQO1P-vCylTiBidCdk4uyU7-FjUxda4Q/exec";
 
 // Dados globais
 let usuarioAtual = null;
@@ -19,36 +8,56 @@ let dados = {
     clientes: [],
     catalogo: [],
     ordens: [],
-    configuracoes: {
-        empresaNome: "WR Manutenção e Serviços",
-        empresaCnpj: "12.345.678/0001-90",
-        empresaTelefone: "(11) 4444-5555",
-        empresaEmail: "contato@wrmanutencao.com.br",
-        empresaEndereco: "Rua das Oficinas, 100 - Centro",
-        empresaSite: "www.wrmanutencao.com.br"
-    }
+    configuracoes: {}
 };
 
 let osItensTemp = [];
 let statusChart = null, monthlyChart = null;
 let osSelecionada = null;
-let osParaFinalizar = null;
 
 // ============================================
 // FUNÇÕES DE LOADING
 // ============================================
 function showLoading() {
-    document.getElementById('loading').classList.add('active');
+    const loading = document.getElementById('loading');
+    if (loading) loading.classList.add('active');
 }
 
 function hideLoading() {
-    document.getElementById('loading').classList.remove('active');
+    const loading = document.getElementById('loading');
+    if (loading) loading.classList.remove('active');
+}
+
+// ============================================
+// FUNÇÕES DE API
+// ============================================
+async function apiGet(endpoint) {
+    try {
+        const response = await fetch(`${API_URL}?tipo=${endpoint}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`Erro na API (GET ${endpoint}):`, error);
+        return null;
+    }
+}
+
+async function apiPost(data) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erro na API (POST):', error);
+        return null;
+    }
 }
 
 // ============================================
 // LOGIN
 // ============================================
-function realizarLogin() {
+async function realizarLogin() {
     const usuario = document.getElementById('loginUsuario').value.trim();
     const senha = document.getElementById('loginSenha').value;
     
@@ -57,45 +66,45 @@ function realizarLogin() {
         return;
     }
     
-    const usuarioLocal = USUARIOS_LOCAIS[usuario];
-    if (usuarioLocal && usuarioLocal.senha === senha) {
-        usuarioAtual = { usuario: usuario, nome: usuarioLocal.nome };
+    showLoading();
+    
+    const result = await apiPost({
+        tipo: "login",
+        usuario: usuario,
+        senha: senha
+    });
+    
+    hideLoading();
+    
+    if (result && result.auth) {
+        usuarioAtual = { usuario: usuario, nome: result.nome };
         localStorage.setItem('wrSession', JSON.stringify(usuarioAtual));
         entrarNoApp();
-        return;
+    } else {
+        alert('❌ Usuário ou senha inválidos!');
     }
-    
-    showLoading();
-    fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ tipo: "login", usuario: usuario, senha: senha })
-    })
-    .then(res => res.json())
-    .then(result => {
-        hideLoading();
-        if (result && result.auth) {
-            usuarioAtual = { usuario: usuario, nome: result.nome };
-            localStorage.setItem('wrSession', JSON.stringify(usuarioAtual));
-            entrarNoApp();
-        } else {
-            alert('❌ Usuário ou senha inválidos!');
-        }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error("Erro na API:", error);
-        alert('❌ Erro de conexão. Use as credenciais locais:\nUsuário: admin\nSenha: wr@2024');
-    });
 }
 
 function entrarNoApp() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').classList.add('active');
-    document.getElementById('userName').innerText = usuarioAtual.nome;
-    document.getElementById('welcomeName').innerText = usuarioAtual.nome;
-    document.getElementById('osData').value = new Date().toISOString().split('T')[0];
-    document.getElementById('finalizarDataConclusao').value = new Date().toISOString().split('T')[0];
-    carregarDados();
+    
+    // Atualizar nome do usuário em ambos os lugares
+    const userNameElements = document.querySelectorAll('.user-name');
+    userNameElements.forEach(el => {
+        if (el) el.innerText = usuarioAtual.nome;
+    });
+    
+    const welcomeName = document.getElementById('welcomeName');
+    if (welcomeName) welcomeName.innerText = usuarioAtual.nome;
+    
+    const osData = document.getElementById('osData');
+    if (osData) osData.value = new Date().toISOString().split('T')[0];
+    
+    const finalizarData = document.getElementById('finalizarDataConclusao');
+    if (finalizarData) finalizarData.value = new Date().toISOString().split('T')[0];
+    
+    carregarTodosDados();
 }
 
 function fazerLogout() {
@@ -106,36 +115,54 @@ function fazerLogout() {
 }
 
 // ============================================
-// CARREGAR DADOS
+// CARREGAR DADOS DA PLANILHA
 // ============================================
-async function carregarDados() {
+async function carregarTodosDados() {
     showLoading();
     
     try {
         const [clientesRes, catalogoRes, ordensRes, configRes] = await Promise.all([
-            fetch(`${API_URL}?tipo=clientes`).then(r => r.json()).catch(() => ({ res: "erro" })),
-            fetch(`${API_URL}?tipo=catalogo`).then(r => r.json()).catch(() => ({ res: "erro" })),
-            fetch(`${API_URL}?tipo=ordens`).then(r => r.json()).catch(() => ({ res: "erro" })),
-            fetch(`${API_URL}?tipo=config`).then(r => r.json()).catch(() => ({ res: "erro" }))
+            apiGet('clientes'),
+            apiGet('catalogo'),
+            apiGet('ordens'),
+            apiGet('config')
         ]);
         
-        if (clientesRes.res === "ok") dados.clientes = clientesRes.clientes;
-        if (catalogoRes.res === "ok") {
-            dados.catalogo = catalogoRes.catalogo;
-            // Garantir que materiais tenham campo estoque
-            dados.catalogo.forEach(item => {
-                if (item.estoque === undefined) item.estoque = 0;
+        if (clientesRes && clientesRes.res === "ok") dados.clientes = clientesRes.clientes;
+        if (catalogoRes && catalogoRes.res === "ok") dados.catalogo = catalogoRes.catalogo;
+        
+        if (ordensRes && ordensRes.res === "ok") {
+            // Mapear dados do cliente e parsear itensOS para cada OS
+            dados.ordens = ordensRes.ordens.map(os => {
+                const cliente = dados.clientes.find(c => c.id == os.clienteId);
+                
+                // CORREÇÃO: Parsear itensOS se for string
+                let itensOS = os.itensOS;
+                if (typeof itensOS === 'string') {
+                    try {
+                        itensOS = JSON.parse(itensOS);
+                    } catch (e) {
+                        itensOS = [];
+                    }
+                }
+                if (!Array.isArray(itensOS)) itensOS = [];
+                
+                return {
+                    ...os,
+                    itensOS: itensOS,
+                    clienteDocumento: cliente ? cliente.documento : '',
+                    clienteTelefone: cliente ? cliente.telefone : '',
+                    clienteEmail: cliente ? cliente.email : '',
+                    clienteEndereco: cliente ? cliente.endereco : ''
+                };
             });
         }
-        if (ordensRes.res === "ok") dados.ordens = ordensRes.ordens;
-        if (configRes.res === "ok") dados.configuracoes = configRes.config;
+        
+        if (configRes && configRes.res === "ok") dados.configuracoes = configRes.config;
         
     } catch (error) {
-        console.log("Erro na API, carregando dados locais");
-        carregarDadosLocais();
+        console.error("Erro ao carregar dados:", error);
     }
-    
-    if (dados.clientes.length === 0) criarDadosExemplo();
     
     atualizarSelects();
     renderizarClientes();
@@ -146,50 +173,8 @@ async function carregarDados() {
     
     hideLoading();
 }
-
-function carregarDadosLocais() {
-    const saved = localStorage.getItem(`wr_data_${usuarioAtual.usuario}`);
-    if (saved) {
-        const data = JSON.parse(saved);
-        dados.clientes = data.clientes || [];
-        dados.catalogo = data.catalogo || [];
-        dados.ordens = data.ordens || [];
-        dados.configuracoes = data.configuracoes || dados.configuracoes;
-    }
-}
-
-function salvarDadosLocal() {
-    localStorage.setItem(`wr_data_${usuarioAtual.usuario}`, JSON.stringify({
-        clientes: dados.clientes,
-        catalogo: dados.catalogo,
-        ordens: dados.ordens,
-        configuracoes: dados.configuracoes
-    }));
-}
-
-function criarDadosExemplo() {
-    dados.clientes = [
-        { id: 1, nome: "João Silva", documento: "123.456.789-00", telefone: "(11) 99999-1111", email: "joao@email.com", endereco: "Rua A, 123" },
-        { id: 2, nome: "Maria Santos", documento: "987.654.321-00", telefone: "(11) 99999-2222", email: "maria@email.com", endereco: "Av. B, 456" }
-    ];
-    
-    dados.catalogo = [
-        { id: 1, tipo: "material", nome: "Filtro de Ar", valor: 45.90, estoque: 10, categoria: "Ar Condicionado", descricao: "Filtro original" },
-        { id: 2, tipo: "servico", nome: "Manutenção Preventiva", valor: 150.00, estoque: 0, categoria: "Ar Condicionado", descricao: "Revisão completa" },
-        { id: 3, tipo: "material", nome: "Câmera IP", valor: 199.90, estoque: 5, categoria: "Segurança", descricao: "Câmera 4MP" },
-        { id: 4, tipo: "servico", nome: "Instalação de Câmeras", valor: 500.00, estoque: 0, categoria: "Segurança", descricao: "Instalação completa" }
-    ];
-    
-    dados.ordens = [
-        { id: "OS-0001", clienteId: 1, clienteNome: "João Silva", dataAbertura: "2024-01-15", status: "concluida", prazo: "2024-01-30", descricao: "Manutenção de ar condicionado", maoObra: 250, desconto: 0, valorTotal: 400, itensOS: [{ id: 1, nome: "Filtro de Ar", tipo: "material", quantidade: 2, valor: 45.90, subtotal: 91.80 }], dataConclusao: "2024-01-20", observacoes: "Serviço realizado com sucesso" },
-        { id: "OS-0002", clienteId: 2, clienteNome: "Maria Santos", dataAbertura: "2024-02-01", status: "em_andamento", prazo: "2024-02-20", descricao: "Instalação de câmeras", maoObra: 500, desconto: 50, valorTotal: 1250, itensOS: [{ id: 3, nome: "Câmera IP", tipo: "material", quantidade: 4, valor: 199.90, subtotal: 799.60 }], dataConclusao: "", observacoes: "" }
-    ];
-    
-    salvarDadosLocal();
-}
-
 // ============================================
-// CLIENTES - COM EDIÇÃO
+// CLIENTES
 // ============================================
 async function cadastrarCliente() {
     const cliente = {
@@ -207,27 +192,19 @@ async function cadastrarCliente() {
     }
     
     showLoading();
-    try {
-        const result = await fetch(API_URL, { method: 'POST', body: JSON.stringify(cliente) }).then(r => r.json());
-        if (result.res === "ok") {
-            await carregarDados();
-            alert('✅ Cliente cadastrado!');
-            limparFormCliente();
-        } else {
-            throw new Error("Erro na API");
-        }
-    } catch (error) {
-        cliente.id = Date.now();
-        dados.clientes.push(cliente);
-        salvarDadosLocal();
-        renderizarClientes();
-        atualizarSelects();
-        alert('✅ Cliente cadastrado localmente!');
-    }
+    const result = await apiPost(cliente);
     hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Cliente cadastrado!');
+        await carregarTodosDados();
+        limparFormCliente();
+    } else {
+        alert('❌ Erro ao cadastrar cliente!');
+    }
 }
 
-function editarCliente(id) {
+async function editarCliente(id) {
     const cliente = dados.clientes.find(c => c.id === id);
     if (!cliente) return;
     
@@ -241,13 +218,10 @@ function editarCliente(id) {
     document.getElementById('modalEditarCliente').classList.add('active');
 }
 
-function salvarEdicaoCliente() {
-    const id = parseInt(document.getElementById('editClienteId').value);
-    const index = dados.clientes.findIndex(c => c.id === id);
-    if (index === -1) return;
-    
-    dados.clientes[index] = {
-        ...dados.clientes[index],
+async function salvarEdicaoCliente() {
+    const cliente = {
+        tipo: "editar_cliente",
+        id: parseInt(document.getElementById('editClienteId').value),
         nome: document.getElementById('editClienteNome').value,
         documento: document.getElementById('editClienteDocumento').value,
         telefone: document.getElementById('editClienteTelefone').value,
@@ -255,33 +229,46 @@ function salvarEdicaoCliente() {
         endereco: document.getElementById('editClienteEndereco').value
     };
     
-    salvarDadosLocal();
-    renderizarClientes();
-    atualizarSelects();
-    fecharModalEditarCliente();
-    alert('✅ Cliente atualizado!');
+    showLoading();
+    const result = await apiPost(cliente);
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Cliente atualizado!');
+        await carregarTodosDados();
+        fecharModalEditarCliente();
+    } else {
+        alert('❌ Erro ao atualizar cliente!');
+    }
 }
 
 function fecharModalEditarCliente() {
     document.getElementById('modalEditarCliente').classList.remove('active');
 }
 
-function excluirCliente(id) {
+async function excluirCliente(id) {
     if (!confirm('Excluir este cliente?')) return;
-    dados.clientes = dados.clientes.filter(c => c.id !== id);
-    salvarDadosLocal();
-    renderizarClientes();
-    atualizarSelects();
+    
+    showLoading();
+    const result = await apiPost({ tipo: "excluir_cliente", id: id });
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Cliente excluído!');
+        await carregarTodosDados();
+    }
 }
 
 function renderizarClientes() {
     const container = document.getElementById('clientesList');
+    if (!container) return;
+    
     if (!dados.clientes.length) {
         container.innerHTML = '<p style="text-align:center;color:var(--gray-400);">Nenhum cliente cadastrado</p>';
         return;
     }
     
-    let html = '<table class="data-table"><thead> <th>Nome</th><th>Telefone</th><th>Ações</th> </thead><tbody>';
+    let html = '<table class="data-table"><thead><tr><th>Nome</th><th>Telefone</th><th>Ações</th></tr></thead><tbody>';
     dados.clientes.forEach(c => {
         html += `
             <tr>
@@ -307,7 +294,7 @@ function limparFormCliente() {
 }
 
 // ============================================
-// CATÁLOGO - COM EDIÇÃO E ESTOQUE
+// CATÁLOGO
 // ============================================
 async function cadastrarItem() {
     const item = {
@@ -326,27 +313,19 @@ async function cadastrarItem() {
     }
     
     showLoading();
-    try {
-        const result = await fetch(API_URL, { method: 'POST', body: JSON.stringify(item) }).then(r => r.json());
-        if (result.res === "ok") {
-            await carregarDados();
-            alert('✅ Item cadastrado!');
-            limparFormItem();
-        } else {
-            throw new Error("Erro na API");
-        }
-    } catch (error) {
-        item.id = Date.now();
-        dados.catalogo.push(item);
-        salvarDadosLocal();
-        renderizarCatalogo();
-        atualizarSelects();
-        alert('✅ Item cadastrado localmente!');
-    }
+    const result = await apiPost(item);
     hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Item cadastrado!');
+        await carregarTodosDados();
+        limparFormItem();
+    } else {
+        alert('❌ Erro ao cadastrar item!');
+    }
 }
 
-function editarItem(id) {
+async function editarItem(id) {
     const item = dados.catalogo.find(i => i.id === id);
     if (!item) return;
     
@@ -361,13 +340,10 @@ function editarItem(id) {
     document.getElementById('modalEditarItem').classList.add('active');
 }
 
-function salvarEdicaoItem() {
-    const id = parseInt(document.getElementById('editItemId').value);
-    const index = dados.catalogo.findIndex(i => i.id === id);
-    if (index === -1) return;
-    
-    dados.catalogo[index] = {
-        ...dados.catalogo[index],
+async function salvarEdicaoItem() {
+    const item = {
+        tipo: "editar_item",
+        id: parseInt(document.getElementById('editItemId').value),
         tipo: document.getElementById('editItemTipo').value,
         nome: document.getElementById('editItemNome').value,
         valor: parseFloat(document.getElementById('editItemValor').value) || 0,
@@ -376,33 +352,46 @@ function salvarEdicaoItem() {
         descricao: document.getElementById('editItemDescricao').value
     };
     
-    salvarDadosLocal();
-    renderizarCatalogo();
-    atualizarSelects();
-    fecharModalEditarItem();
-    alert('✅ Item atualizado!');
+    showLoading();
+    const result = await apiPost(item);
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Item atualizado!');
+        await carregarTodosDados();
+        fecharModalEditarItem();
+    } else {
+        alert('❌ Erro ao atualizar item!');
+    }
 }
 
 function fecharModalEditarItem() {
     document.getElementById('modalEditarItem').classList.remove('active');
 }
 
-function excluirItem(id) {
+async function excluirItem(id) {
     if (!confirm('Excluir este item?')) return;
-    dados.catalogo = dados.catalogo.filter(i => i.id !== id);
-    salvarDadosLocal();
-    renderizarCatalogo();
-    atualizarSelects();
+    
+    showLoading();
+    const result = await apiPost({ tipo: "excluir_item", id: id });
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Item excluído!');
+        await carregarTodosDados();
+    }
 }
 
 function renderizarCatalogo() {
     const container = document.getElementById('catalogoList');
+    if (!container) return;
+    
     if (!dados.catalogo.length) {
         container.innerHTML = '<p style="text-align:center;color:var(--gray-400);">Nenhum item cadastrado</p>';
         return;
     }
     
-    let html = '<table class="data-table"><thead> <th>Tipo</th><th>Nome</th><th>Valor</th><th>Estoque</th><th>Ações</th> </thead><tbody>';
+    let html = '<table class="data-table"><thead><tr><th>Tipo</th><th>Nome</th><th>Valor</th><th>Estoque</th><th>Ações</th></tr></thead><tbody>';
     dados.catalogo.forEach(i => {
         const estoqueDisplay = i.tipo === 'material' ? (i.estoque || 0) : 'N/A';
         const estoqueClass = (i.estoque || 0) <= 0 && i.tipo === 'material' ? 'style="color:var(--danger);"' : '';
@@ -432,19 +421,23 @@ function limparFormItem() {
 }
 
 // ============================================
-// ORDENS DE SERVIÇO - COM EDIÇÃO E FINALIZAÇÃO
+// ORDENS DE SERVIÇO
 // ============================================
 function adicionarItemOS() {
-    const itemId = parseInt(document.getElementById('osItemSelect').value);
+    const itemSelect = document.getElementById('osItemSelect');
+    const qtdInput = document.getElementById('osItemQtd');
+    
+    if (!itemSelect || !qtdInput) return;
+    
+    const itemId = parseInt(itemSelect.value);
     const item = dados.catalogo.find(i => i.id === itemId);
-    const qtd = parseInt(document.getElementById('osItemQtd').value) || 1;
+    const qtd = parseInt(qtdInput.value) || 1;
     
     if (!item) {
         alert('Selecione um item!');
         return;
     }
     
-    // Verificar estoque para materiais
     if (item.tipo === 'material' && (item.estoque || 0) < qtd) {
         alert(`❌ Estoque insuficiente! Disponível: ${item.estoque || 0} unidades`);
         return;
@@ -481,12 +474,14 @@ function removerItemOS(index) {
 
 function renderizarItensOS() {
     const container = document.getElementById('osItensList');
+    if (!container) return;
+    
     if (!osItensTemp.length) {
         container.innerHTML = '<p style="color:var(--gray-400);">Nenhum item adicionado</p>';
         return;
     }
     
-    let html = '<table class="data-table"><thead> <th>Item</th><th>Qtd</th><th>Valor Unit.</th><th>Subtotal</th><th></th> </thead><tbody>';
+    let html = '<table class="data-table"><thead><tr><th>Item</th><th>Qtd</th><th>Valor Unit.</th><th>Subtotal</th><th></th></tr></thead><tbody>';
     osItensTemp.forEach((i, idx) => {
         html += `
             <tr>
@@ -508,12 +503,21 @@ function atualizarTotalOS() {
     const maoObra = parseFloat(document.getElementById('osMaoObra').value) || 0;
     const desconto = parseFloat(document.getElementById('osDesconto').value) || 0;
     const total = totalMateriais + totalServicos + maoObra - desconto;
-    document.getElementById('osTotalPreview').innerHTML = `R$ ${total.toFixed(2)}`;
+    
+    const totalPreview = document.getElementById('osTotalPreview');
+    if (totalPreview) totalPreview.innerHTML = `R$ ${total.toFixed(2)}`;
     return total;
 }
 
+// ============================================
+// CRIAR ORDEM DE SERVIÇO - VERSÃO CORRIGIDA
+// ============================================
+
 async function criarOS() {
-    const clienteId = parseInt(document.getElementById('osCliente').value);
+    const clienteSelect = document.getElementById('osCliente');
+    if (!clienteSelect) return;
+    
+    const clienteId = parseInt(clienteSelect.value);
     const cliente = dados.clientes.find(c => c.id === clienteId);
     
     if (!cliente) {
@@ -523,76 +527,74 @@ async function criarOS() {
     
     const maoObra = parseFloat(document.getElementById('osMaoObra').value) || 0;
     const desconto = parseFloat(document.getElementById('osDesconto').value) || 0;
-    const totalMateriais = osItensTemp.filter(i => i.tipo === 'material').reduce((s, i) => s + i.subtotal, 0);
-    const totalServicos = osItensTemp.filter(i => i.tipo === 'servico').reduce((s, i) => s + i.subtotal, 0);
+    const dataAbertura = document.getElementById('osData').value;
+    const status = document.getElementById('osStatus').value;
+    const prazo = document.getElementById('osPrazo').value;
+    const descricao = document.getElementById('osDescricao').value;
+    
+    if (!dataAbertura) {
+        alert('❌ Preencha a data!');
+        return;
+    }
+    
+    // Calcular totais dos itens
+    const totalMateriais = osItensTemp.filter(i => i.tipo === 'material').reduce((s, i) => s + (i.valor * i.quantidade), 0);
+    const totalServicos = osItensTemp.filter(i => i.tipo === 'servico').reduce((s, i) => s + (i.valor * i.quantidade), 0);
     const valorTotal = totalMateriais + totalServicos + maoObra - desconto;
+    
+    // CORREÇÃO: Garantir que os itens estejam no formato correto
+    const itensOS = osItensTemp.map(item => ({
+        id: item.id,
+        tipo: item.tipo,
+        nome: item.nome,
+        valor: item.valor,
+        quantidade: item.quantidade,
+        subtotal: item.valor * item.quantidade
+    }));
     
     const os = {
         tipo: "criar_os",
         clienteId: cliente.id,
         clienteNome: cliente.nome,
-        dataAbertura: document.getElementById('osData').value,
-        status: document.getElementById('osStatus').value,
-        prazo: document.getElementById('osPrazo').value,
-        descricao: document.getElementById('osDescricao').value,
+        dataAbertura: dataAbertura,
+        status: status,
+        prazo: prazo,
+        descricao: descricao,
         maoObra: maoObra,
         desconto: desconto,
-        itensOS: osItensTemp,
+        itensOS: itensOS,
         valorTotal: valorTotal
     };
     
-    if (!os.dataAbertura) {
-        alert('❌ Preencha a data!');
-        return;
-    }
+    console.log('Enviando OS:', os); // Debug
     
     showLoading();
     
     try {
-        const result = await fetch(API_URL, { method: 'POST', body: JSON.stringify(os) }).then(r => r.json());
-        if (result.res === "ok") {
-            await carregarDados();
-            alert(`✅ OS ${result.id} criada!`);
+        const result = await apiPost(os);
+        console.log('Resposta:', result); // Debug
+        
+        if (result && result.res === "ok") {
+            alert(`✅ OS ${result.id} criada com sucesso!`);
+            await carregarTodosDados();
             limparFormOS();
+            mudarTab('ordens');
         } else {
-            throw new Error("Erro na API");
+            alert('❌ Erro ao criar OS: ' + (result?.msg || 'Erro desconhecido'));
         }
     } catch (error) {
-        const novoId = `OS-${String(dados.ordens.length + 1).padStart(4, '0')}`;
-        dados.ordens.unshift({
-            id: novoId,
-            ...os,
-            dataConclusao: "",
-            observacoes: "",
-            criadoEm: new Date().toISOString()
-        });
-        
-        // Dar baixa no estoque
-        osItensTemp.forEach(item => {
-            if (item.tipo === 'material') {
-                const catalogoItem = dados.catalogo.find(i => i.id === item.id);
-                if (catalogoItem) {
-                    catalogoItem.estoque = (catalogoItem.estoque || 0) - item.quantidade;
-                }
-            }
-        });
-        
-        salvarDadosLocal();
-        renderizarOrdens();
-        atualizarDashboard();
-        renderizarCatalogo();
-        limparFormOS();
-        alert(`✅ OS ${novoId} criada localmente!`);
+        console.error('Erro ao criar OS:', error);
+        alert('❌ Erro de conexão ao criar OS!');
+    } finally {
+        hideLoading();
     }
-    hideLoading();
 }
 
-function editarOS(id) {
+async function editarOS(id) {
     const os = dados.ordens.find(o => o.id === id);
     if (!os) return;
     
     document.getElementById('editOSId').value = os.id;
-    document.getElementById('editOSCliente').value = os.clienteId;
     document.getElementById('editOSData').value = os.dataAbertura;
     document.getElementById('editOSStatus').value = os.status;
     document.getElementById('editOSPrazo').value = os.prazo || '';
@@ -600,53 +602,49 @@ function editarOS(id) {
     document.getElementById('editOSMaoObra').value = os.maoObra;
     document.getElementById('editOSDesconto').value = os.desconto || 0;
     
-    // Preencher select de clientes
     const select = document.getElementById('editOSCliente');
-    select.innerHTML = '<option value="">Selecione um cliente</option>';
-    dados.clientes.forEach(c => {
-        select.innerHTML += `<option value="${c.id}" ${c.id === os.clienteId ? 'selected' : ''}>${c.nome}</option>`;
-    });
+    if (select) {
+        select.innerHTML = '<option value="">Selecione um cliente</option>';
+        dados.clientes.forEach(c => {
+            select.innerHTML += `<option value="${c.id}" ${c.id === os.clienteId ? 'selected' : ''}>${c.nome}</option>`;
+        });
+    }
     
     document.getElementById('modalEditarOS').classList.add('active');
 }
 
-function salvarEdicaoOS() {
-    const id = document.getElementById('editOSId').value;
-    const index = dados.ordens.findIndex(o => o.id === id);
-    if (index === -1) return;
-    
-    const clienteId = parseInt(document.getElementById('editOSCliente').value);
-    const cliente = dados.clientes.find(c => c.id === clienteId);
-    
-    dados.ordens[index] = {
-        ...dados.ordens[index],
-        clienteId: clienteId,
-        clienteNome: cliente ? cliente.nome : dados.ordens[index].clienteNome,
+async function salvarEdicaoOS() {
+    const os = {
+        tipo: "editar_os",
+        id: document.getElementById('editOSId').value,
+        clienteId: parseInt(document.getElementById('editOSCliente').value),
         dataAbertura: document.getElementById('editOSData').value,
         status: document.getElementById('editOSStatus').value,
         prazo: document.getElementById('editOSPrazo').value,
         descricao: document.getElementById('editOSDescricao').value,
         maoObra: parseFloat(document.getElementById('editOSMaoObra').value) || 0,
-        desconto: parseFloat(document.getElementById('editOSDesconto').value) || 0
+        desconto: parseFloat(document.getElementById('editOSDesconto').value) || 0,
+        itensOS: []
     };
     
-    // Recalcular total
-    const totalMateriais = (dados.ordens[index].itensOS || []).filter(i => i.tipo === 'material').reduce((s, i) => s + i.subtotal, 0);
-    const totalServicos = (dados.ordens[index].itensOS || []).filter(i => i.tipo === 'servico').reduce((s, i) => s + i.subtotal, 0);
-    dados.ordens[index].valorTotal = totalMateriais + totalServicos + dados.ordens[index].maoObra - dados.ordens[index].desconto;
+    showLoading();
+    const result = await apiPost(os);
+    hideLoading();
     
-    salvarDadosLocal();
-    renderizarOrdens();
-    atualizarDashboard();
-    fecharModalEditarOS();
-    alert('✅ OS atualizada!');
+    if (result && result.res === "ok") {
+        alert('✅ OS atualizada!');
+        await carregarTodosDados();
+        fecharModalEditarOS();
+    } else {
+        alert('❌ Erro ao atualizar OS!');
+    }
 }
 
 function fecharModalEditarOS() {
     document.getElementById('modalEditarOS').classList.remove('active');
 }
 
-function finalizarOS(id) {
+async function finalizarOS(id) {
     const os = dados.ordens.find(o => o.id === id);
     if (!os) return;
     
@@ -655,97 +653,60 @@ function finalizarOS(id) {
         return;
     }
     
-    osParaFinalizar = os;
+    const dataConclusao = document.getElementById('finalizarDataConclusao').value;
+    const observacoes = document.getElementById('finalizarObservacoes').value;
     
-    const container = document.getElementById('finalizarOSContent');
-    let itensHtml = '';
-    if (os.itensOS && os.itensOS.length) {
-        itensHtml = '<table class="data-table"><thead> <th>Item</th><th>Qtd</th><th>Valor</th> </thead><tbody>';
-        os.itensOS.forEach(item => {
-            itensHtml += `<tr><td>${item.nome}</td><td>${item.quantidade}</td><td>R$ ${item.subtotal.toFixed(2)}</td></tr>`;
-        });
-        itensHtml += '</tbody></table>';
-    } else {
-        itensHtml = '<p>Nenhum item adicionado</p>';
-    }
+    showLoading();
+    const result = await apiPost({
+        tipo: "finalizar_os",
+        id: id,
+        dataConclusao: dataConclusao,
+        observacoes: observacoes
+    });
+    hideLoading();
     
-    container.innerHTML = `
-        <div><strong>OS #${os.id}</strong></div>
-        <div><strong>Cliente:</strong> ${os.clienteNome}</div>
-        <div><strong>Descrição:</strong> ${os.descricao}</div>
-        <div style="margin: 12px 0;"><strong>Itens Utilizados:</strong></div>
-        ${itensHtml}
-        <div style="margin-top: 12px;"><strong>Total: R$ ${os.valorTotal.toFixed(2)}</strong></div>
-    `;
-    
-    document.getElementById('finalizarDataConclusao').value = new Date().toISOString().split('T')[0];
-    document.getElementById('finalizarObservacoes').value = '';
-    
-    document.getElementById('modalFinalizarOS').classList.add('active');
-}
-
-function confirmarFinalizarOS() {
-    if (!osParaFinalizar) return;
-    
-    const index = dados.ordens.findIndex(o => o.id === osParaFinalizar.id);
-    if (index === -1) return;
-    
-    dados.ordens[index].status = 'concluida';
-    dados.ordens[index].dataConclusao = document.getElementById('finalizarDataConclusao').value;
-    dados.ordens[index].observacoes = document.getElementById('finalizarObservacoes').value;
-    
-    // Dar baixa no estoque se ainda não foi dado
-    if (osParaFinalizar.itensOS) {
-        osParaFinalizar.itensOS.forEach(item => {
-            if (item.tipo === 'material') {
-                const catalogoItem = dados.catalogo.find(i => i.id === item.id);
-                if (catalogoItem && catalogoItem.estoque) {
-                    // Verificar se já deu baixa
-                    const osOriginal = dados.ordens.find(o => o.id === osParaFinalizar.id);
-                    const jaDeuBaixa = osOriginal && osOriginal.status === 'concluida';
-                    if (!jaDeuBaixa) {
-                        catalogoItem.estoque = (catalogoItem.estoque || 0) - item.quantidade;
-                    }
-                }
+    if (result && result.res === "ok") {
+        alert('✅ OS finalizada com sucesso!');
+        await carregarTodosDados();
+        fecharModalFinalizarOS();
+        
+        setTimeout(() => {
+            if (confirm('Deseja gerar o PDF da OS finalizada?')) {
+                gerarPDFUnico(id);
             }
-        });
+        }, 500);
+    } else {
+        alert('❌ Erro ao finalizar OS!');
     }
-    
-    salvarDadosLocal();
-    renderizarOrdens();
-    atualizarDashboard();
-    renderizarCatalogo();
-    fecharModalFinalizarOS();
-    
-    // Gerar PDF automaticamente ao finalizar
-    setTimeout(() => {
-        if (confirm('✅ OS finalizada! Deseja gerar o PDF agora?')) {
-            gerarPDFUnico(osParaFinalizar.id);
-        }
-    }, 500);
-    
-    osParaFinalizar = null;
 }
 
 function fecharModalFinalizarOS() {
     document.getElementById('modalFinalizarOS').classList.remove('active');
-    osParaFinalizar = null;
 }
 
-function excluirOS(id) {
+async function excluirOS(id) {
     if (!confirm('Excluir esta OS?')) return;
-    dados.ordens = dados.ordens.filter(o => o.id !== id);
-    salvarDadosLocal();
-    renderizarOrdens();
-    atualizarDashboard();
+    
+    showLoading();
+    const result = await apiPost({ tipo: "excluir_os", id: id });
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ OS excluída!');
+        await carregarTodosDados();
+    }
 }
 
 function renderizarOrdens() {
-    const filtro = document.getElementById('filtroStatusOS').value;
+    const container = document.getElementById('ordensList');
+    if (!container) return;
+    
+    const filtroSelect = document.getElementById('filtroStatusOS');
+    const filtro = filtroSelect ? filtroSelect.value : 'todos';
+    
     let lista = dados.ordens;
     if (filtro !== 'todos') lista = dados.ordens.filter(o => o.status === filtro);
     
-    const container = document.getElementById('ordensList');
     if (!lista.length) {
         container.innerHTML = '<p style="text-align:center;color:var(--gray-400);">Nenhuma OS encontrada</p>';
         return;
@@ -772,7 +733,7 @@ function renderizarOrdens() {
                 <div class="os-actions">
                     <button class="btn-icon-action btn-edit" onclick="visualizarOS('${os.id}')">👁️ Visualizar</button>
                     <button class="btn-icon-action btn-edit" onclick="editarOS('${os.id}')">✏️ Editar</button>
-                    ${os.status !== 'concluida' ? `<button class="btn-icon-action btn-success" onclick="finalizarOS('${os.id}')">✅ Finalizar</button>` : ''}
+                    ${os.status !== 'concluida' ? `<button class="btn-icon-action btn-success" onclick="abrirModalFinalizarOS('${os.id}')">✅ Finalizar</button>` : ''}
                     <button class="btn-icon-action btn-delete" onclick="excluirOS('${os.id}')">🗑️ Excluir</button>
                     <button class="btn-icon-action btn-pdf" onclick="gerarPDFUnico('${os.id}')">📄 PDF</button>
                 </div>
@@ -782,20 +743,63 @@ function renderizarOrdens() {
     container.innerHTML = html;
 }
 
+function abrirModalFinalizarOS(id) {
+    const os = dados.ordens.find(o => o.id === id);
+    if (!os) return;
+    
+    const container = document.getElementById('finalizarOSContent');
+    if (!container) return;
+    
+    let itensHtml = '';
+    if (os.itensOS && os.itensOS.length) {
+        itensHtml = '<table class="data-table"><thead><tr><th>Item</th><th>Qtd</th><th>Valor</th></tr></thead><tbody>';
+        os.itensOS.forEach(item => {
+            itensHtml += `<tr><td>${item.nome}</td><td>${item.quantidade}</td><td>R$ ${(item.valor * item.quantidade).toFixed(2)}</td></tr>`;
+        });
+        itensHtml += '</tbody></table>';
+    } else {
+        itensHtml = '<p>Nenhum item adicionado</p>';
+    }
+    
+    container.innerHTML = `
+        <div><strong>OS #${os.id}</strong></div>
+        <div><strong>Cliente:</strong> ${os.clienteNome}</div>
+        <div><strong>Descrição:</strong> ${os.descricao}</div>
+        <div style="margin: 12px 0;"><strong>Itens Utilizados:</strong></div>
+        ${itensHtml}
+        <div style="margin-top: 12px;"><strong>Total: R$ ${os.valorTotal.toFixed(2)}</strong></div>
+    `;
+    
+    const dataConclusao = document.getElementById('finalizarDataConclusao');
+    const observacoes = document.getElementById('finalizarObservacoes');
+    
+    if (dataConclusao) dataConclusao.value = new Date().toISOString().split('T')[0];
+    if (observacoes) observacoes.value = '';
+    
+    window.osParaFinalizarId = id;
+    document.getElementById('modalFinalizarOS').classList.add('active');
+}
+
+function confirmarFinalizarOS() {
+    if (window.osParaFinalizarId) {
+        finalizarOS(window.osParaFinalizarId);
+    }
+}
+
 function visualizarOS(id) {
     osSelecionada = dados.ordens.find(o => o.id === id);
     if (!osSelecionada) return;
     
     const modal = document.getElementById('modalOS');
     const content = document.getElementById('modalOSContent');
+    if (!modal || !content) return;
     
-    // Gerar lista de itens
     let itensHtml = '';
     if (osSelecionada.itensOS && osSelecionada.itensOS.length) {
         itensHtml = '<div style="margin-top:12px;"><strong>📦 Materiais e Serviços Utilizados:</strong></div>';
-        itensHtml += '<table class="data-table" style="margin-top:8px;"><thead> <th>Item</th><th>Qtd</th><th>Valor Unit.</th><th>Subtotal</th> </thead><tbody>';
+        itensHtml += '<table class="data-table" style="margin-top:8px;"><thead><tr><th>Item</th><th>Qtd</th><th>Valor Unit.</th><th>Subtotal</th></tr></thead><tbody>';
         osSelecionada.itensOS.forEach(item => {
-            itensHtml += `<tr><td>${item.nome}</td><td>${item.quantidade}</td><td>R$ ${item.valor.toFixed(2)}</td><td>R$ ${item.subtotal.toFixed(2)}</td></tr>`;
+            itensHtml += `<tr><td>${item.nome}</td><td>${item.quantidade}</td><td>R$ ${item.valor.toFixed(2)}</td><td>R$ ${(item.valor * item.quantidade).toFixed(2)}</td></tr>`;
         });
         itensHtml += '</tbody></table>';
     }
@@ -824,7 +828,11 @@ function fecharModalOS() {
 }
 
 function gerarPDFAtual() {
-    if (osSelecionada) gerarPDFUnico(osSelecionada.id);
+    if (osSelecionada) {
+        gerarPDFUnico(osSelecionada.id);
+    } else {
+        alert('❌ Nenhuma OS selecionada!');
+    }
 }
 
 function filtrarOS() {
@@ -834,78 +842,77 @@ function filtrarOS() {
 function limparFormOS() {
     osItensTemp = [];
     renderizarItensOS();
-    document.getElementById('osDescricao').value = '';
-    document.getElementById('osMaoObra').value = '';
-    document.getElementById('osDesconto').value = '';
-    document.getElementById('osData').value = new Date().toISOString().split('T')[0];
-    document.getElementById('osTotalPreview').innerHTML = 'R$ 0,00';
+    
+    const descricao = document.getElementById('osDescricao');
+    const maoObra = document.getElementById('osMaoObra');
+    const desconto = document.getElementById('osDesconto');
+    const osData = document.getElementById('osData');
+    const totalPreview = document.getElementById('osTotalPreview');
+    
+    if (descricao) descricao.value = '';
+    if (maoObra) maoObra.value = '';
+    if (desconto) desconto.value = '';
+    if (osData) osData.value = new Date().toISOString().split('T')[0];
+    if (totalPreview) totalPreview.innerHTML = 'R$ 0,00';
 }
 
 // ============================================
 // DASHBOARD
 // ============================================
-function atualizarDashboard() {
-    const total = dados.ordens.length;
-    const abertas = dados.ordens.filter(o => o.status === 'aberta').length;
-    const andamento = dados.ordens.filter(o => o.status === 'em_andamento').length;
-    const concluidas = dados.ordens.filter(o => o.status === 'concluida').length;
-    const faturamento = dados.ordens.filter(o => o.status === 'concluida').reduce((s, o) => s + (parseFloat(o.valorTotal) || 0), 0);
+async function atualizarDashboard() {
+    const result = await apiGet('dashboard');
     
-    document.getElementById('statTotal').innerText = total;
-    document.getElementById('statAbertas').innerText = abertas;
-    document.getElementById('statAndamento').innerText = andamento;
-    document.getElementById('statConcluidas').innerText = concluidas;
-    document.getElementById('statFaturamento').innerText = `R$ ${faturamento.toFixed(2)}`;
-    
-    const ctxStatus = document.getElementById('statusChart').getContext('2d');
-    if (statusChart) statusChart.destroy();
-    statusChart = new Chart(ctxStatus, {
-        type: 'doughnut',
-        data: {
-            labels: ['Abertas', 'Em Andamento', 'Concluídas', 'Canceladas'],
-            datasets: [{
-                data: [abertas, andamento, concluidas, dados.ordens.filter(o => o.status === 'cancelada').length],
-                backgroundColor: ['#F59E0B', '#3B82F6', '#10B981', '#EF4444']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: { legend: { position: 'bottom' } }
+    if (result && result.res === "ok") {
+        const stats = result.stats;
+        
+        const statTotal = document.getElementById('statTotal');
+        const statAbertas = document.getElementById('statAbertas');
+        const statAndamento = document.getElementById('statAndamento');
+        const statConcluidas = document.getElementById('statConcluidas');
+        const statFaturamento = document.getElementById('statFaturamento');
+        
+        if (statTotal) statTotal.innerText = stats.total;
+        if (statAbertas) statAbertas.innerText = stats.abertas;
+        if (statAndamento) statAndamento.innerText = stats.em_andamento;
+        if (statConcluidas) statConcluidas.innerText = stats.concluidas;
+        if (statFaturamento) statFaturamento.innerText = `R$ ${stats.faturamento.toFixed(2)}`;
+        
+        const ctxStatus = document.getElementById('statusChart');
+        if (ctxStatus) {
+            const ctx = ctxStatus.getContext('2d');
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Abertas', 'Em Andamento', 'Concluídas', 'Canceladas'],
+                    datasets: [{
+                        data: [stats.abertas, stats.em_andamento, stats.concluidas, stats.canceladas],
+                        backgroundColor: ['#F59E0B', '#3B82F6', '#10B981', '#EF4444']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            });
         }
-    });
-    
-    const ctxMonthly = document.getElementById('monthlyChart').getContext('2d');
-    if (monthlyChart) monthlyChart.destroy();
-    monthlyChart = new Chart(ctxMonthly, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{
-                label: 'Faturamento (R$)',
-                data: [0, 0, 0, 0, 0, 0],
-                backgroundColor: '#0066CC',
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: { y: { beginAtZero: true, ticks: { callback: v => 'R$ ' + v.toLocaleString('pt-BR') } } }
-        }
-    });
+    }
 }
 
 // ============================================
 // CONFIGURAÇÕES
 // ============================================
 function carregarConfiguracoesForm() {
-    document.getElementById('configEmpresaNome').value = dados.configuracoes.empresaNome || '';
-    document.getElementById('configEmpresaCnpj').value = dados.configuracoes.empresaCnpj || '';
-    document.getElementById('configEmpresaTelefone').value = dados.configuracoes.empresaTelefone || '';
-    document.getElementById('configEmpresaEmail').value = dados.configuracoes.empresaEmail || '';
-    document.getElementById('configEmpresaEndereco').value = dados.configuracoes.empresaEndereco || '';
-    document.getElementById('configEmpresaSite').value = dados.configuracoes.empresaSite || '';
+    const inputs = {
+        configEmpresaNome: dados.configuracoes.empresaNome || '',
+        configEmpresaCnpj: dados.configuracoes.empresaCnpj || '',
+        configEmpresaTelefone: dados.configuracoes.empresaTelefone || '',
+        configEmpresaEmail: dados.configuracoes.empresaEmail || '',
+        configEmpresaEndereco: dados.configuracoes.empresaEndereco || '',
+        configEmpresaSite: dados.configuracoes.empresaSite || ''
+    };
+    
+    for (const [id, value] of Object.entries(inputs)) {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+    }
 }
 
 async function salvarConfiguracoes() {
@@ -919,126 +926,298 @@ async function salvarConfiguracoes() {
         empresaSite: document.getElementById('configEmpresaSite').value
     };
     
-    dados.configuracoes = config;
-    salvarDadosLocal();
-    alert('✅ Configurações salvas!');
+    showLoading();
+    const result = await apiPost(config);
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Configurações salvas!');
+        dados.configuracoes = config;
+    } else {
+        alert('❌ Erro ao salvar configurações!');
+    }
 }
 
-function limparTodosDados() {
+async function limparTodosDados() {
     const senha = document.getElementById('senhaAdminConfig').value;
-    if (senha !== 'wr@2024') {
-        alert('❌ Senha incorreta!');
+    if (!senha) {
+        alert('❌ Digite a senha administrativa!');
         return;
     }
-    if (!confirm('⚠️ Isso apagará TODOS os dados! Confirma?')) return;
+    if (!confirm('⚠️ ATENÇÃO: Isso irá apagar TODOS os dados da planilha! Confirma?')) return;
     
-    dados.clientes = [];
-    dados.catalogo = [];
-    dados.ordens = [];
-    salvarDadosLocal();
-    renderizarClientes();
-    renderizarCatalogo();
-    renderizarOrdens();
-    atualizarDashboard();
-    alert('✅ Todos os dados foram removidos!');
+    showLoading();
+    const result = await apiPost({ tipo: "limpar_tudo", senha: senha });
+    hideLoading();
+    
+    if (result && result.res === "ok") {
+        alert('✅ Todos os dados foram removidos!');
+        await carregarTodosDados();
+    } else if (result && result.msg) {
+        alert('❌ ' + result.msg);
+    } else {
+        alert('❌ Erro ao limpar dados!');
+    }
 }
 
 // ============================================
-// PDF COM LISTA DE MATERIAIS
+// PDF DETALHADO COM TODOS OS ITENS - VERSÃO CORRIGIDA
 // ============================================
-function gerarPDFUnico(id) {
-    const os = dados.ordens.find(o => o.id === id);
-    if (!os) return;
-    
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const cfg = dados.configuracoes;
-    
-    // Cabeçalho
-    doc.setFillColor(0, 102, 204);
-    doc.rect(0, 0, 210, 45, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.text(cfg.empresaNome || "WR Manutenção e Serviços", 105, 20, { align: 'center' });
-    doc.setFontSize(8);
-    doc.text(`CNPJ: ${cfg.empresaCnpj || '-'} | Tel: ${cfg.empresaTelefone || '-'}`, 105, 30, { align: 'center' });
-    doc.text(cfg.empresaEndereco || '', 105, 36, { align: 'center' });
-    
-    // Destinatário
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(10);
-    doc.text('DESTINATÁRIO:', 20, 55);
-    doc.setFont(undefined, 'bold');
-    doc.text(os.clienteNome, 20, 62);
-    doc.setFont(undefined, 'normal');
-    if (os.cliente.documento) doc.text(`Documento: ${os.cliente.documento}`, 20, 69);
-    if (os.cliente.endereco) doc.text(`Endereço: ${os.cliente.endereco}`, 20, 76);
-    if (os.cliente.telefone) doc.text(`Contato: ${os.cliente.telefone}`, 20, 83);
-    
-    // Dados da OS
-    doc.text(`OS #${os.id}`, 20, 95);
-    doc.text(`Data de Abertura: ${formatarData(os.dataAbertura)}`, 20, 102);
-    if (os.prazo) doc.text(`Prazo: ${formatarData(os.prazo)}`, 20, 109);
-    if (os.dataConclusao) doc.text(`Data Conclusão: ${formatarData(os.dataConclusao)}`, 20, 116);
-    doc.text(`Status: ${os.status === 'aberta' ? 'Aberta' : os.status === 'em_andamento' ? 'Em Andamento' : os.status === 'concluida' ? 'Concluída' : 'Cancelada'}`, 20, 123);
-    
-    // Descrição
-    doc.text('DESCRIÇÃO DO SERVIÇO:', 20, 138);
-    doc.setFontSize(10);
-    const descLinhas = doc.splitTextToSize(os.descricao, 170);
-    doc.text(descLinhas, 20, 145);
-    
-    let yPos = 155 + (descLinhas.length * 5);
-    
-    // Lista de Materiais e Serviços
-    if (os.itensOS && os.itensOS.length) {
-        doc.setFontSize(11);
-        doc.setFont(undefined, 'bold');
-        doc.text('MATERIAIS E SERVIÇOS UTILIZADOS:', 20, yPos);
-        yPos += 7;
+
+async function gerarPDFUnico(id) {
+    try {
+        // Buscar a OS atualizada
+        let os = dados.ordens.find(o => o.id === id);
         
-        const itensBody = os.itensOS.map(i => [i.nome, i.quantidade.toString(), `R$ ${i.valor.toFixed(2)}`, `R$ ${i.subtotal.toFixed(2)}`]);
-        doc.autoTable({
-            head: [['Item', 'Qtd', 'Valor Unit.', 'Subtotal']],
-            body: itensBody,
-            startY: yPos,
-            theme: 'grid',
-            styles: { fontSize: 9, cellPadding: 3 },
-            headStyles: { fillColor: [0, 102, 204], textColor: 255 }
-        });
-        yPos = doc.lastAutoTable.finalY + 5;
-    }
-    
-    // Valores
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.text('RESUMO DOS VALORES:', 20, yPos);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Mão de Obra: R$ ${parseFloat(os.maoObra).toFixed(2)}`, 20, yPos + 7);
-    doc.text(`Desconto: R$ ${parseFloat(os.desconto || 0).toFixed(2)}`, 20, yPos + 14);
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(14);
-    doc.text(`TOTAL: R$ ${parseFloat(os.valorTotal).toFixed(2)}`, 20, yPos + 25);
-    
-    // Observações finais
-    if (os.observacoes) {
+        // Se não encontrar, recarregar dados
+        if (!os) {
+            await carregarTodosDados();
+            os = dados.ordens.find(o => o.id === id);
+        }
+        
+        if (!os) {
+            alert('❌ Ordem de Serviço não encontrada!');
+            return;
+        }
+        
+        // CORREÇÃO: Garantir que itensOS seja um array
+        let itensOS = [];
+        if (os.itensOS) {
+            if (typeof os.itensOS === 'string') {
+                try {
+                    itensOS = JSON.parse(os.itensOS);
+                } catch (e) {
+                    console.error('Erro ao parsear itensOS:', e);
+                    itensOS = [];
+                }
+            } else if (Array.isArray(os.itensOS)) {
+                itensOS = os.itensOS;
+            }
+        }
+        
+        // Buscar dados completos do cliente
+        const cliente = dados.clientes.find(c => c.id == os.clienteId);
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const cfg = dados.configuracoes;
+        
+        // CABEÇALHO
+        doc.setFillColor(0, 102, 204);
+        doc.rect(0, 0, 210, 50, 'F');
+        doc.setTextColor(255, 255, 255);
+        
+        doc.setFontSize(22);
+        doc.setFont(undefined, 'bold');
+        doc.text("WR", 20, 25);
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text("Manutenção e Serviços", 20, 33);
+        
+        doc.setFontSize(16);
+        doc.text(cfg.empresaNome || "WR Manutenção e Serviços", 105, 22, { align: 'center' });
+        doc.setFontSize(8);
+        doc.text(`CNPJ: ${cfg.empresaCnpj || '-'} | Tel: ${cfg.empresaTelefone || '-'}`, 105, 32, { align: 'center' });
+        doc.text(cfg.empresaEndereco || '', 105, 38, { align: 'center' });
+        
+        // TÍTULO
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
+        doc.text("ORDEM DE SERVIÇO", 105, 62, { align: 'center' });
+        
+        // INFORMAÇÕES DA OS
         doc.setFontSize(10);
         doc.setFont(undefined, 'bold');
-        doc.text('OBSERVAÇÕES:', 20, yPos + 40);
+        doc.text("Nº da OS:", 20, 78);
         doc.setFont(undefined, 'normal');
-        const obsLinhas = doc.splitTextToSize(os.observacoes, 170);
-        doc.text(obsLinhas, 20, yPos + 47);
+        doc.text(os.id || '-', 60, 78);
+        
+        doc.setFont(undefined, 'bold');
+        doc.text("Data Abertura:", 20, 85);
+        doc.setFont(undefined, 'normal');
+        doc.text(formatarData(os.dataAbertura), 60, 85);
+        
+        doc.setFont(undefined, 'bold');
+        doc.text("Prazo:", 20, 92);
+        doc.setFont(undefined, 'normal');
+        doc.text(formatarData(os.prazo) || '-', 60, 92);
+        
+        doc.setFont(undefined, 'bold');
+        doc.text("Status:", 20, 99);
+        const statusText = os.status === 'aberta' ? '🟡 Aberta' : os.status === 'em_andamento' ? '🔵 Em Andamento' : os.status === 'concluida' ? '✅ Concluída' : '❌ Cancelada';
+        doc.text(statusText, 60, 99);
+        
+        if (os.dataConclusao) {
+            doc.setFont(undefined, 'bold');
+            doc.text("Data Conclusão:", 20, 106);
+            doc.setFont(undefined, 'normal');
+            doc.text(formatarData(os.dataConclusao), 60, 106);
+        }
+        
+        // DADOS DO CLIENTE
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text("DADOS DO CLIENTE", 20, 120);
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.rect(20, 122, 170, 45);
+        
+        let clienteY = 132;
+        doc.text(`Nome: ${os.clienteNome || '-'}`, 25, clienteY);
+        clienteY += 7;
+        
+        if (cliente && cliente.documento) {
+            doc.text(`Documento: ${cliente.documento}`, 25, clienteY);
+            clienteY += 7;
+        }
+        
+        if (cliente && cliente.telefone) {
+            doc.text(`Telefone: ${cliente.telefone}`, 25, clienteY);
+            clienteY += 7;
+        }
+        
+        if (cliente && cliente.email) {
+            doc.text(`Email: ${cliente.email}`, 25, clienteY);
+            clienteY += 7;
+        }
+        
+        if (cliente && cliente.endereco) {
+            doc.text(`Endereço: ${cliente.endereco}`, 25, clienteY);
+        }
+        
+        // DESCRIÇÃO DO SERVIÇO
+        let yPos = 180;
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text("DESCRIÇÃO DO SERVIÇO", 20, yPos);
+        yPos += 7;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        const descLinhas = doc.splitTextToSize(os.descricao || "Sem descrição", 170);
+        doc.text(descLinhas, 20, yPos);
+        yPos += (descLinhas.length * 5) + 5;
+        
+        // LISTA DE MATERIAIS E SERVIÇOS
+        if (itensOS && itensOS.length > 0) {
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text("MATERIAIS E SERVIÇOS UTILIZADOS", 20, yPos);
+            yPos += 5;
+            
+            const itensBody = itensOS.map(i => [
+                i.nome || '-',
+                i.quantidade?.toString() || '0',
+                `R$ ${(i.valor || 0).toFixed(2)}`,
+                `R$ ${((i.valor || 0) * (i.quantidade || 0)).toFixed(2)}`
+            ]);
+            
+            doc.autoTable({
+                head: [['Item', 'Qtd', 'Valor Unit.', 'Subtotal']],
+                body: itensBody,
+                startY: yPos,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 3 },
+                headStyles: { fillColor: [0, 102, 204], textColor: 255, fontStyle: 'bold' },
+                alternateRowStyles: { fillColor: [245, 245, 245] }
+            });
+            yPos = doc.lastAutoTable.finalY + 5;
+        } else {
+            doc.setFontSize(10);
+            doc.text("Nenhum material ou serviço adicionado", 20, yPos);
+            yPos += 10;
+        }
+        
+        // RESUMO DOS VALORES
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text("RESUMO DOS VALORES", 20, yPos);
+        yPos += 7;
+        
+        const totalMateriais = itensOS.filter(i => i.tipo === 'material').reduce((s, i) => s + ((i.valor || 0) * (i.quantidade || 0)), 0);
+        const totalServicos = itensOS.filter(i => i.tipo === 'servico').reduce((s, i) => s + ((i.valor || 0) * (i.quantidade || 0)), 0);
+        const maoObra = parseFloat(os.maoObra) || 0;
+        const desconto = parseFloat(os.desconto) || 0;
+        const subtotal = totalMateriais + totalServicos + maoObra;
+        const valorTotal = subtotal - desconto;
+        
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Total em Materiais:`, 20, yPos);
+        doc.text(`R$ ${totalMateriais.toFixed(2)}`, 130, yPos);
+        yPos += 6;
+        
+        doc.text(`Total em Serviços:`, 20, yPos);
+        doc.text(`R$ ${totalServicos.toFixed(2)}`, 130, yPos);
+        yPos += 6;
+        
+        doc.text(`Mão de Obra:`, 20, yPos);
+        doc.text(`R$ ${maoObra.toFixed(2)}`, 130, yPos);
+        yPos += 6;
+        
+        doc.text(`Subtotal:`, 20, yPos);
+        doc.text(`R$ ${subtotal.toFixed(2)}`, 130, yPos);
+        yPos += 6;
+        
+        if (desconto > 0) {
+            doc.text(`Desconto:`, 20, yPos);
+            doc.text(`- R$ ${desconto.toFixed(2)}`, 130, yPos);
+            yPos += 8;
+        }
+        
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(12);
+        doc.text(`VALOR LÍQUIDO:`, 20, yPos);
+        doc.text(`R$ ${valorTotal.toFixed(2)}`, 130, yPos);
+        yPos += 12;
+        
+        // OBSERVAÇÕES FINAIS
+        if (os.observacoes) {
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text("OBSERVAÇÕES:", 20, yPos);
+            yPos += 5;
+            doc.setFont(undefined, 'normal');
+            const obsLinhas = doc.splitTextToSize(os.observacoes, 170);
+            doc.text(obsLinhas, 20, yPos);
+            yPos += (obsLinhas.length * 5) + 10;
+        }
+        
+        // ASSINATURAS
+        doc.setDrawColor(100, 100, 100);
+        doc.line(20, yPos, 90, yPos);
+        doc.line(120, yPos, 190, yPos);
+        doc.setFontSize(9);
+        doc.text("Assinatura do Responsável Técnico", 20, yPos + 5);
+        doc.text("Assinatura do Cliente", 120, yPos + 5);
+        yPos += 20;
+        
+        // RODAPÉ
+        doc.setFontSize(7);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Documento gerado eletronicamente em: ${new Date().toLocaleString('pt-BR')}`, 105, 280, { align: 'center' });
+        doc.text(`${cfg.empresaSite || ''} - ${cfg.empresaEmail || ''}`, 105, 285, { align: 'center' });
+        
+        // SALVAR PDF
+        const nomeArquivo = `OS_${os.id}_${(os.clienteNome || 'cliente').replace(/\s/g, '_')}.pdf`;
+        doc.save(nomeArquivo);
+        
+        console.log(`✅ PDF gerado: ${nomeArquivo}`);
+        
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        alert('❌ Erro ao gerar PDF. Verifique o console para mais detalhes.');
     }
-    
-    // Rodapé
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 105, 280, { align: 'center' });
-    doc.text(`${cfg.empresaSite || ''} - ${cfg.empresaEmail || ''}`, 105, 285, { align: 'center' });
-    
-    doc.save(`OS_${os.id}_${os.clienteNome.replace(/\s/g, '_')}.pdf`);
 }
 
+// Função auxiliar para garantir que o PDF seja gerado
+function gerarPDF(id) {
+    if (!id) {
+        alert('❌ ID da OS não informado!');
+        return;
+    }
+    gerarPDFUnico(id);
+}
 // ============================================
 // UTILITÁRIOS
 // ============================================
@@ -1071,31 +1250,142 @@ function atualizarSelects() {
 }
 
 function mudarTab(tab) {
+    const tabContent = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+    if (!tabContent) return;
+    
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+    tabContent.classList.add('active');
+    
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
     const tabs = ['dashboard', 'clientes', 'catalogo', 'ordens', 'config'];
     const idx = tabs.indexOf(tab);
-    if (idx >= 0) document.querySelectorAll('.nav-item')[idx].classList.add('active');
+    if (idx >= 0) {
+        const navItems = document.querySelectorAll('.nav-item');
+        if (navItems[idx]) navItems[idx].classList.add('active');
+    }
+    
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    bottomNavItems.forEach(item => {
+        if (item.getAttribute('data-tab') === tab) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
     if (tab === 'ordens') renderizarOrdens();
 }
 
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('open');
+}
+
+function ajustarLayoutMobile() {
+    const isMobile = window.innerWidth < 768;
+    const topBar = document.querySelector('.top-bar-desktop');
+    const sidebar = document.querySelector('.sidebar');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const topBarMobile = document.querySelector('.top-bar-mobile');
+    
+    if (isMobile) {
+        if (topBar) topBar.style.display = 'none';
+        if (sidebar) sidebar.style.display = 'none';
+        if (bottomNav) bottomNav.style.display = 'flex';
+        if (topBarMobile) topBarMobile.style.display = 'flex';
+    } else {
+        if (topBar) topBar.style.display = 'flex';
+        if (sidebar) sidebar.style.display = 'block';
+        if (bottomNav) bottomNav.style.display = 'none';
+        if (topBarMobile) topBarMobile.style.display = 'none';
+    }
+}
+
+function initMobileNavigation() {
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    const sidebarItems = document.querySelectorAll('.sidebar .nav-item');
+    
+    function changeTab(tabId) {
+        mudarTab(tabId);
+    }
+    
+    bottomNavItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const tab = item.getAttribute('data-tab');
+            if (tab) changeTab(tab);
+        });
+    });
+    
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const tab = item.getAttribute('data-tab');
+            if (tab) changeTab(tab);
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) sidebar.classList.remove('open');
+            }
+        });
+    });
+}
+
+// ============================================
+// PWA - INSTALAÇÃO
+// ============================================
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installButton = document.getElementById('installButton');
+    if (installButton && window.innerWidth < 768) {
+        installButton.style.display = 'flex';
+        installButton.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') console.log('App instalado!');
+                deferredPrompt = null;
+                installButton.style.display = 'none';
+            }
+        };
+    }
+});
+
+if ('serviceWorker' in navigator && window.innerWidth < 768) {
+    navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registrado!', reg))
+        .catch(err => console.log('Erro no Service Worker:', err));
 }
 
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    ajustarLayoutMobile();
+    initMobileNavigation();
+    window.addEventListener('resize', () => ajustarLayoutMobile());
+});
+
 const session = localStorage.getItem('wrSession');
 if (session) {
     usuarioAtual = JSON.parse(session);
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').classList.add('active');
-    document.getElementById('userName').innerText = usuarioAtual.nome;
-    document.getElementById('welcomeName').innerText = usuarioAtual.nome;
-    carregarDados();
+    
+    const userNameElements = document.querySelectorAll('.user-name');
+    userNameElements.forEach(el => {
+        if (el) el.innerText = usuarioAtual.nome;
+    });
+    
+    const welcomeName = document.getElementById('welcomeName');
+    if (welcomeName) welcomeName.innerText = usuarioAtual.nome;
+    
+    carregarTodosDados();
+    setTimeout(() => {
+        ajustarLayoutMobile();
+        initMobileNavigation();
+    }, 100);
 }
 
 // Expor funções globalmente
@@ -1130,140 +1420,3 @@ window.filtrarOS = filtrarOS;
 window.salvarConfiguracoes = salvarConfiguracoes;
 window.limparTodosDados = limparTodosDados;
 window.gerarPDFUnico = gerarPDFUnico;
-
-
-
-// ============================================
-// PWA - INSTALAÇÃO COMO APP
-// ============================================
-
-let deferredPrompt;
-
-// Detectar se pode instalar o app
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installButton = document.getElementById('installButton');
-    if (installButton) {
-        installButton.style.display = 'flex';
-        installButton.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('App instalado!');
-                }
-                deferredPrompt = null;
-                installButton.style.display = 'none';
-            }
-        };
-    }
-});
-
-// Registrar Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker registrado!', reg))
-        .catch(err => console.log('Erro no Service Worker:', err));
-}
-
-// ============================================
-// NAVEGAÇÃO MOBILE - BOTTOM NAV
-// ============================================
-
-// Inicializar navegação mobile
-function initMobileNavigation() {
-    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
-    const sidebarItems = document.querySelectorAll('.sidebar .nav-item');
-    
-    // Função para mudar tab
-    function changeTab(tabId) {
-        // Esconder todas as tabs
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
-        
-        // Atualizar sidebar
-        sidebarItems.forEach(item => {
-            if (item.getAttribute('data-tab') === tabId) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-        
-        // Atualizar bottom nav
-        bottomNavItems.forEach(item => {
-            if (item.getAttribute('data-tab') === tabId) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-        
-        // Scroll para o topo
-        document.querySelector('.main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    
-    // Adicionar eventos aos itens do bottom nav
-    bottomNavItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const tab = item.getAttribute('data-tab');
-            if (tab) {
-                changeTab(tab);
-                // Fechar sidebar mobile se estiver aberta
-                const sidebar = document.getElementById('sidebar');
-                if (sidebar.classList.contains('open')) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-    });
-    
-    // Adicionar eventos aos itens da sidebar
-    sidebarItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const tab = item.getAttribute('data-tab');
-            if (tab) {
-                changeTab(tab);
-                // Fechar sidebar em mobile
-                if (window.innerWidth < 768) {
-                    document.getElementById('sidebar').classList.remove('open');
-                }
-            }
-        });
-    });
-}
-
-// Inicializar quando o app estiver pronto
-window.initMobileNavigation = initMobileNavigation;
-
-// Modificar a função mudarTab existente para manter compatibilidade
-const originalMudarTab = window.mudarTab;
-window.mudarTab = function(tab) {
-    if (originalMudarTab) originalMudarTab(tab);
-    
-    // Atualizar bottom nav
-    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
-    bottomNavItems.forEach(item => {
-        if (item.getAttribute('data-tab') === tab) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
-    });
-    
-    // Atualizar sidebar
-    const sidebarItems = document.querySelectorAll('.sidebar .nav-item');
-    sidebarItems.forEach(item => {
-        if (item.getAttribute('data-tab') === tab) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
-    });
-};
-
-// Chamar inicialização quando o app for carregado
-document.addEventListener('DOMContentLoaded', () => {
-    initMobileNavigation();
-});
