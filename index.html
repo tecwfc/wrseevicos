@@ -62,15 +62,23 @@
 
     <!-- Main App -->
     <div id="app" class="app">
+        <!-- Top Bar com Logo (Desktop) -->
+        <div class="top-bar-desktop">
+            <div class="logo-area">
+                <img src="assets/logo_marca.png" alt="WR Manutenção e Serviços" class="logo-top-desktop" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%230066CC%27/%3E%3Ctext x=%2750%27 y=%2765%27 font-size=%2740%27 text-anchor=%27middle%27 fill=%27white%27%3EWR%3C/text%3E%3C/svg%3E'">
+                <div class="logo-text">
+                    <h2>WR Manutenção e Serviços</h2>
+                    <p>Sistema de Ordens de Serviço</p>
+                </div>
+            </div>
+            <div class="user-info-desktop">
+                <span class="user-name" id="userName">Carregando...</span>
+                <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+            </div>
+        </div>
+
         <!-- Sidebar Desktop -->
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-circle-small">
-                    <img src="assets/logo_marca.png" alt="WR Manutenção e Serviços" class="logo-img-sidebar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2750%27 fill=%27%230066CC%27/%3E%3Ctext x=%2750%27 y=%2765%27 font-size=%2740%27 text-anchor=%27middle%27 fill=%27white%27%3EWR%3C/text%3E%3C/svg%3E'">
-                </div>
-                <h2>WR Manutenção e Serviços</h2>
-                <p>Sistema de Ordens de Serviço</p>
-            </div>
             <nav>
                 <div class="nav-item active" data-tab="dashboard">
                     <span class="nav-icon">📊</span>
@@ -97,18 +105,16 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <div class="top-bar">
+            <!-- Top Bar Mobile -->
+            <div class="top-bar-mobile">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-                <div class="user-info">
-                    <span class="user-name" id="userName">Carregando...</span>
-                    <button class="btn-logout" onclick="fazerLogout()">
-                        <span class="btn-icon">🚪</span>
-                        Sair
-                    </button>
+                <div class="user-info-mobile">
+                    <span class="user-name" id="userNameMobile">Carregando...</span>
+                    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
                 </div>
             </div>
 
-            <!-- Conteúdo das Tabs -->
+            <!-- Dashboard Tab -->
             <div id="tabDashboard" class="tab-content active">
                 <div class="welcome-card">
                     <h2>Olá, <span id="welcomeName">Usuário</span>! 👋</h2>
@@ -163,6 +169,7 @@
                 </div>
             </div>
 
+            <!-- Clientes Tab -->
             <div id="tabClientes" class="tab-content">
                 <div class="form-card">
                     <div class="card-header">
@@ -205,6 +212,7 @@
                 </div>
             </div>
 
+            <!-- Catálogo Tab -->
             <div id="tabCatalogo" class="tab-content">
                 <div class="form-card">
                     <div class="card-header">
@@ -254,6 +262,7 @@
                 </div>
             </div>
 
+            <!-- Ordens de Serviço Tab -->
             <div id="tabOrdens" class="tab-content">
                 <div class="form-card">
                     <div class="card-header">
@@ -349,6 +358,7 @@
                 </div>
             </div>
 
+            <!-- Configurações Tab -->
             <div id="tabConfig" class="tab-content">
                 <div class="form-card">
                     <div class="card-header">
