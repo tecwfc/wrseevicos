@@ -1,32 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WR Manutencao e Servicos - Ordens de Servico</title>
-  <meta name="theme-color" content="#0066cc">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WR Manutenção e Serviços - Ordens de Serviço</title>
+  <meta name="theme-color" content="#0f766e">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     :root {
-      --primary: #0066cc;
-      --primary-dark: #004999;
-      --primary-soft: #e8f2ff;
-      --ink: #111827;
-      --muted: #64748b;
-      --line: #dbe5ef;
-      --bg: #f3f6fa;
+      --bg: #eef4f6;
       --panel: #ffffff;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #3b82f6;
+      --ink: #102027;
+      --muted: #64747d;
+      --line: #d7e2e6;
+      --teal: #0f766e;
+      --teal-dark: #0b5f59;
+      --cyan: #0ea5e9;
+      --blue: #2563eb;
+      --amber: #d97706;
+      --green: #059669;
+      --red: #dc2626;
+      --soft-teal: #e5f4f2;
       --radius: 8px;
-      --shadow: 0 14px 32px rgba(15, 23, 42, .09);
-      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --shadow: 0 18px 45px rgba(16, 32, 39, .11);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,216 +38,251 @@
     button, input, select, textarea { font: inherit; }
     button { border: 0; cursor: pointer; }
 
-    .login {
+    .login-screen {
       min-height: 100vh;
       display: grid;
-      place-items: center;
-      padding: 24px;
-      background:
-        linear-gradient(120deg, rgba(0, 47, 96, .92), rgba(0, 102, 204, .72)),
-        url("https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1500&q=80") center / cover;
+      grid-template-columns: 1.1fr .9fr;
+      background: #0b1f26;
     }
 
-    .login-card {
-      width: min(430px, 100%);
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(255,255,255,.62);
-      border-radius: var(--radius);
-      box-shadow: 0 24px 60px rgba(0,0,0,.24);
-      padding: 32px;
-    }
-
-    .logo-mark {
-      width: 64px;
-      height: 64px;
-      border-radius: var(--radius);
-      background: var(--primary);
+    .login-hero {
       color: white;
-      display: grid;
-      place-items: center;
+      padding: clamp(28px, 5vw, 58px);
+      background:
+        linear-gradient(90deg, rgba(8, 36, 44, .96), rgba(8, 36, 44, .72), rgba(8, 36, 44, .18)),
+        url("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=80") center / cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .login-hero h1 {
+      font-size: clamp(38px, 6vw, 70px);
+      line-height: .96;
       font-weight: 900;
-      font-size: 24px;
+      max-width: 760px;
       margin-bottom: 18px;
     }
 
-    .login h1 { font-size: 25px; line-height: 1.1; font-weight: 900; }
-    .login p { color: var(--muted); margin-top: 8px; }
-    .login-form { display: grid; gap: 12px; margin-top: 24px; }
+    .login-hero p {
+      color: rgba(255,255,255,.84);
+      max-width: 620px;
+      font-weight: 600;
+      font-size: 17px;
+    }
 
-    .field { display: grid; gap: 6px; }
-    .field label {
-      color: #43566d;
+    .login-card-wrap {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--bg);
+    }
+
+    .login-card {
+      width: min(100%, 430px);
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .login-card h2 { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
+    .login-card p { color: var(--muted); font-weight: 600; margin-bottom: 18px; }
+
+    .app { min-height: 100vh; display: none; grid-template-columns: 270px minmax(0, 1fr); }
+    .app.active { display: grid; }
+
+    .sidebar {
+      background: #0b1f26;
+      color: #e8f6f8;
+      padding: 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: white;
+    }
+
+    .brand h1 { font-size: 18px; line-height: 1.08; font-weight: 900; }
+    .brand span { color: #9fb5bd; font-size: 12px; font-weight: 700; }
+
+    .nav { display: grid; gap: 8px; }
+    .nav button {
+      min-height: 44px;
+      border-radius: var(--radius);
+      background: transparent;
+      color: #b7cbd1;
+      font-weight: 800;
+      padding: 0 12px;
+      text-align: left;
+    }
+
+    .nav button:hover, .nav button.active { background: rgba(255,255,255,.1); color: #fff; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius);
+      color: #b7cbd1;
+      font-size: 13px;
+    }
+
+    .main { min-width: 0; padding: 22px clamp(18px, 3vw, 34px) 42px; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .topbar h2 { font-size: 28px; line-height: 1; font-weight: 900; }
+    .topbar p { color: var(--muted); margin-top: 6px; font-weight: 600; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: end; }
+
+    .btn {
+      min-height: 42px;
+      border-radius: var(--radius);
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 900;
+    }
+
+    .btn-primary { background: var(--teal); color: #fff; }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .btn-danger { background: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3; }
+    .btn-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
+    .hero {
+      min-height: 280px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(8, 36, 44, .93), rgba(8, 36, 44, .62), rgba(8, 36, 44, .06)),
+        url("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=80") center / cover;
+      box-shadow: var(--shadow);
+      color: white;
+      padding: clamp(24px, 4vw, 44px);
+      display: flex;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.18);
+      padding: 6px 11px;
       font-size: 12px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .08em;
+      margin-bottom: 12px;
+    }
+
+    .hero h2 { font-size: clamp(34px, 5.5vw, 62px); line-height: .96; font-weight: 900; margin-bottom: 14px; }
+    .hero p { max-width: 610px; color: rgba(255,255,255,.86); font-size: 16px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .stat, .panel, .order-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 24px rgba(16, 32, 39, .06);
+    }
+
+    .stat { padding: 16px; display: grid; gap: 8px; border-left: 5px solid var(--teal); }
+    .stat.blue { border-left-color: var(--blue); }
+    .stat.amber { border-left-color: var(--amber); }
+    .stat.green { border-left-color: var(--green); }
+    .stat span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 900; }
+    .stat strong { font-size: 28px; font-weight: 900; line-height: 1; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr); gap: 18px; align-items: start; }
+    .panel { padding: 18px; margin-bottom: 18px; }
+
+    .panel-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel-head h3 { font-size: 20px; font-weight: 900; }
+    .panel-head p { color: var(--muted); font-size: 13px; font-weight: 600; margin-top: 3px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .full { grid-column: 1 / -1; }
+
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field label {
+      color: #40545c;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
     }
 
     .input {
-      min-height: 46px;
       width: 100%;
+      min-height: 44px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
       background: #fff;
+      border-radius: var(--radius);
       padding: 10px 12px;
       color: var(--ink);
       outline: 0;
     }
 
-    textarea.input { resize: vertical; min-height: 90px; }
-    .input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,102,204,.12); }
+    textarea.input { min-height: 86px; resize: vertical; }
+    .input:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(15, 118, 110, .12); }
 
-    .btn {
-      min-height: 44px;
+    .summary-box {
+      background: linear-gradient(180deg, var(--soft-teal), #fff);
+      border: 1px solid #bddfda;
       border-radius: var(--radius);
-      padding: 10px 14px;
-      font-weight: 900;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-light { background: #fff; color: var(--primary-dark); border: 1px solid var(--line); }
-    .btn-danger { background: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3; }
-    .btn-success { background: #ecfdf5; color: #047857; border: 1px solid #bbf7d0; }
-
-    .app { display: none; min-height: 100vh; }
-    .app.active { display: grid; grid-template-columns: 280px 1fr; grid-template-rows: 72px 1fr; }
-
-    .topbar {
-      grid-column: 1 / -1;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .brand .logo-mark { width: 44px; height: 44px; margin: 0; font-size: 16px; }
-    .brand h2 { font-size: 18px; font-weight: 900; line-height: 1.1; }
-    .brand span { color: var(--muted); font-size: 12px; font-weight: 700; }
-    .user-area { display: flex; align-items: center; gap: 12px; color: var(--muted); font-weight: 800; }
-
-    .sidebar {
-      background: #fff;
-      border-right: 1px solid var(--line);
-      padding: 18px;
-      position: sticky;
-      top: 72px;
-      height: calc(100vh - 72px);
-    }
-
-    .nav { display: grid; gap: 8px; }
-    .nav button {
-      min-height: 46px;
-      border-radius: var(--radius);
-      background: transparent;
-      color: #42526a;
-      font-weight: 900;
-      text-align: left;
-      padding: 0 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .nav button:hover { background: #f1f5f9; color: var(--primary-dark); }
-    .nav button.active { background: var(--primary); color: #fff; }
-
-    .content { padding: 24px; min-width: 0; }
-    .tab { display: none; }
-    .tab.active { display: block; }
-
-    .page-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .page-head h1 { font-size: 30px; font-weight: 900; line-height: 1; }
-    .page-head p { color: var(--muted); margin-top: 7px; font-weight: 600; }
-
-    .grid-stats {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .stat, .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .stat { padding: 16px; display: grid; gap: 6px; border-left: 5px solid var(--primary); }
-    .stat.warning { border-left-color: var(--warning); }
-    .stat.info { border-left-color: var(--info); }
-    .stat.success { border-left-color: var(--success); }
-    .stat.danger { border-left-color: var(--danger); }
-    .stat span { color: var(--muted); font-size: 12px; font-weight: 900; text-transform: uppercase; }
-    .stat strong { font-size: 27px; font-weight: 900; }
-
-    .card { padding: 18px; margin-bottom: 18px; }
-    .card-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 16px; }
-    .card-head h2 { font-size: 20px; font-weight: 900; }
-    .card-head p { color: var(--muted); font-size: 13px; font-weight: 600; margin-top: 3px; }
-
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .full { grid-column: 1 / -1; }
-
-    .list { display: grid; gap: 10px; }
-    .list-row {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 13px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .list-row h3 { font-size: 15px; font-weight: 900; }
-    .list-row p { color: var(--muted); font-size: 13px; margin-top: 3px; }
-    .row-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
-
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--radius); overflow: hidden; }
-    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; font-size: 13px; }
-    th { background: #f8fafc; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
-
-    .os-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-left: 5px solid var(--warning);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 16px;
+      padding: 15px;
       display: grid;
       gap: 10px;
     }
 
-    .os-card.em_andamento { border-left-color: var(--info); }
-    .os-card.concluida { border-left-color: var(--success); }
-    .os-card.cancelada { border-left-color: var(--danger); }
-    .os-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
-    .os-number { color: var(--muted); font-size: 12px; font-weight: 900; }
-    .os-card h3 { font-size: 18px; font-weight: 900; }
-    .os-meta { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 700; }
-    .os-total { color: var(--primary-dark); font-size: 22px; font-weight: 900; }
+    .summary-row { display: flex; justify-content: space-between; gap: 12px; color: #36575f; font-weight: 800; font-size: 14px; }
+    .summary-row.total { border-top: 1px solid #bddfda; padding-top: 10px; color: var(--teal-dark); font-size: 22px; font-weight: 900; }
+
+    .order-list, .list { display: grid; gap: 12px; }
+    .order-card { padding: 14px; border-left: 5px solid var(--amber); display: grid; gap: 9px; }
+    .order-card.em_andamento { border-left-color: var(--blue); }
+    .order-card.concluida { border-left-color: var(--green); }
+    .order-card.cancelada { border-left-color: var(--red); }
+
+    .order-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .order-id { color: var(--muted); font-size: 12px; font-weight: 900; }
 
     .badge {
       border-radius: 999px;
@@ -259,754 +298,984 @@
     .badge.concluida { background: #d1fae5; color: #065f46; }
     .badge.cancelada { background: #fee2e2; color: #991b1b; }
 
-    .split { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
-    .total-box {
-      background: var(--primary-soft);
-      border: 1px solid #bfdbfe;
+    .order-card h4 { font-size: 16px; font-weight: 900; line-height: 1.2; }
+    .order-meta { display: flex; flex-wrap: wrap; gap: 9px; color: var(--muted); font-size: 12px; font-weight: 700; }
+
+    .table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: var(--radius); }
+    .table th, .table td { padding: 11px; border-bottom: 1px solid var(--line); text-align: left; font-size: 13px; }
+    .table th { background: #f8fafc; color: #475569; text-transform: uppercase; font-size: 12px; letter-spacing: .04em; }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      background: #0b1f26;
+      color: white;
+      padding: 12px 14px;
       border-radius: var(--radius);
-      padding: 14px;
-      display: grid;
-      gap: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: .2s ease;
+      font-weight: 800;
     }
 
-    .total-line { display: flex; justify-content: space-between; gap: 12px; color: #31536f; font-weight: 800; }
-    .total-line.final { color: var(--primary-dark); font-size: 22px; font-weight: 900; border-top: 1px solid #bfdbfe; padding-top: 8px; }
+    .toast.show { opacity: 1; transform: translateY(0); }
 
-    .modal {
+    .loading {
       position: fixed;
       inset: 0;
+      background: rgba(11,31,38,.58);
       display: none;
-      place-items: center;
-      background: rgba(15, 23, 42, .55);
-      z-index: 60;
-      padding: 18px;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 100;
+      font-weight: 900;
     }
 
-    .modal.active { display: grid; }
-    .modal-card {
-      width: min(760px, 100%);
-      max-height: 86vh;
-      overflow: auto;
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: 0 28px 80px rgba(0,0,0,.28);
-      padding: 20px;
-    }
+    .loading.active { display: flex; }
 
-    .modal-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 14px; }
-    .modal-head h2 { font-size: 22px; font-weight: 900; }
-
-    .bottom-nav { display: none; }
-    .empty { color: var(--muted); text-align: center; padding: 22px; border: 1px dashed var(--line); border-radius: var(--radius); background: #f8fafc; }
+    .mobile-nav { display: none; }
 
     @media (max-width: 1080px) {
-      .grid-stats { grid-template-columns: repeat(3, 1fr); }
-      .split { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 760px) {
-      .app.active { display: block; padding-bottom: 78px; }
-      .topbar { padding: 0 14px; height: 66px; }
-      .brand h2 { font-size: 15px; }
-      .brand span, .user-area span { display: none; }
+      .login-screen { grid-template-columns: 1fr; }
+      .login-hero { min-height: 330px; }
+      .app.active { display: block; }
       .sidebar { display: none; }
-      .content { padding: 16px; }
-      .page-head { align-items: start; flex-direction: column; }
-      .page-head h1 { font-size: 25px; }
-      .grid-stats { grid-template-columns: repeat(2, 1fr); }
-      .form-grid { grid-template-columns: 1fr; }
-      .full { grid-column: auto; }
-      .list-row { grid-template-columns: 1fr; }
-      .row-actions { justify-content: start; }
-      .bottom-nav {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
+      .layout { grid-template-columns: 1fr; }
+      .mobile-nav {
         position: fixed;
         left: 0;
         right: 0;
         bottom: 0;
+        z-index: 30;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
         background: #fff;
         border-top: 1px solid var(--line);
-        z-index: 50;
       }
-      .bottom-nav button {
+      .mobile-nav button {
         min-height: 62px;
         background: #fff;
         color: var(--muted);
         font-size: 11px;
         font-weight: 900;
       }
-      .bottom-nav button.active { color: var(--primary); background: var(--primary-soft); }
+      .mobile-nav button.active { color: var(--teal); background: var(--soft-teal); }
+      .main { padding-bottom: 86px; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar { align-items: start; flex-direction: column; }
+      .actions { justify-content: start; width: 100%; }
+      .actions .btn { flex: 1; }
+      .hero { min-height: 390px; background: linear-gradient(0deg, rgba(8, 36, 44, .94), rgba(8, 36, 44, .45)), url("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=80") center / cover; }
+      .stats, .form-grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
     }
   </style>
 </head>
+
 <body>
-  <section id="loginScreen" class="login">
-    <div class="login-card">
-      <div class="logo-mark">WR</div>
-      <h1>WR Manutencao e Servicos</h1>
-      <p>Sistema de ordens de servico com clientes, catalogo, materiais, servicos e PDF.</p>
-      <div class="login-form">
+  <section class="login-screen" id="loginScreen">
+    <div class="login-hero">
+      <div class="brand">
+        <div class="brand-mark">WR</div>
+        <div>
+          <h1>WR Manutenção e Serviços</h1>
+          <span>climatização e assistência técnica</span>
+        </div>
+      </div>
+
+      <div>
+        <span class="eyebrow">Sistema profissional de OS</span>
+        <h1>Gestão moderna para manutenção de ar condicionado.</h1>
+        <p>Controle clientes, materiais, serviços, visitas técnicas, status, valores e PDFs em uma interface elegante e funcional.</p>
+      </div>
+    </div>
+
+    <div class="login-card-wrap">
+      <div class="login-card">
+        <div class="brand" style="margin-bottom:18px">
+          <div class="brand-mark">WR</div>
+          <div>
+            <h1>Entrar no sistema</h1>
+            <span>Ordens de serviço</span>
+          </div>
+        </div>
+
+        <p>Acesse sua área administrativa.</p>
+
         <div class="field">
-          <label for="loginUsuario">Usuario</label>
+          <label>Usuário</label>
           <input class="input" id="loginUsuario" value="admin" autocomplete="username">
         </div>
+
         <div class="field">
-          <label for="loginSenha">Senha</label>
+          <label>Senha</label>
           <input class="input" id="loginSenha" type="password" value="wr@2024" autocomplete="current-password">
         </div>
-        <button class="btn btn-primary" id="loginBtn">Entrar no sistema</button>
+
+        <button class="btn btn-primary" style="width:100%" onclick="realizarLogin()">Entrar no sistema</button>
+        <p style="font-size:12px;margin-top:12px">Acesso local: admin / wr@2024</p>
       </div>
     </div>
   </section>
 
-  <section id="app" class="app">
-    <header class="topbar">
+  <div class="loading" id="loading">Carregando...</div>
+
+  <div class="app" id="app">
+    <aside class="sidebar">
       <div class="brand">
-        <div class="logo-mark">WR</div>
+        <div class="brand-mark">WR</div>
         <div>
-          <h2>WR Manutencao e Servicos</h2>
-          <span>Gestao de ordens de servico</span>
+          <h1>WR Manutenção</h1>
+          <span>ordens de serviço</span>
         </div>
       </div>
-      <div class="user-area">
-        <span id="userName">Administrador</span>
-        <button class="btn btn-light" id="logoutBtn">Sair</button>
-      </div>
-    </header>
 
-    <aside class="sidebar">
-      <nav class="nav" id="desktopNav">
+      <nav class="nav">
         <button class="active" data-tab="dashboard">Dashboard</button>
+        <button data-tab="ordens">Ordens de serviço</button>
         <button data-tab="clientes">Clientes</button>
-        <button data-tab="catalogo">Materiais/Servicos</button>
-        <button data-tab="ordens">Ordens de Servico</button>
-        <button data-tab="config">Configuracoes</button>
+        <button data-tab="catalogo">Materiais/Serviços</button>
+        <button data-tab="config">Configurações</button>
       </nav>
+
+      <div class="sidebar-footer" id="sidebarInfo">Usuário: Administrador</div>
     </aside>
 
-    <main class="content">
+    <main class="main">
       <section id="tabDashboard" class="tab active">
-        <div class="page-head">
+        <header class="topbar">
           <div>
-            <h1>Dashboard</h1>
-            <p>Visao geral das ordens, faturamento e situacao dos atendimentos.</p>
+            <h2>Painel operacional</h2>
+            <p>Gestão de manutenção, instalação e higienização de ar condicionado.</p>
           </div>
-          <button class="btn btn-primary" data-open-tab="ordens">Nova OS</button>
-        </div>
+          <div class="actions">
+            <button class="btn btn-light" onclick="exportarResumo()">Exportar resumo</button>
+            <button class="btn btn-primary" data-tab-jump="ordens">Nova OS</button>
+            <button class="btn btn-danger" onclick="fazerLogout()">Sair</button>
+          </div>
+        </header>
 
-        <div class="grid-stats">
+        <section class="hero">
+          <div>
+            <span class="eyebrow">WR Manutenção e Serviços</span>
+            <h2>Ordens de serviço claras para equipes de climatização.</h2>
+            <p>Organize atendimentos, clientes, materiais, serviços, prazos e faturamento em um painel rápido e profissional.</p>
+          </div>
+        </section>
+
+        <section class="stats">
           <div class="stat"><span>Total de OS</span><strong id="statTotal">0</strong></div>
-          <div class="stat warning"><span>Abertas</span><strong id="statAbertas">0</strong></div>
-          <div class="stat info"><span>Em andamento</span><strong id="statAndamento">0</strong></div>
-          <div class="stat success"><span>Concluidas</span><strong id="statConcluidas">0</strong></div>
-          <div class="stat danger"><span>Faturamento</span><strong id="statFaturamento">R$ 0,00</strong></div>
-        </div>
+          <div class="stat blue"><span>Em andamento</span><strong id="statAndamento">0</strong></div>
+          <div class="stat amber"><span>Abertas</span><strong id="statAbertas">0</strong></div>
+          <div class="stat green"><span>Faturamento</span><strong id="statFaturamento">R$ 0,00</strong></div>
+        </section>
 
-        <div class="card">
-          <div class="card-head">
-            <div>
-              <h2>Ordens recentes</h2>
-              <p>Acompanhe os ultimos atendimentos cadastrados.</p>
+        <div class="layout">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Ordens recentes</h3>
+                <p>Acompanhe os atendimentos mais importantes.</p>
+              </div>
+              <select class="input" id="filtroStatusOS" style="max-width:190px" onchange="renderizarOrdens()">
+                <option value="todos">Todos os status</option>
+                <option value="aberta">Abertas</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="concluida">Concluídas</option>
+                <option value="cancelada">Canceladas</option>
+              </select>
             </div>
-          </div>
-          <div class="list" id="recentOrders"></div>
-        </div>
-      </section>
+            <div class="order-list" id="ordensList"></div>
+          </section>
 
-      <section id="tabClientes" class="tab">
-        <div class="page-head">
-          <div>
-            <h1>Clientes</h1>
-            <p>Cadastre e mantenha os dados de contato dos clientes.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div><h2>Novo cliente</h2><p>Preencha os dados principais para usar nas OS.</p></div></div>
-          <div class="form-grid">
-            <div class="field"><label>Nome *</label><input class="input" id="clienteNome" placeholder="Nome completo"></div>
-            <div class="field"><label>CPF/CNPJ</label><input class="input" id="clienteDocumento" placeholder="Documento"></div>
-            <div class="field"><label>Telefone</label><input class="input" id="clienteTelefone" placeholder="(00) 00000-0000"></div>
-            <div class="field"><label>Email</label><input class="input" id="clienteEmail" type="email" placeholder="email@exemplo.com"></div>
-            <div class="field full"><label>Endereco</label><input class="input" id="clienteEndereco" placeholder="Endereco completo"></div>
-          </div>
-          <button class="btn btn-primary" id="saveClienteBtn">Salvar cliente</button>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div><h2>Clientes cadastrados</h2><p>Lista local para consulta e edicao rapida.</p></div></div>
-          <div class="list" id="clientesList"></div>
-        </div>
-      </section>
-
-      <section id="tabCatalogo" class="tab">
-        <div class="page-head">
-          <div>
-            <h1>Materiais e Servicos</h1>
-            <p>Monte o catalogo usado nas ordens de servico.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div><h2>Novo item</h2><p>Cadastre materiais com estoque ou servicos de mao tecnica.</p></div></div>
-          <div class="form-grid">
-            <div class="field"><label>Tipo</label><select class="input" id="itemTipo"><option value="material">Material</option><option value="servico">Servico</option></select></div>
-            <div class="field"><label>Nome *</label><input class="input" id="itemNome" placeholder="Nome do item"></div>
-            <div class="field"><label>Valor (R$) *</label><input class="input" id="itemValor" type="number" step="0.01" placeholder="0,00"></div>
-            <div class="field"><label>Estoque</label><input class="input" id="itemEstoque" type="number" value="0"></div>
-            <div class="field"><label>Categoria</label><input class="input" id="itemCategoria" placeholder="Eletrica, Hidraulica..."></div>
-            <div class="field full"><label>Descricao</label><input class="input" id="itemDescricao" placeholder="Descricao opcional"></div>
-          </div>
-          <button class="btn btn-primary" id="saveItemBtn">Salvar item</button>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div><h2>Catalogo</h2><p>Materiais e servicos disponiveis para adicionar na OS.</p></div></div>
-          <div class="table-wrap" id="catalogoList"></div>
+          <aside>
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Resumo rápido</h3>
+                  <p>Visão geral da operação.</p>
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="summary-row"><span>Clientes</span><strong id="resumoClientes">0</strong></div>
+                <div class="summary-row"><span>Itens no catálogo</span><strong id="resumoCatalogo">0</strong></div>
+                <div class="summary-row"><span>OS concluídas</span><strong id="statConcluidas">0</strong></div>
+                <div class="summary-row total"><span>Receita</span><strong id="resumoReceita">R$ 0,00</strong></div>
+              </div>
+            </section>
+          </aside>
         </div>
       </section>
 
       <section id="tabOrdens" class="tab">
-        <div class="page-head">
+        <header class="topbar">
           <div>
-            <h1>Ordens de Servico</h1>
-            <p>Crie, acompanhe, finalize e gere PDF das ordens.</p>
+            <h2>Nova ordem de serviço</h2>
+            <p>Preencha cliente, itens, valores e gere uma OS completa.</p>
           </div>
-        </div>
+        </header>
 
-        <div class="split">
-          <div class="card">
-            <div class="card-head"><div><h2>Nova OS</h2><p>Selecione o cliente, inclua itens e descreva o atendimento.</p></div></div>
-            <div class="form-grid">
-              <div class="field"><label>Cliente *</label><select class="input" id="osCliente"></select></div>
-              <div class="field"><label>Data abertura</label><input class="input" id="osData" type="date"></div>
-              <div class="field"><label>Status</label><select class="input" id="osStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluida</option><option value="cancelada">Cancelada</option></select></div>
-              <div class="field"><label>Prazo</label><input class="input" id="osPrazo" type="date"></div>
-              <div class="field full"><label>Descricao do servico</label><textarea class="input" id="osDescricao" placeholder="Detalhe o problema, local, solicitacao e observacoes tecnicas"></textarea></div>
-            </div>
+        <div class="layout">
+          <div>
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Dados do atendimento</h3>
+                  <p>Cliente, data, status e descrição técnica.</p>
+                </div>
+              </div>
 
-            <div class="card-head" style="margin-top:18px"><div><h2>Itens da OS</h2><p>Materiais e servicos do catalogo.</p></div></div>
-            <div class="form-grid">
-              <div class="field"><label>Item</label><select class="input" id="osItemSelect"></select></div>
-              <div class="field"><label>Quantidade</label><input class="input" id="osItemQtd" type="number" min="1" value="1"></div>
-            </div>
-            <button class="btn btn-light" id="addOsItemBtn">Adicionar item</button>
-            <div class="table-wrap" id="osItensList" style="margin-top:12px"></div>
+              <div class="form-grid">
+                <div class="field"><label>Cliente</label><select class="input" id="osCliente"></select></div>
+                <div class="field"><label>Data de abertura</label><input class="input" type="date" id="osData"></div>
+                <div class="field"><label>Status</label><select class="input" id="osStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></div>
+                <div class="field"><label>Prazo</label><input class="input" type="date" id="osPrazo"></div>
+                <div class="field full"><label>Descrição do serviço</label><textarea class="input" id="osDescricao" placeholder="Descreva o serviço a realizar..."></textarea></div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Materiais e serviços</h3>
+                  <p>Adicione itens do catálogo à ordem.</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field"><label>Item</label><select class="input" id="osItemSelect"></select></div>
+                <div class="field"><label>Quantidade</label><input class="input" id="osItemQtd" type="number" min="1" value="1"></div>
+              </div>
+
+              <button class="btn btn-light" onclick="adicionarItemOS()">Adicionar item</button>
+              <div id="osItensList" style="margin-top:14px"></div>
+            </section>
           </div>
 
-          <aside class="total-box">
-            <div class="field"><label>Mao de obra (R$)</label><input class="input" id="osMaoObra" type="number" step="0.01" value="0"></div>
-            <div class="field"><label>Desconto (R$)</label><input class="input" id="osDesconto" type="number" step="0.01" value="0"></div>
-            <div class="total-line"><span>Itens</span><strong id="totalItens">R$ 0,00</strong></div>
-            <div class="total-line"><span>Mao de obra</span><strong id="totalMaoObra">R$ 0,00</strong></div>
-            <div class="total-line"><span>Desconto</span><strong id="totalDesconto">R$ 0,00</strong></div>
-            <div class="total-line final"><span>Total</span><strong id="osTotalPreview">R$ 0,00</strong></div>
-            <button class="btn btn-primary" id="saveOsBtn">Criar ordem de servico</button>
+          <aside>
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Resumo financeiro</h3>
+                  <p>Cálculo automático da OS.</p>
+                </div>
+              </div>
+
+              <div class="field"><label>Mão de obra (R$)</label><input class="input" id="osMaoObra" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
+              <div class="field"><label>Desconto (R$)</label><input class="input" id="osDesconto" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
+
+              <div class="summary-box">
+                <div class="summary-row"><span>Itens</span><strong id="totalItens">R$ 0,00</strong></div>
+                <div class="summary-row"><span>Mão de obra</span><strong id="totalMaoObra">R$ 0,00</strong></div>
+                <div class="summary-row"><span>Desconto</span><strong id="totalDesconto">R$ 0,00</strong></div>
+                <div class="summary-row total"><span>Total</span><strong id="osTotalPreview">R$ 0,00</strong></div>
+              </div>
+
+              <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="criarOS()">Gerar ordem de serviço</button>
+            </section>
           </aside>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <div><h2>Lista de OS</h2><p>Filtre por status e acompanhe os servicos.</p></div>
-            <select class="input" id="filtroStatusOS" style="max-width:210px"><option value="todos">Todos os status</option><option value="aberta">Abertas</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluidas</option><option value="cancelada">Canceladas</option></select>
-          </div>
-          <div class="list" id="ordensList"></div>
         </div>
       </section>
 
-      <section id="tabConfig" class="tab">
-        <div class="page-head">
-          <div>
-            <h1>Configuracoes</h1>
-            <p>Dados da empresa usados no PDF e no sistema.</p>
-          </div>
-        </div>
+      <section id="tabClientes" class="tab">
+        <header class="topbar"><div><h2>Clientes</h2><p>Cadastro e consulta de clientes.</p></div></header>
 
-        <div class="card">
-          <div class="card-head"><div><h2>Empresa</h2><p>Essas informacoes aparecem nos documentos gerados.</p></div></div>
+        <section class="panel">
+          <div class="panel-head"><div><h3>Novo cliente</h3><p>Inclua clientes no sistema.</p></div></div>
           <div class="form-grid">
-            <div class="field full"><label>Nome da empresa</label><input class="input" id="configEmpresaNome"></div>
+            <div class="field"><label>Nome</label><input class="input" id="clienteNome"></div>
+            <div class="field"><label>CPF/CNPJ</label><input class="input" id="clienteDocumento"></div>
+            <div class="field"><label>Telefone</label><input class="input" id="clienteTelefone"></div>
+            <div class="field"><label>Email</label><input class="input" id="clienteEmail" type="email"></div>
+            <div class="field full"><label>Endereço</label><input class="input" id="clienteEndereco"></div>
+          </div>
+          <button class="btn btn-primary" onclick="cadastrarCliente()">Salvar cliente</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h3>Clientes cadastrados</h3><p>Lista de clientes ativos.</p></div></div>
+          <div id="clientesList"></div>
+        </section>
+      </section>
+
+      <section id="tabCatalogo" class="tab">
+        <header class="topbar"><div><h2>Materiais e Serviços</h2><p>Catálogo usado nas ordens.</p></div></header>
+
+        <section class="panel">
+          <div class="panel-head"><div><h3>Novo item</h3><p>Cadastre peças, materiais e serviços.</p></div></div>
+          <div class="form-grid">
+            <div class="field"><label>Tipo</label><select class="input" id="itemTipo"><option value="material">Material</option><option value="servico">Serviço</option></select></div>
+            <div class="field"><label>Nome</label><input class="input" id="itemNome"></div>
+            <div class="field"><label>Valor</label><input class="input" id="itemValor" type="number" step="0.01"></div>
+            <div class="field"><label>Estoque</label><input class="input" id="itemEstoque" type="number" value="0"></div>
+            <div class="field full"><label>Categoria</label><input class="input" id="itemCategoria"></div>
+            <div class="field full"><label>Descrição</label><input class="input" id="itemDescricao"></div>
+          </div>
+          <button class="btn btn-primary" onclick="cadastrarItem()">Salvar item</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h3>Catálogo</h3><p>Itens disponíveis para OS.</p></div></div>
+          <div id="catalogoList"></div>
+        </section>
+      </section>
+
+      <section id="tabConfig" class="tab">
+        <header class="topbar"><div><h2>Configurações</h2><p>Dados da empresa para documentos.</p></div></header>
+
+        <section class="panel">
+          <div class="form-grid">
+            <div class="field full"><label>Empresa</label><input class="input" id="configEmpresaNome" value="WR Manutenção e Serviços"></div>
             <div class="field"><label>CNPJ</label><input class="input" id="configEmpresaCnpj"></div>
             <div class="field"><label>Telefone</label><input class="input" id="configEmpresaTelefone"></div>
             <div class="field"><label>Email</label><input class="input" id="configEmpresaEmail"></div>
             <div class="field"><label>Site</label><input class="input" id="configEmpresaSite"></div>
-            <div class="field full"><label>Endereco</label><input class="input" id="configEmpresaEndereco"></div>
+            <div class="field full"><label>Endereço</label><input class="input" id="configEmpresaEndereco"></div>
           </div>
-          <button class="btn btn-primary" id="saveConfigBtn">Salvar configuracoes</button>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div><h2>Dados locais</h2><p>Use com cuidado. Esta versao salva dados no navegador.</p></div></div>
-          <button class="btn btn-danger" id="clearAllBtn">Limpar todos os dados</button>
-        </div>
+          <button class="btn btn-primary" onclick="salvarConfiguracoes()">Salvar configurações</button>
+        </section>
       </section>
     </main>
-
-    <nav class="bottom-nav" id="mobileNav">
-      <button class="active" data-tab="dashboard">Dashboard</button>
-      <button data-tab="clientes">Clientes</button>
-      <button data-tab="catalogo">Catalogo</button>
-      <button data-tab="ordens">OS</button>
-      <button data-tab="config">Config</button>
-    </nav>
-  </section>
-
-  <div class="modal" id="osModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h2>Detalhes da OS</h2>
-        <button class="btn btn-light" id="closeModalBtn">Fechar</button>
-      </div>
-      <div id="osModalContent"></div>
-    </div>
   </div>
 
+  <nav class="mobile-nav">
+    <button class="active" data-tab="dashboard">Painel</button>
+    <button data-tab="ordens">OS</button>
+    <button data-tab="clientes">Clientes</button>
+    <button data-tab="catalogo">Itens</button>
+    <button data-tab="config">Config</button>
+  </nav>
+
+  <div class="toast" id="toast">Salvo</div>
+
   <script>
-    const STORAGE_KEY = "wr_os_melhorado_v1";
-    const sessionKey = "wr_os_session_v1";
+    const API_URL = "https://script.google.com/macros/s/AKfycbztW9LS1vkMx-M6QhBvylBlmUxzKBkgBn5tBERQO1P-vCylTiBidCdk4uyU7-FjUxda4Q/exec";
+    const storageKey = "wr_os_profissional";
     const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
-    let currentUser = null;
-    let tempItems = [];
-    let selectedOs = null;
-    let data = loadData();
+    let usuarioAtual = null;
+    let dados = carregarLocal();
+    let osItensTemp = [];
 
-    function defaultData() {
-      return {
-        clientes: [
-          { id: 1, nome: "Condominio Jardim Azul", documento: "00.000.000/0001-00", telefone: "(85) 99999-1000", email: "contato@jardimazul.com", endereco: "Fortaleza/CE" },
-          { id: 2, nome: "Mercado Boa Compra", documento: "", telefone: "(85) 98888-2000", email: "", endereco: "Eusebio/CE" }
-        ],
-        catalogo: [
-          { id: 1, tipo: "servico", nome: "Manutencao preventiva", valor: 180, estoque: 0, categoria: "Manutencao", descricao: "Inspecao, limpeza e ajustes gerais" },
-          { id: 2, tipo: "servico", nome: "Reparo eletrico", valor: 220, estoque: 0, categoria: "Eletrica", descricao: "Atendimento eletrico tecnico" },
-          { id: 3, tipo: "material", nome: "Disjuntor bipolar 32A", valor: 68, estoque: 12, categoria: "Eletrica", descricao: "Material eletrico" },
-          { id: 4, tipo: "material", nome: "Cabo flexivel 2,5mm", valor: 145, estoque: 8, categoria: "Eletrica", descricao: "Rolo de cabo para instalacao" }
-        ],
-        ordens: [],
-        configuracoes: {
-          empresaNome: "WR Manutencao e Servicos",
-          empresaCnpj: "",
-          empresaTelefone: "",
-          empresaEmail: "",
-          empresaEndereco: "",
-          empresaSite: ""
-        }
-      };
-    }
-
-    function loadData() {
+    function carregarLocal() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData();
+        return JSON.parse(localStorage.getItem(storageKey)) || { clientes: [], catalogo: [], ordens: [], configuracoes: {} };
       } catch {
-        return defaultData();
+        return { clientes: [], catalogo: [], ordens: [], configuracoes: {} };
       }
     }
 
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    function salvarLocal() {
+      localStorage.setItem(storageKey, JSON.stringify(dados));
     }
 
-    function nextId(list) {
-      return list.length ? Math.max(...list.map(item => Number(item.id) || 0)) + 1 : 1;
+    function showLoading() {
+      document.querySelector("#loading").classList.add("active");
     }
 
-    function formatDate(value) {
-      if (!value) return "-";
-      const [year, month, day] = value.split("-");
-      return `${day}/${month}/${year}`;
+    function hideLoading() {
+      document.querySelector("#loading").classList.remove("active");
     }
 
-    function statusLabel(status) {
-      return { aberta: "Aberta", em_andamento: "Em andamento", concluida: "Concluida", cancelada: "Cancelada" }[status] || status;
+    function toast(msg) {
+      const el = document.querySelector("#toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2200);
     }
 
-    function escapeHtml(value) {
-      return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+    async function apiGet(endpoint) {
+      try {
+        const response = await fetch(`${API_URL}?tipo=${endpoint}`);
+        return await response.json();
+      } catch {
+        return null;
+      }
     }
 
-    function login() {
-      const user = document.querySelector("#loginUsuario").value.trim();
-      const pass = document.querySelector("#loginSenha").value;
-      if (user !== "admin" || pass !== "wr@2024") {
-        alert("Usuario ou senha invalidos.");
+    async function apiPost(payload) {
+      try {
+        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+        return await response.json();
+      } catch {
+        return null;
+      }
+    }
+
+    async function realizarLogin() {
+      const usuario = document.querySelector("#loginUsuario").value.trim();
+      const senha = document.querySelector("#loginSenha").value;
+
+      if (!usuario || !senha) {
+        alert("Preencha usuário e senha.");
         return;
       }
-      currentUser = { nome: "Administrador", usuario: user };
-      localStorage.setItem(sessionKey, JSON.stringify(currentUser));
-      openApp();
+
+      showLoading();
+
+      const result = await apiPost({ tipo: "login", usuario, senha });
+
+      hideLoading();
+
+      if (result && result.auth) {
+        usuarioAtual = { usuario, nome: result.nome || usuario };
+        localStorage.setItem("wrSession", JSON.stringify(usuarioAtual));
+        entrarNoApp();
+        return;
+      }
+
+      if (usuario === "admin" && senha === "wr@2024") {
+        usuarioAtual = { usuario: "admin", nome: "Administrador" };
+        localStorage.setItem("wrSession", JSON.stringify(usuarioAtual));
+        entrarNoApp();
+        return;
+      }
+
+      alert("Usuário ou senha inválidos.");
     }
 
-    function openApp() {
+    function entrarNoApp() {
       document.querySelector("#loginScreen").style.display = "none";
       document.querySelector("#app").classList.add("active");
-      document.querySelector("#userName").textContent = currentUser?.nome || "Administrador";
+      document.querySelector("#sidebarInfo").innerHTML = `Usuário:<br>${usuarioAtual.nome || "Administrador"}`;
       document.querySelector("#osData").value = new Date().toISOString().slice(0, 10);
-      renderAll();
+      carregarTodosDados();
     }
 
-    function logout() {
-      localStorage.removeItem(sessionKey);
+    function fazerLogout() {
+      if (!confirm("Deseja sair do sistema?")) return;
+      localStorage.removeItem("wrSession");
       location.reload();
     }
 
-    function switchTab(tab) {
-      document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
-      document.querySelector(`#tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add("active");
-      document.querySelectorAll("[data-tab]").forEach(el => el.classList.toggle("active", el.dataset.tab === tab));
-      if (tab === "ordens") renderOrders();
+    async function carregarTodosDados() {
+      showLoading();
+
+      const [clientesRes, catalogoRes, ordensRes, configRes] = await Promise.all([
+        apiGet("clientes"),
+        apiGet("catalogo"),
+        apiGet("ordens"),
+        apiGet("config")
+      ]);
+
+      if (clientesRes && clientesRes.res === "ok") dados.clientes = clientesRes.clientes || [];
+      if (catalogoRes && catalogoRes.res === "ok") dados.catalogo = catalogoRes.catalogo || [];
+      if (configRes && configRes.res === "ok") dados.configuracoes = configRes.config || {};
+
+      if (ordensRes && ordensRes.res === "ok") {
+        dados.ordens = (ordensRes.ordens || []).map(os => ({
+          ...os,
+          itensOS: parseItens(os.itensOS)
+        }));
+      }
+
+      salvarLocal();
+      renderAll();
+      hideLoading();
     }
 
-    function renderDashboard() {
-      const total = data.ordens.length;
-      const abertas = data.ordens.filter(os => os.status === "aberta").length;
-      const andamento = data.ordens.filter(os => os.status === "em_andamento").length;
-      const concluidas = data.ordens.filter(os => os.status === "concluida").length;
-      const faturamento = data.ordens.filter(os => os.status !== "cancelada").reduce((sum, os) => sum + os.valorTotal, 0);
-      document.querySelector("#statTotal").textContent = total;
+    function parseItens(value) {
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") {
+        try { return JSON.parse(value); } catch { return []; }
+      }
+      return [];
+    }
+
+    async function cadastrarCliente() {
+      const cliente = {
+        id: Date.now(),
+        tipo: "cadastrar_cliente",
+        nome: document.querySelector("#clienteNome").value.trim(),
+        documento: document.querySelector("#clienteDocumento").value,
+        telefone: document.querySelector("#clienteTelefone").value,
+        email: document.querySelector("#clienteEmail").value,
+        endereco: document.querySelector("#clienteEndereco").value
+      };
+
+      if (!cliente.nome) {
+        alert("Digite o nome do cliente.");
+        return;
+      }
+
+      showLoading();
+      const result = await apiPost(cliente);
+      hideLoading();
+
+      if (!result || result.res === "ok") {
+        dados.clientes.push(cliente);
+        salvarLocal();
+        limparCliente();
+        renderAll();
+        toast("Cliente salvo");
+      } else {
+        alert("Erro ao salvar cliente.");
+      }
+    }
+
+    function limparCliente() {
+      ["clienteNome", "clienteDocumento", "clienteTelefone", "clienteEmail", "clienteEndereco"].forEach(id => {
+        document.querySelector(`#${id}`).value = "";
+      });
+    }
+
+    async function excluirCliente(id) {
+      if (!confirm("Excluir este cliente?")) return;
+      await apiPost({ tipo: "excluir_cliente", id });
+      dados.clientes = dados.clientes.filter(item => Number(item.id) !== Number(id));
+      salvarLocal();
+      renderAll();
+      toast("Cliente excluído");
+    }
+
+    function renderClientes() {
+      const el = document.querySelector("#clientesList");
+
+      if (!dados.clientes.length) {
+        el.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
+        return;
+      }
+
+      el.innerHTML = `<table class="table">
+        <thead><tr><th>Cliente</th><th>Telefone</th><th>Email</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${dados.clientes.map(c => `<tr>
+            <td><strong>${c.nome || "-"}</strong></td>
+            <td>${c.telefone || "-"}</td>
+            <td>${c.email || "-"}</td>
+            <td><button class="btn btn-danger" onclick="excluirCliente(${c.id})">Excluir</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+    }
+
+    async function cadastrarItem() {
+      const item = {
+        id: Date.now(),
+        tipo: "cadastrar_item",
+        tipoItem: document.querySelector("#itemTipo").value,
+        nome: document.querySelector("#itemNome").value.trim(),
+        valor: Number(document.querySelector("#itemValor").value || 0),
+        estoque: Number(document.querySelector("#itemEstoque").value || 0),
+        categoria: document.querySelector("#itemCategoria").value,
+        descricao: document.querySelector("#itemDescricao").value
+      };
+
+      if (!item.nome || item.valor <= 0) {
+        alert("Preencha nome e valor válido.");
+        return;
+      }
+
+      showLoading();
+      const result = await apiPost(item);
+      hideLoading();
+
+      if (!result || result.res === "ok") {
+        dados.catalogo.push({ ...item, tipo: item.tipoItem });
+        salvarLocal();
+        limparItem();
+        renderAll();
+        toast("Item salvo");
+      } else {
+        alert("Erro ao salvar item.");
+      }
+    }
+
+    function limparItem() {
+      ["itemNome", "itemValor", "itemCategoria", "itemDescricao"].forEach(id => {
+        document.querySelector(`#${id}`).value = "";
+      });
+      document.querySelector("#itemEstoque").value = "0";
+    }
+
+    async function excluirItem(id) {
+      if (!confirm("Excluir este item?")) return;
+      await apiPost({ tipo: "excluir_item", id });
+      dados.catalogo = dados.catalogo.filter(item => Number(item.id) !== Number(id));
+      salvarLocal();
+      renderAll();
+      toast("Item excluído");
+    }
+
+    function renderCatalogo() {
+      const el = document.querySelector("#catalogoList");
+
+      if (!dados.catalogo.length) {
+        el.innerHTML = "<p>Nenhum item cadastrado.</p>";
+        return;
+      }
+
+      el.innerHTML = `<table class="table">
+        <thead><tr><th>Tipo</th><th>Nome</th><th>Valor</th><th>Estoque</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${dados.catalogo.map(i => `<tr>
+            <td>${i.tipo || i.tipoItem || "-"}</td>
+            <td><strong>${i.nome || "-"}</strong></td>
+            <td>${money.format(Number(i.valor || 0))}</td>
+            <td>${(i.tipo || i.tipoItem) === "material" ? Number(i.estoque || 0) : "-"}</td>
+            <td><button class="btn btn-danger" onclick="excluirItem(${i.id})">Excluir</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+    }
+
+    function atualizarSelects() {
+      const clienteSelect = document.querySelector("#osCliente");
+      clienteSelect.innerHTML = `<option value="">Selecione um cliente</option>` + dados.clientes.map(c => {
+        return `<option value="${c.id}">${c.nome}</option>`;
+      }).join("");
+
+      const itemSelect = document.querySelector("#osItemSelect");
+      itemSelect.innerHTML = `<option value="">Selecione um item</option>` + dados.catalogo.map(i => {
+        return `<option value="${i.id}">${i.nome} - ${money.format(Number(i.valor || 0))}</option>`;
+      }).join("");
+    }
+
+    function adicionarItemOS() {
+      const id = Number(document.querySelector("#osItemSelect").value);
+      const qtd = Number(document.querySelector("#osItemQtd").value || 1);
+      const item = dados.catalogo.find(i => Number(i.id) === id);
+
+      if (!item) {
+        alert("Selecione um item.");
+        return;
+      }
+
+      const tipo = item.tipo || item.tipoItem;
+
+      if (tipo === "material" && Number(item.estoque || 0) < qtd) {
+        alert("Estoque insuficiente.");
+        return;
+      }
+
+      const existente = osItensTemp.find(i => Number(i.id) === id);
+
+      if (existente) {
+        existente.quantidade += qtd;
+        existente.subtotal = existente.quantidade * existente.valor;
+      } else {
+        osItensTemp.push({
+          id: item.id,
+          tipo,
+          nome: item.nome,
+          valor: Number(item.valor || 0),
+          quantidade: qtd,
+          subtotal: Number(item.valor || 0) * qtd
+        });
+      }
+
+      renderItensOS();
+      atualizarTotalOS();
+    }
+
+    function removerItemOS(index) {
+      osItensTemp.splice(index, 1);
+      renderItensOS();
+      atualizarTotalOS();
+    }
+
+    function renderItensOS() {
+      const el = document.querySelector("#osItensList");
+
+      if (!osItensTemp.length) {
+        el.innerHTML = "<p>Nenhum item adicionado.</p>";
+        return;
+      }
+
+      el.innerHTML = `<table class="table">
+        <thead><tr><th>Item</th><th>Qtd</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody>
+          ${osItensTemp.map((i, index) => `<tr>
+            <td>${i.nome}</td>
+            <td>${i.quantidade}</td>
+            <td>${money.format(i.subtotal)}</td>
+            <td><button class="btn btn-danger" onclick="removerItemOS(${index})">Remover</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+    }
+
+    function atualizarTotalOS() {
+      const itens = osItensTemp.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
+      const maoObra = Number(document.querySelector("#osMaoObra").value || 0);
+      const desconto = Number(document.querySelector("#osDesconto").value || 0);
+      const total = Math.max(0, itens + maoObra - desconto);
+
+      document.querySelector("#totalItens").textContent = money.format(itens);
+      document.querySelector("#totalMaoObra").textContent = money.format(maoObra);
+      document.querySelector("#totalDesconto").textContent = `- ${money.format(desconto)}`;
+      document.querySelector("#osTotalPreview").textContent = money.format(total);
+
+      return total;
+    }
+
+    async function criarOS() {
+      const clienteId = Number(document.querySelector("#osCliente").value);
+      const cliente = dados.clientes.find(c => Number(c.id) === clienteId);
+
+      if (!cliente) {
+        alert("Selecione um cliente.");
+        return;
+      }
+
+      if (!document.querySelector("#osData").value) {
+        alert("Informe a data de abertura.");
+        return;
+      }
+
+      const os = {
+        id: Date.now(),
+        tipo: "criar_os",
+        clienteId,
+        clienteNome: cliente.nome,
+        dataAbertura: document.querySelector("#osData").value,
+        status: document.querySelector("#osStatus").value,
+        prazo: document.querySelector("#osPrazo").value,
+        descricao: document.querySelector("#osDescricao").value,
+        itensOS: osItensTemp,
+        maoObra: Number(document.querySelector("#osMaoObra").value || 0),
+        desconto: Number(document.querySelector("#osDesconto").value || 0),
+        valorTotal: atualizarTotalOS()
+      };
+
+      showLoading();
+      const result = await apiPost({ ...os, itensOS: JSON.stringify(os.itensOS) });
+      hideLoading();
+
+      if (!result || result.res === "ok") {
+        dados.ordens.unshift(os);
+        osItensTemp = [];
+        salvarLocal();
+        limparOS();
+        renderAll();
+        switchTab("dashboard");
+        toast("Ordem de serviço criada");
+      } else {
+        alert("Erro ao criar OS.");
+      }
+    }
+
+    function limparOS() {
+      document.querySelector("#osPrazo").value = "";
+      document.querySelector("#osDescricao").value = "";
+      document.querySelector("#osMaoObra").value = "0";
+      document.querySelector("#osDesconto").value = "0";
+      renderItensOS();
+      atualizarTotalOS();
+    }
+
+    function renderizarOrdens() {
+      const filtro = document.querySelector("#filtroStatusOS")?.value || "todos";
+      let ordens = dados.ordens || [];
+
+      if (filtro !== "todos") {
+        ordens = ordens.filter(os => os.status === filtro);
+      }
+
+      const el = document.querySelector("#ordensList");
+
+      if (!ordens.length) {
+        el.innerHTML = `<div class="panel">Nenhuma ordem encontrada.</div>`;
+        return;
+      }
+
+      el.innerHTML = ordens.map(os => `<article class="order-card ${os.status}">
+        <div class="order-top">
+          <span class="order-id">OS #${os.id}</span>
+          <span class="badge ${os.status}">${statusLabel(os.status)}</span>
+        </div>
+        <h4>${os.clienteNome || "-"} - ${os.descricao || "Atendimento técnico"}</h4>
+        <div class="order-meta">
+          <span>Abertura: ${formatDate(os.dataAbertura)}</span>
+          <span>Prazo: ${formatDate(os.prazo)}</span>
+          <span>${money.format(Number(os.valorTotal || 0))}</span>
+        </div>
+        <div class="actions" style="justify-content:start">
+          <button class="btn btn-green" onclick="finalizarOS(${os.id})">Finalizar</button>
+          <button class="btn btn-light" onclick="gerarPDF(${os.id})">PDF</button>
+          <button class="btn btn-danger" onclick="excluirOS(${os.id})">Excluir</button>
+        </div>
+      </article>`).join("");
+    }
+
+    function statusLabel(status) {
+      return {
+        aberta: "Aberta",
+        em_andamento: "Em andamento",
+        concluida: "Concluída",
+        cancelada: "Cancelada"
+      }[status] || status;
+    }
+
+    async function finalizarOS(id) {
+      const os = dados.ordens.find(item => Number(item.id) === Number(id));
+      if (!os) return;
+
+      os.status = "concluida";
+      os.dataConclusao = new Date().toISOString().slice(0, 10);
+
+      await apiPost({ tipo: "finalizar_os", id, status: "concluida", dataConclusao: os.dataConclusao });
+
+      salvarLocal();
+      renderAll();
+      toast("OS finalizada");
+    }
+
+    async function excluirOS(id) {
+      if (!confirm("Excluir esta ordem de serviço?")) return;
+
+      await apiPost({ tipo: "excluir_os", id });
+
+      dados.ordens = dados.ordens.filter(item => Number(item.id) !== Number(id));
+      salvarLocal();
+      renderAll();
+      toast("OS excluída");
+    }
+
+    function atualizarDashboard() {
+      const ordens = dados.ordens || [];
+      const abertas = ordens.filter(o => o.status === "aberta").length;
+      const andamento = ordens.filter(o => o.status === "em_andamento").length;
+      const concluidas = ordens.filter(o => o.status === "concluida").length;
+      const faturamento = ordens.filter(o => o.status === "concluida").reduce((sum, o) => sum + Number(o.valorTotal || 0), 0);
+
+      document.querySelector("#statTotal").textContent = ordens.length;
       document.querySelector("#statAbertas").textContent = abertas;
       document.querySelector("#statAndamento").textContent = andamento;
       document.querySelector("#statConcluidas").textContent = concluidas;
       document.querySelector("#statFaturamento").textContent = money.format(faturamento);
-
-      const recent = [...data.ordens].sort((a, b) => b.id - a.id).slice(0, 4);
-      document.querySelector("#recentOrders").innerHTML = recent.length ? recent.map(orderCard).join("") : `<div class="empty">Nenhuma ordem cadastrada ainda.</div>`;
+      document.querySelector("#resumoReceita").textContent = money.format(faturamento);
+      document.querySelector("#resumoClientes").textContent = dados.clientes.length;
+      document.querySelector("#resumoCatalogo").textContent = dados.catalogo.length;
     }
 
-    function renderClients() {
-      document.querySelector("#clientesList").innerHTML = data.clientes.length ? data.clientes.map(client => `
-        <div class="list-row">
-          <div>
-            <h3>${escapeHtml(client.nome)}</h3>
-            <p>${escapeHtml(client.telefone || "-")} - ${escapeHtml(client.endereco || "-")}</p>
-          </div>
-          <div class="row-actions">
-            <button class="btn btn-light" data-edit-client="${client.id}">Editar</button>
-            <button class="btn btn-danger" data-delete-client="${client.id}">Excluir</button>
-          </div>
-        </div>
-      `).join("") : `<div class="empty">Nenhum cliente cadastrado.</div>`;
-    }
-
-    function saveClient() {
-      const nome = document.querySelector("#clienteNome").value.trim();
-      if (!nome) return alert("Digite o nome do cliente.");
-      data.clientes.push({
-        id: nextId(data.clientes),
-        nome,
-        documento: document.querySelector("#clienteDocumento").value.trim(),
-        telefone: document.querySelector("#clienteTelefone").value.trim(),
-        email: document.querySelector("#clienteEmail").value.trim(),
-        endereco: document.querySelector("#clienteEndereco").value.trim()
-      });
-      ["clienteNome","clienteDocumento","clienteTelefone","clienteEmail","clienteEndereco"].forEach(id => document.querySelector(`#${id}`).value = "");
-      saveData();
-      renderAll();
-    }
-
-    function renderCatalog() {
-      document.querySelector("#catalogoList").innerHTML = data.catalogo.length ? `
-        <table>
-          <thead><tr><th>Tipo</th><th>Nome</th><th>Categoria</th><th>Valor</th><th>Estoque</th><th>Acoes</th></tr></thead>
-          <tbody>
-            ${data.catalogo.map(item => `
-              <tr>
-                <td>${item.tipo === "material" ? "Material" : "Servico"}</td>
-                <td><strong>${escapeHtml(item.nome)}</strong><br><span style="color:var(--muted)">${escapeHtml(item.descricao || "")}</span></td>
-                <td>${escapeHtml(item.categoria || "-")}</td>
-                <td>${money.format(item.valor)}</td>
-                <td>${item.tipo === "material" ? item.estoque : "N/A"}</td>
-                <td><button class="btn btn-danger" data-delete-item="${item.id}">Excluir</button></td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>` : `<div class="empty">Nenhum item cadastrado.</div>`;
-    }
-
-    function saveItem() {
-      const nome = document.querySelector("#itemNome").value.trim();
-      const valor = Number(document.querySelector("#itemValor").value);
-      if (!nome || valor <= 0) return alert("Preencha nome e valor valido.");
-      data.catalogo.push({
-        id: nextId(data.catalogo),
-        tipo: document.querySelector("#itemTipo").value,
-        nome,
-        valor,
-        estoque: Number(document.querySelector("#itemEstoque").value) || 0,
-        categoria: document.querySelector("#itemCategoria").value.trim(),
-        descricao: document.querySelector("#itemDescricao").value.trim()
-      });
-      ["itemNome","itemValor","itemCategoria","itemDescricao"].forEach(id => document.querySelector(`#${id}`).value = "");
-      document.querySelector("#itemEstoque").value = "0";
-      saveData();
-      renderAll();
-    }
-
-    function renderSelects() {
-      const clienteOptions = `<option value="">Selecione um cliente</option>` + data.clientes.map(c => `<option value="${c.id}">${escapeHtml(c.nome)}</option>`).join("");
-      document.querySelector("#osCliente").innerHTML = clienteOptions;
-      document.querySelector("#osItemSelect").innerHTML = `<option value="">Selecione um item</option>` + data.catalogo.map(item => {
-        const estoque = item.tipo === "material" ? ` - Estoque: ${item.estoque}` : "";
-        return `<option value="${item.id}">${escapeHtml(item.nome)} - ${money.format(item.valor)}${estoque}</option>`;
-      }).join("");
-    }
-
-    function addTempItem() {
-      const id = Number(document.querySelector("#osItemSelect").value);
-      const quantity = Math.max(1, Number(document.querySelector("#osItemQtd").value) || 1);
-      const item = data.catalogo.find(i => i.id === id);
-      if (!item) return alert("Selecione um item.");
-      if (item.tipo === "material" && item.estoque < quantity) return alert("Estoque insuficiente.");
-      const found = tempItems.find(i => i.id === id);
-      if (found) found.quantidade += quantity;
-      else tempItems.push({ ...item, quantidade: quantity });
-      renderTempItems();
-      updateOsTotal();
-    }
-
-    function renderTempItems() {
-      document.querySelector("#osItensList").innerHTML = tempItems.length ? `
-        <table>
-          <thead><tr><th>Item</th><th>Qtd</th><th>Unitario</th><th>Subtotal</th><th></th></tr></thead>
-          <tbody>${tempItems.map((item, index) => `
-            <tr>
-              <td>${escapeHtml(item.nome)}</td>
-              <td>${item.quantidade}</td>
-              <td>${money.format(item.valor)}</td>
-              <td>${money.format(item.valor * item.quantidade)}</td>
-              <td><button class="btn btn-danger" data-remove-temp="${index}">Remover</button></td>
-            </tr>
-          `).join("")}</tbody>
-        </table>` : `<div class="empty">Nenhum item adicionado na OS.</div>`;
-    }
-
-    function totals() {
-      const itens = tempItems.reduce((sum, item) => sum + item.valor * item.quantidade, 0);
-      const maoObra = Number(document.querySelector("#osMaoObra").value) || 0;
-      const desconto = Number(document.querySelector("#osDesconto").value) || 0;
-      return { itens, maoObra, desconto, total: Math.max(0, itens + maoObra - desconto) };
-    }
-
-    function updateOsTotal() {
-      const t = totals();
-      document.querySelector("#totalItens").textContent = money.format(t.itens);
-      document.querySelector("#totalMaoObra").textContent = money.format(t.maoObra);
-      document.querySelector("#totalDesconto").textContent = money.format(t.desconto);
-      document.querySelector("#osTotalPreview").textContent = money.format(t.total);
-    }
-
-    function createOs() {
-      const clienteId = Number(document.querySelector("#osCliente").value);
-      const cliente = data.clientes.find(c => c.id === clienteId);
-      if (!cliente) return alert("Selecione um cliente.");
-      const dataAbertura = document.querySelector("#osData").value;
-      if (!dataAbertura) return alert("Preencha a data de abertura.");
-      const t = totals();
-      const order = {
-        id: nextId(data.ordens),
-        clienteId,
-        clienteNome: cliente.nome,
-        dataAbertura,
-        status: document.querySelector("#osStatus").value,
-        prazo: document.querySelector("#osPrazo").value,
-        descricao: document.querySelector("#osDescricao").value.trim(),
-        itensOS: tempItems.map(item => ({ id: item.id, tipo: item.tipo, nome: item.nome, valor: item.valor, quantidade: item.quantidade, subtotal: item.valor * item.quantidade })),
-        maoObra: t.maoObra,
-        desconto: t.desconto,
-        valorTotal: t.total,
-        criadoEm: new Date().toISOString()
+    function salvarConfiguracoes() {
+      dados.configuracoes = {
+        empresaNome: document.querySelector("#configEmpresaNome").value,
+        empresaCnpj: document.querySelector("#configEmpresaCnpj").value,
+        empresaTelefone: document.querySelector("#configEmpresaTelefone").value,
+        empresaEmail: document.querySelector("#configEmpresaEmail").value,
+        empresaSite: document.querySelector("#configEmpresaSite").value,
+        empresaEndereco: document.querySelector("#configEmpresaEndereco").value
       };
-      order.itensOS.forEach(osItem => {
-        const catalogItem = data.catalogo.find(item => item.id === osItem.id);
-        if (catalogItem && catalogItem.tipo === "material") catalogItem.estoque = Math.max(0, catalogItem.estoque - osItem.quantidade);
-      });
-      data.ordens.push(order);
-      tempItems = [];
-      document.querySelector("#osDescricao").value = "";
-      document.querySelector("#osMaoObra").value = "0";
-      document.querySelector("#osDesconto").value = "0";
-      saveData();
-      renderAll();
-      alert("Ordem de servico criada.");
+
+      apiPost({ tipo: "salvar_config", ...dados.configuracoes });
+      salvarLocal();
+      toast("Configurações salvas");
     }
 
-    function orderCard(os) {
-      return `<article class="os-card ${os.status}">
-        <div class="os-top">
-          <span class="os-number">OS #${String(os.id).padStart(4, "0")}</span>
-          <span class="badge ${os.status}">${statusLabel(os.status)}</span>
-        </div>
-        <h3>${escapeHtml(os.clienteNome)}</h3>
-        <div class="os-meta">
-          <span>Abertura: ${formatDate(os.dataAbertura)}</span>
-          <span>Prazo: ${formatDate(os.prazo)}</span>
-          <span>Itens: ${os.itensOS.length}</span>
-        </div>
-        <div class="os-total">${money.format(os.valorTotal)}</div>
-        <div class="row-actions">
-          <button class="btn btn-light" data-view-os="${os.id}">Ver detalhes</button>
-          <button class="btn btn-success" data-finish-os="${os.id}">Finalizar</button>
-          <button class="btn btn-light" data-pdf-os="${os.id}">PDF</button>
-          <button class="btn btn-danger" data-delete-os="${os.id}">Excluir</button>
-        </div>
-      </article>`;
+    function carregarConfiguracoesForm() {
+      const cfg = dados.configuracoes || {};
+      document.querySelector("#configEmpresaNome").value = cfg.empresaNome || "WR Manutenção e Serviços";
+      document.querySelector("#configEmpresaCnpj").value = cfg.empresaCnpj || "";
+      document.querySelector("#configEmpresaTelefone").value = cfg.empresaTelefone || "";
+      document.querySelector("#configEmpresaEmail").value = cfg.empresaEmail || "";
+      document.querySelector("#configEmpresaSite").value = cfg.empresaSite || "";
+      document.querySelector("#configEmpresaEndereco").value = cfg.empresaEndereco || "";
     }
 
-    function renderOrders() {
-      const filter = document.querySelector("#filtroStatusOS").value;
-      const orders = data.ordens.filter(os => filter === "todos" || os.status === filter).sort((a, b) => b.id - a.id);
-      document.querySelector("#ordensList").innerHTML = orders.length ? orders.map(orderCard).join("") : `<div class="empty">Nenhuma ordem encontrada.</div>`;
-    }
+    function gerarPDF(id) {
+      const os = dados.ordens.find(item => Number(item.id) === Number(id));
+      if (!os) return;
 
-    function viewOs(id) {
-      selectedOs = data.ordens.find(os => os.id === id);
-      if (!selectedOs) return;
-      document.querySelector("#osModalContent").innerHTML = `
-        <div class="os-card ${selectedOs.status}" style="box-shadow:none">
-          <div class="os-top"><span class="os-number">OS #${String(selectedOs.id).padStart(4, "0")}</span><span class="badge ${selectedOs.status}">${statusLabel(selectedOs.status)}</span></div>
-          <h3>${escapeHtml(selectedOs.clienteNome)}</h3>
-          <p style="color:var(--muted)">${escapeHtml(selectedOs.descricao || "Sem descricao")}</p>
-          <div class="os-meta"><span>Abertura: ${formatDate(selectedOs.dataAbertura)}</span><span>Prazo: ${formatDate(selectedOs.prazo)}</span></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Item</th><th>Qtd</th><th>Unitario</th><th>Subtotal</th></tr></thead>
-              <tbody>${selectedOs.itensOS.map(item => `<tr><td>${escapeHtml(item.nome)}</td><td>${item.quantidade}</td><td>${money.format(item.valor)}</td><td>${money.format(item.subtotal)}</td></tr>`).join("")}</tbody>
-            </table>
-          </div>
-          <div class="os-total">Total: ${money.format(selectedOs.valorTotal)}</div>
-          <button class="btn btn-primary" data-pdf-os="${selectedOs.id}">Gerar PDF</button>
-        </div>`;
-      document.querySelector("#osModal").classList.add("active");
-    }
-
-    function generatePdf(id) {
-      const os = data.ordens.find(order => order.id === id);
-      if (!os || !window.jspdf) return alert("Nao foi possivel gerar o PDF.");
-      const cfg = data.configuracoes;
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFillColor(0, 102, 204);
-      doc.rect(0, 0, 210, 34, "F");
-      doc.setTextColor(255, 255, 255);
+      const cfg = dados.configuracoes || {};
+      const itens = parseItens(os.itensOS);
+
+      doc.setFillColor(15, 118, 110);
+      doc.rect(0, 0, 210, 38, "F");
+      doc.setTextColor(255);
       doc.setFontSize(18);
-      doc.text(cfg.empresaNome || "WR Manutencao e Servicos", 14, 16);
+      doc.text(cfg.empresaNome || "WR Manutenção e Serviços", 14, 16);
       doc.setFontSize(10);
-      doc.text(`Ordem de Servico #${String(os.id).padStart(4, "0")}`, 14, 25);
-      doc.setTextColor(17, 24, 39);
-      doc.setFontSize(12);
-      doc.text(`Cliente: ${os.clienteNome}`, 14, 48);
-      doc.text(`Status: ${statusLabel(os.status)}`, 14, 56);
-      doc.text(`Abertura: ${formatDate(os.dataAbertura)}   Prazo: ${formatDate(os.prazo)}`, 14, 64);
-      doc.text("Descricao:", 14, 78);
-      doc.setFontSize(10);
-      doc.text(doc.splitTextToSize(os.descricao || "-", 180), 14, 85);
+      doc.text(`${cfg.empresaTelefone || ""} ${cfg.empresaEmail || ""}`, 14, 25);
+
+      doc.setTextColor(16, 32, 39);
+      doc.setFontSize(16);
+      doc.text(`Ordem de Serviço #${os.id}`, 14, 52);
+
+      doc.setFontSize(11);
+      doc.text(`Cliente: ${os.clienteNome || "-"}`, 14, 64);
+      doc.text(`Data: ${formatDate(os.dataAbertura)}    Status: ${statusLabel(os.status)}`, 14, 72);
+      doc.text(`Descrição: ${os.descricao || "-"}`, 14, 84);
+
       doc.autoTable({
-        startY: 105,
-        head: [["Item", "Qtd", "Unitario", "Subtotal"]],
-        body: os.itensOS.map(item => [item.nome, item.quantidade, money.format(item.valor), money.format(item.subtotal)]),
-        headStyles: { fillColor: [0, 102, 204] }
+        startY: 96,
+        head: [["Item", "Qtd", "Valor", "Subtotal"]],
+        body: itens.map(i => [i.nome, i.quantidade, money.format(Number(i.valor || 0)), money.format(Number(i.subtotal || 0))]),
+        headStyles: { fillColor: [15, 118, 110] },
+        styles: { fontSize: 9 }
       });
-      const y = doc.lastAutoTable.finalY + 12;
-      doc.setFontSize(12);
-      doc.text(`Mao de obra: ${money.format(os.maoObra)}`, 14, y);
-      doc.text(`Desconto: ${money.format(os.desconto)}`, 14, y + 8);
-      doc.setFontSize(15);
-      doc.text(`Total: ${money.format(os.valorTotal)}`, 14, y + 20);
-      doc.save(`OS_${String(os.id).padStart(4, "0")}_${os.clienteNome.replace(/\s+/g, "_")}.pdf`);
+
+      const y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 12 : 110;
+      doc.setFontSize(13);
+      doc.text(`Mão de obra: ${money.format(Number(os.maoObra || 0))}`, 14, y);
+      doc.text(`Desconto: ${money.format(Number(os.desconto || 0))}`, 14, y + 8);
+      doc.setFontSize(16);
+      doc.text(`Total: ${money.format(Number(os.valorTotal || 0))}`, 14, y + 20);
+
+      doc.save(`OS_${os.id}.pdf`);
     }
 
-    function renderConfig() {
-      Object.entries(data.configuracoes).forEach(([key, value]) => {
-        const el = document.querySelector(`#config${key.charAt(0).toUpperCase() + key.slice(1)}`);
-        if (el) el.value = value || "";
-      });
+    function exportarResumo() {
+      const linhas = (dados.ordens || []).map(os => {
+        return `OS #${os.id} - ${os.clienteNome} - ${statusLabel(os.status)} - ${money.format(Number(os.valorTotal || 0))}`;
+      }).join("\n");
+
+      const blob = new Blob([`Resumo WR Manutenção e Serviços\n\n${linhas}`], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "resumo-ordens-wr.txt";
+      link.click();
+      URL.revokeObjectURL(url);
+      toast("Resumo exportado");
     }
 
-    function saveConfig() {
-      data.configuracoes = {
-        empresaNome: document.querySelector("#configEmpresaNome").value.trim(),
-        empresaCnpj: document.querySelector("#configEmpresaCnpj").value.trim(),
-        empresaTelefone: document.querySelector("#configEmpresaTelefone").value.trim(),
-        empresaEmail: document.querySelector("#configEmpresaEmail").value.trim(),
-        empresaEndereco: document.querySelector("#configEmpresaEndereco").value.trim(),
-        empresaSite: document.querySelector("#configEmpresaSite").value.trim()
-      };
-      saveData();
-      alert("Configuracoes salvas.");
+    function formatDate(date) {
+      if (!date) return "-";
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll(".tab").forEach(section => section.classList.remove("active"));
+      document.querySelector(`#tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add("active");
+      document.querySelectorAll("[data-tab]").forEach(button => {
+        button.classList.toggle("active", button.dataset.tab === tab);
+      });
     }
 
     function renderAll() {
-      renderSelects();
-      renderDashboard();
-      renderClients();
-      renderCatalog();
-      renderTempItems();
-      updateOsTotal();
-      renderOrders();
-      renderConfig();
+      atualizarSelects();
+      renderClientes();
+      renderCatalogo();
+      renderItensOS();
+      renderizarOrdens();
+      atualizarTotalOS();
+      atualizarDashboard();
+      carregarConfiguracoesForm();
     }
 
-    document.querySelector("#loginBtn").addEventListener("click", login);
-    document.querySelector("#logoutBtn").addEventListener("click", logout);
-    document.querySelectorAll("[data-tab]").forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
-    document.querySelectorAll("[data-open-tab]").forEach(button => button.addEventListener("click", () => switchTab(button.dataset.openTab)));
-    document.querySelector("#saveClienteBtn").addEventListener("click", saveClient);
-    document.querySelector("#saveItemBtn").addEventListener("click", saveItem);
-    document.querySelector("#addOsItemBtn").addEventListener("click", addTempItem);
-    document.querySelector("#saveOsBtn").addEventListener("click", createOs);
-    document.querySelector("#filtroStatusOS").addEventListener("change", renderOrders);
-    document.querySelector("#osMaoObra").addEventListener("input", updateOsTotal);
-    document.querySelector("#osDesconto").addEventListener("input", updateOsTotal);
-    document.querySelector("#saveConfigBtn").addEventListener("click", saveConfig);
-    document.querySelector("#closeModalBtn").addEventListener("click", () => document.querySelector("#osModal").classList.remove("active"));
-    document.querySelector("#clearAllBtn").addEventListener("click", () => {
-      if (confirm("Limpar todos os dados locais?")) {
-        data = defaultData();
-        tempItems = [];
-        saveData();
-        renderAll();
-      }
+    document.querySelectorAll("[data-tab], [data-tab-jump]").forEach(button => {
+      button.addEventListener("click", () => switchTab(button.dataset.tab || button.dataset.tabJump));
     });
 
-    document.body.addEventListener("click", event => {
-      const deleteClient = event.target.closest("[data-delete-client]");
-      const deleteItem = event.target.closest("[data-delete-item]");
-      const deleteOs = event.target.closest("[data-delete-os]");
-      const removeTemp = event.target.closest("[data-remove-temp]");
-      const view = event.target.closest("[data-view-os]");
-      const finish = event.target.closest("[data-finish-os]");
-      const pdf = event.target.closest("[data-pdf-os]");
-
-      if (deleteClient && confirm("Excluir cliente?")) {
-        data.clientes = data.clientes.filter(client => client.id !== Number(deleteClient.dataset.deleteClient));
-        saveData(); renderAll();
+    document.addEventListener("DOMContentLoaded", () => {
+      const session = localStorage.getItem("wrSession");
+      if (session) {
+        usuarioAtual = JSON.parse(session);
+        entrarNoApp();
       }
-      if (deleteItem && confirm("Excluir item do catalogo?")) {
-        data.catalogo = data.catalogo.filter(item => item.id !== Number(deleteItem.dataset.deleteItem));
-        saveData(); renderAll();
-      }
-      if (deleteOs && confirm("Excluir ordem de servico?")) {
-        data.ordens = data.ordens.filter(os => os.id !== Number(deleteOs.dataset.deleteOs));
-        saveData(); renderAll();
-      }
-      if (removeTemp) {
-        tempItems.splice(Number(removeTemp.dataset.removeTemp), 1);
-        renderTempItems(); updateOsTotal();
-      }
-      if (view) viewOs(Number(view.dataset.viewOs));
-      if (finish) {
-        const os = data.ordens.find(order => order.id === Number(finish.dataset.finishOs));
-        if (os) { os.status = "concluida"; os.dataConclusao = new Date().toISOString().slice(0, 10); saveData(); renderAll(); }
-      }
-      if (pdf) generatePdf(Number(pdf.dataset.pdfOs));
     });
-
-    const session = localStorage.getItem(sessionKey);
-    if (session) {
-      currentUser = JSON.parse(session);
-      openApp();
-    }
   </script>
 </body>
 </html>
