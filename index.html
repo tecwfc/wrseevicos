@@ -11,7 +11,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
   <style>
-    /* ====== SEUS ESTILOS AQUI ====== */
     :root {
       --bg: #eef4f6;
       --panel: #ffffff;
@@ -380,7 +379,7 @@
 </head>
 
 <body>
-  <!-- ====== TELA DE LOGIN ====== -->
+  <!-- TELA DE LOGIN -->
   <section class="login-screen" id="loginScreen">
     <div class="login-hero">
       <div class="brand">
@@ -426,10 +425,10 @@
     </div>
   </section>
 
-  <!-- ====== LOADING ====== -->
+  <!-- LOADING -->
   <div class="loading" id="loading">Carregando...</div>
 
-  <!-- ====== APP ====== -->
+  <!-- APP -->
   <div class="app" id="app">
     <aside class="sidebar">
       <div class="brand">
@@ -452,7 +451,7 @@
     </aside>
 
     <main class="main">
-      <!-- ====== DASHBOARD ====== -->
+      <!-- DASHBOARD -->
       <section id="tabDashboard" class="tab active">
         <header class="topbar">
           <div>
@@ -460,7 +459,7 @@
             <p>Gestão de manutenção, instalação e higienização de ar condicionado.</p>
           </div>
           <div class="actions">
-            <button class="btn btn-light" onclick="exportarResumo()">Exportar resumo</button>
+            <button class="btn btn-light" onclick="exportarResumoPDF()">📄 Resumo PDF</button>
             <button class="btn btn-primary" onclick="switchTab('ordens')">Nova OS</button>
             <button class="btn btn-danger" onclick="fazerLogout()">Sair</button>
           </div>
@@ -518,7 +517,7 @@
         </div>
       </section>
 
-      <!-- ====== ORDENS ====== -->
+      <!-- ORDENS -->
       <section id="tabOrdens" class="tab">
         <header class="topbar">
           <div>
@@ -589,7 +588,7 @@
         </div>
       </section>
 
-      <!-- ====== CLIENTES ====== -->
+      <!-- CLIENTES -->
       <section id="tabClientes" class="tab">
         <header class="topbar"><div><h2>Clientes</h2><p>Cadastro e consulta de clientes.</p></div></header>
 
@@ -611,7 +610,7 @@
         </section>
       </section>
 
-      <!-- ====== CATÁLOGO ====== -->
+      <!-- CATÁLOGO -->
       <section id="tabCatalogo" class="tab">
         <header class="topbar"><div><h2>Materiais e Serviços</h2><p>Catálogo usado nas ordens.</p></div></header>
 
@@ -634,7 +633,7 @@
         </section>
       </section>
 
-      <!-- ====== CONFIGURAÇÕES ====== -->
+      <!-- CONFIGURAÇÕES -->
       <section id="tabConfig" class="tab">
         <header class="topbar"><div><h2>Configurações</h2><p>Dados da empresa para documentos.</p></div></header>
 
@@ -653,7 +652,7 @@
     </main>
   </div>
 
-  <!-- ====== MOBILE NAV ====== -->
+  <!-- MOBILE NAV -->
   <nav class="mobile-nav">
     <button class="active" data-tab="dashboard">Painel</button>
     <button data-tab="ordens">OS</button>
@@ -662,12 +661,12 @@
     <button data-tab="config">Config</button>
   </nav>
 
-  <!-- ====== TOAST ====== -->
+  <!-- TOAST -->
   <div class="toast" id="toast">Salvo</div>
 
   <script>
     // ============================================
-    // CONFIGURAÇÃO - ATUALIZE COM SUA URL DO APPS SCRIPT
+    // CONFIGURAÇÃO
     // ============================================
     const API_URL = "https://script.google.com/macros/s/AKfycbztW9LS1vkMx-M6QhBvylBlmUxzKBkgBn5tBERQO1P-vCylTiBidCdk4uyU7-FjUxda4Q/exec";
     const storageKey = "wr_os_profissional";
@@ -715,7 +714,7 @@
     }
 
     // ============================================
-    // API - CORRIGIDO COM NO-CORS
+    // API
     // ============================================
     async function apiGet(endpoint) {
       try {
@@ -728,16 +727,12 @@
 
     async function apiPost(payload) {
       try {
-        // Usando mode: 'no-cors' para evitar CORS
         const response = await fetch(API_URL, { 
           method: "POST", 
           mode: 'no-cors',
           body: JSON.stringify(payload),
           headers: { 'Content-Type': 'application/json' }
         });
-        
-        // Com no-cors, a resposta é opaca, mas a requisição foi enviada
-        // Vamos buscar os dados atualizados depois
         return { res: "ok", msg: "Enviado com sucesso" };
       } catch (error) {
         console.error("Erro na API:", error);
@@ -759,7 +754,6 @@
 
       showLoading();
 
-      // Fallback local (já que o login via API pode ter CORS)
       if (usuario === "admin" && senha === "wr@2024") {
         usuarioAtual = { usuario: "admin", nome: "Administrador" };
         localStorage.setItem("wrSession", JSON.stringify(usuarioAtual));
@@ -768,7 +762,6 @@
         return;
       }
 
-      // Tenta via API
       try {
         const result = await apiPost({ tipo: "login", usuario, senha });
         if (result && result.auth) {
@@ -867,7 +860,6 @@
       await apiPost(cliente);
       hideLoading();
 
-      // Adiciona localmente com ID temporário
       const novoCliente = {
         id: Date.now(),
         nome: cliente.nome,
@@ -880,9 +872,8 @@
       salvarLocal();
       limparCliente();
       renderAll();
-      toast("Cliente salvo localmente (sincronizará com a planilha)");
+      toast("Cliente salvo localmente");
 
-      // Recarrega da planilha para pegar o ID real
       setTimeout(carregarTodosDados, 2000);
     }
 
@@ -1135,7 +1126,6 @@
       await apiPost(osData);
       hideLoading();
 
-      // Adiciona localmente
       const novaOS = {
         id: "OS-" + String(Date.now()).slice(-4),
         clienteId: osData.clienteId,
@@ -1282,7 +1272,7 @@
     }
 
     // ============================================
-    // GERAR PDF
+    // PDF PROFISSIONAL - ORDEM DE SERVIÇO
     // ============================================
     function gerarPDF(id) {
       const idLimpo = String(id).trim();
@@ -1295,49 +1285,384 @@
 
       try {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const doc = new jsPDF('p', 'mm', 'a4');
         const cfg = dados.configuracoes || {};
         const itens = parseItens(os.itensOS);
+        const pageWidth = 210;
+        const margin = 15;
+        let y = 20;
 
-        doc.setFillColor(15, 118, 110);
-        doc.rect(0, 0, 210, 38, "F");
-        doc.setTextColor(255);
-        doc.setFontSize(18);
-        doc.text(cfg.empresaNome || "WR Manutenção e Serviços", 14, 16);
+        const corPrimaria = [15, 118, 110];
+        const corSecundaria = [11, 31, 38];
+        const corCinza = [100, 116, 125];
+
+        // CABEÇALHO
+        doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
+        doc.rect(0, 0, pageWidth, 45, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.text(cfg.empresaNome || "WR Manutenção e Serviços", margin, 18);
+
         doc.setFontSize(10);
-        doc.text(`${cfg.empresaTelefone || ""} ${cfg.empresaEmail || ""}`, 14, 25);
+        doc.setFont('helvetica', 'normal');
+        doc.text(cfg.empresaEndereco || "", margin, 27);
+        doc.text(`${cfg.empresaTelefone || ""} | ${cfg.empresaEmail || ""}`, margin, 33);
+        doc.text(cfg.empresaSite || "", margin, 39);
 
-        doc.setTextColor(16, 32, 39);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`OS #${os.id}`, pageWidth - margin, 18, { align: 'right' });
+
+        y = 52;
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 8;
+
+        doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
         doc.setFontSize(16);
-        doc.text(`Ordem de Serviço #${os.id}`, 14, 52);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ORDEM DE SERVIÇO', margin, y);
+        y += 8;
 
+        // STATUS BADGE
+        const statusMap = {
+          'aberta': ['Aberta', [254, 243, 199], [146, 64, 14]],
+          'em_andamento': ['Em Andamento', [219, 234, 254], [30, 64, 175]],
+          'concluida': ['Concluída', [209, 250, 229], [6, 95, 70]],
+          'cancelada': ['Cancelada', [254, 226, 226], [153, 27, 27]]
+        };
+        const statusInfo = statusMap[os.status] || ['Desconhecido', [200, 200, 200], [100, 100, 100]];
+        
+        doc.setFillColor(statusInfo[1][0], statusInfo[1][1], statusInfo[1][2]);
+        doc.setTextColor(statusInfo[2][0], statusInfo[2][1], statusInfo[2][2]);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        const statusText = `STATUS: ${statusInfo[0].toUpperCase()}`;
+        const statusWidth = doc.getTextWidth(statusText) + 10;
+        const statusX = pageWidth - margin - statusWidth;
+        doc.rect(statusX, y - 6, statusWidth, 8, 'F');
+        doc.text(statusText, statusX + 5, y);
+
+        y += 10;
+
+        // DADOS DO CLIENTE
+        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DADOS DO CLIENTE', margin, y);
+        y += 6;
+
+        doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
         doc.setFontSize(11);
-        doc.text(`Cliente: ${os.clienteNome || "-"}`, 14, 64);
-        doc.text(`Data: ${formatDate(os.dataAbertura)}    Status: ${statusLabel(os.status)}`, 14, 72);
-        doc.text(`Descrição: ${os.descricao || "-"}`, 14, 84);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Nome: ${os.clienteNome || "-"}`, margin, y);
+        y += 6;
+        doc.text(`Data de Abertura: ${formatDate(os.dataAbertura)}`, margin, y);
+        y += 6;
+        doc.text(`Prazo: ${formatDate(os.prazo)}`, margin, y);
+        y += 8;
 
-        if (itens.length > 0) {
-          doc.autoTable({
-            startY: 96,
-            head: [["Item", "Qtd", "Valor", "Subtotal"]],
-            body: itens.map(i => [i.nome, i.quantidade, money.format(Number(i.valor || 0)), money.format(Number(i.subtotal || 0))]),
-            headStyles: { fillColor: [15, 118, 110] },
-            styles: { fontSize: 9 }
-          });
+        // DESCRIÇÃO
+        if (os.descricao) {
+          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.text('DESCRIÇÃO DO SERVIÇO', margin, y);
+          y += 6;
+
+          doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          const descLines = doc.splitTextToSize(os.descricao, pageWidth - margin * 2);
+          doc.text(descLines, margin, y);
+          y += descLines.length * 5 + 6;
         }
 
-        const y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 12 : 110;
-        doc.setFontSize(13);
-        doc.text(`Mão de obra: ${money.format(Number(os.maoObra || 0))}`, 14, y);
-        doc.text(`Desconto: ${money.format(Number(os.desconto || 0))}`, 14, y + 8);
-        doc.setFontSize(16);
-        doc.text(`Total: ${money.format(Number(os.valorTotal || 0))}`, 14, y + 20);
+        // TABELA DE ITENS
+        if (itens.length > 0) {
+          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.text('MATERIAIS E SERVIÇOS', margin, y);
+          y += 4;
+
+          const tableData = itens.map(i => [
+            i.nome || "-",
+            String(i.quantidade || 0),
+            money.format(Number(i.valor || 0)),
+            money.format(Number(i.subtotal || 0))
+          ]);
+
+          doc.autoTable({
+            startY: y,
+            head: [['Item', 'Qtd', 'Valor Unit.', 'Subtotal']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: {
+              fillColor: corPrimaria,
+              textColor: [255, 255, 255],
+              fontSize: 9,
+              fontStyle: 'bold',
+              halign: 'center'
+            },
+            styles: {
+              fontSize: 9,
+              cellPadding: 4,
+              valign: 'middle'
+            },
+            columnStyles: {
+              0: { cellWidth: 'auto' },
+              1: { cellWidth: 20, halign: 'center' },
+              2: { cellWidth: 35, halign: 'right' },
+              3: { cellWidth: 35, halign: 'right' }
+            },
+            margin: { left: margin, right: margin }
+          });
+
+          y = doc.lastAutoTable.finalY + 8;
+        }
+
+        // RESUMO FINANCEIRO
+        const totalItens = itens.reduce((sum, i) => sum + Number(i.subtotal || 0), 0);
+        const maoObra = Number(os.maoObra || 0);
+        const desconto = Number(os.desconto || 0);
+        const valorTotal = Number(os.valorTotal || 0);
+
+        const boxX = pageWidth - margin - 100;
+        const boxY = y;
+        const boxW = 100;
+        let boxH = 50;
+
+        doc.setFillColor(245, 248, 250);
+        doc.setDrawColor(200, 200, 200);
+        doc.rect(boxX, boxY, boxW, boxH, 'FD');
+
+        let lineY = boxY + 8;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+        doc.text('RESUMO FINANCEIRO', boxX + 5, lineY);
+        lineY += 6;
+
+        doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
+        doc.text(`Itens: ${money.format(totalItens)}`, boxX + 5, lineY);
+        lineY += 5;
+        doc.text(`Mão de obra: ${money.format(maoObra)}`, boxX + 5, lineY);
+        lineY += 5;
+        if (desconto > 0) {
+          doc.text(`Desconto: -${money.format(desconto)}`, boxX + 5, lineY);
+          lineY += 5;
+        }
+
+        doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
+        doc.rect(boxX, lineY, boxW, 12, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text(`TOTAL: ${money.format(valorTotal)}`, boxX + 5, lineY + 8);
+
+        // RODAPÉ
+        const footerY = Math.max(y + 70, 280);
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, footerY, pageWidth - margin, footerY);
+
+        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Documento gerado em ${new Date().toLocaleString('pt-BR')}`, margin, footerY + 6);
+        doc.text(`WR Manutenção e Serviços - Todos os direitos reservados`, pageWidth - margin, footerY + 6, { align: 'right' });
 
         doc.save(`OS_${os.id}.pdf`);
-        toast("PDF gerado com sucesso!");
+        toast("✅ PDF gerado com sucesso!");
       } catch(e) {
         console.error("Erro ao gerar PDF:", e);
         alert("Erro ao gerar PDF: " + e.message);
+      }
+    }
+
+    // ============================================
+    // PDF PROFISSIONAL - RESUMO COMPLETO
+    // ============================================
+    function exportarResumoPDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const cfg = dados.configuracoes || {};
+        const ordens = dados.ordens || [];
+        const pageWidth = 210;
+        const margin = 15;
+        let y = 20;
+
+        const corPrimaria = [15, 118, 110];
+        const corSecundaria = [11, 31, 38];
+        const corCinza = [100, 116, 125];
+
+        // CABEÇALHO
+        doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
+        doc.rect(0, 0, pageWidth, 35, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text(cfg.empresaNome || "WR Manutenção e Serviços", margin, 16);
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Relatório Gerencial - ${new Date().toLocaleDateString('pt-BR')}`, margin, 26);
+
+        y = 45;
+
+        // TÍTULO
+        doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RESUMO DE ORDENS DE SERVIÇO', margin, y);
+        y += 8;
+
+        // ESTATÍSTICAS
+        const total = ordens.length;
+        const abertas = ordens.filter(o => o.status === "aberta").length;
+        const emAndamento = ordens.filter(o => o.status === "em_andamento").length;
+        const concluidas = ordens.filter(o => o.status === "concluida").length;
+        const canceladas = ordens.filter(o => o.status === "cancelada").length;
+        const faturamento = ordens.filter(o => o.status === "concluida").reduce((s, o) => s + Number(o.valorTotal || 0), 0);
+
+        const stats = [
+          ['Total de OS', total, corPrimaria],
+          ['Abertas', abertas, [217, 119, 6]],
+          ['Em Andamento', emAndamento, [37, 99, 235]],
+          ['Concluídas', concluidas, [5, 150, 105]],
+          ['Canceladas', canceladas, [220, 38, 38]]
+        ];
+
+        let statX = margin;
+        stats.forEach((stat, index) => {
+          const cardW = 35;
+          const cardH = 30;
+          const x = statX + (index * (cardW + 5));
+
+          doc.setFillColor(248, 250, 252);
+          doc.setDrawColor(200, 200, 200);
+          doc.rect(x, y, cardW, cardH, 'FD');
+
+          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+          doc.setFontSize(7);
+          doc.setFont('helvetica', 'bold');
+          doc.text(stat[0], x + cardW/2, y + 8, { align: 'center' });
+
+          doc.setTextColor(stat[2][0], stat[2][1], stat[2][2]);
+          doc.setFontSize(16);
+          doc.setFont('helvetica', 'bold');
+          doc.text(String(stat[1]), x + cardW/2, y + 23, { align: 'center' });
+        });
+
+        y += 38;
+
+        // FATURAMENTO TOTAL
+        doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
+        doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`FATURAMENTO TOTAL: ${money.format(faturamento)}`, pageWidth / 2, y + 8, { align: 'center' });
+        y += 20;
+
+        // LISTA DE ORDENS
+        if (ordens.length > 0) {
+          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.text('LISTA DE ORDENS DE SERVIÇO', margin, y);
+          y += 4;
+
+          const tableData = ordens.map(os => {
+            const statusMap = {
+              'aberta': 'Aberta',
+              'em_andamento': 'Em Andamento',
+              'concluida': 'Concluída',
+              'cancelada': 'Cancelada'
+            };
+            return [
+              os.id || "-",
+              os.clienteNome || "-",
+              formatDate(os.dataAbertura),
+              statusMap[os.status] || os.status,
+              money.format(Number(os.valorTotal || 0))
+            ];
+          });
+
+          doc.autoTable({
+            startY: y,
+            head: [['OS', 'Cliente', 'Abertura', 'Status', 'Valor']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: {
+              fillColor: corPrimaria,
+              textColor: [255, 255, 255],
+              fontSize: 8,
+              fontStyle: 'bold',
+              halign: 'center'
+            },
+            styles: {
+              fontSize: 8,
+              cellPadding: 3
+            },
+            columnStyles: {
+              0: { cellWidth: 30 },
+              1: { cellWidth: 'auto' },
+              2: { cellWidth: 25, halign: 'center' },
+              3: { cellWidth: 25, halign: 'center' },
+              4: { cellWidth: 30, halign: 'right' }
+            },
+            didParseCell: function(data) {
+              if (data.section === 'body' && data.column.index === 3) {
+                const status = data.cell.raw;
+                const colors = {
+                  'Aberta': { bg: [254, 243, 199], text: [146, 64, 14] },
+                  'Em Andamento': { bg: [219, 234, 254], text: [30, 64, 175] },
+                  'Concluída': { bg: [209, 250, 229], text: [6, 95, 70] },
+                  'Cancelada': { bg: [254, 226, 226], text: [153, 27, 27] }
+                };
+                const color = colors[status] || { bg: [200, 200, 200], text: [100, 100, 100] };
+                data.cell.styles.fillColor = color.bg;
+                data.cell.styles.textColor = color.text;
+                data.cell.styles.fontStyle = 'bold';
+                data.cell.styles.halign = 'center';
+              }
+            },
+            margin: { left: margin, right: margin }
+          });
+
+          y = doc.lastAutoTable.finalY + 10;
+        } else {
+          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'italic');
+          doc.text('Nenhuma ordem de serviço encontrada.', margin, y);
+          y += 10;
+        }
+
+        // RODAPÉ
+        const footerY = Math.max(y + 10, 280);
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, footerY, pageWidth - margin, footerY);
+
+        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Relatório gerado em ${new Date().toLocaleString('pt-BR')}`, margin, footerY + 6);
+        doc.text(`WR Manutenção e Serviços - Todos os direitos reservados`, pageWidth - margin, footerY + 6, { align: 'right' });
+
+        doc.save(`Resumo_OS_WR.pdf`);
+        toast("✅ Resumo PDF gerado com sucesso!");
+      } catch(e) {
+        console.error("Erro ao gerar resumo PDF:", e);
+        alert("Erro ao gerar resumo PDF: " + e.message);
       }
     }
 
@@ -1387,24 +1712,6 @@
       document.getElementById("configEmpresaEmail").value = cfg.empresaEmail || "";
       document.getElementById("configEmpresaSite").value = cfg.empresaSite || "";
       document.getElementById("configEmpresaEndereco").value = cfg.empresaEndereco || "";
-    }
-
-    // ============================================
-    // EXPORTAÇÃO
-    // ============================================
-    function exportarResumo() {
-      const linhas = (dados.ordens || []).map(os => {
-        return `OS #${os.id} - ${os.clienteNome} - ${statusLabel(os.status)} - ${money.format(Number(os.valorTotal || 0))}`;
-      }).join("\n");
-
-      const blob = new Blob([`Resumo WR Manutenção e Serviços\n\n${linhas}`], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "resumo-ordens-wr.txt";
-      link.click();
-      URL.revokeObjectURL(url);
-      toast("Resumo exportado");
     }
 
     // ============================================
@@ -1490,7 +1797,7 @@
     window.finalizarOS = finalizarOS;
     window.excluirOS = excluirOS;
     window.gerarPDF = gerarPDF;
-    window.exportarResumo = exportarResumo;
+    window.exportarResumoPDF = exportarResumoPDF;
     window.salvarConfiguracoes = salvarConfiguracoes;
     window.switchTab = switchTab;
     window.renderizarOrdens = renderizarOrdens;
