@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WR Manutenção e Serviços - Ordens de Serviço</title>
+  <title>WR Manutenção - Multi Usuário</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -130,6 +130,14 @@
     }
 
     .nav button:hover, .nav button.active { background: rgba(255,255,255,.1); color: #fff; }
+    
+    /* Classes de controle de visibilidade - por padrão tudo visível */
+    .admin-only { display: block; }
+    .tecnico-only { display: none; }
+    
+    /* Quando o usuário é técnico, esconde admin-only e mostra tecnico-only */
+    .user-tecnico .admin-only { display: none !important; }
+    .user-tecnico .tecnico-only { display: block !important; }
 
     .sidebar-footer {
       margin-top: auto;
@@ -139,6 +147,7 @@
       color: #b7cbd1;
       font-size: 13px;
     }
+    .sidebar-footer small { display: block; color: #6a8b96; font-weight: 400; }
 
     .main { min-width: 0; padding: 22px clamp(18px, 3vw, 34px) 42px; }
     .tab { display: none; }
@@ -150,12 +159,13 @@
       justify-content: space-between;
       gap: 16px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     .topbar h2 { font-size: 28px; line-height: 1; font-weight: 900; }
     .topbar p { color: var(--muted); margin-top: 6px; font-weight: 600; }
 
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: end; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
     .btn {
       min-height: 42px;
@@ -175,9 +185,11 @@
     .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
     .btn-danger { background: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3; }
     .btn-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .btn-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+    .btn-sm { min-height: 32px; padding: 0 10px; font-size: 12px; }
 
     .hero {
-      min-height: 280px;
+      min-height: 200px;
       border-radius: var(--radius);
       overflow: hidden;
       background:
@@ -280,7 +292,7 @@
     .order-card.concluida { border-left-color: var(--green); }
     .order-card.cancelada { border-left-color: var(--red); }
 
-    .order-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .order-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
     .order-id { color: var(--muted); font-size: 12px; font-weight: 900; }
 
     .badge {
@@ -339,6 +351,59 @@
 
     .mobile-nav { display: none; }
 
+    .user-info { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 8px 14px; 
+      background: var(--soft-teal); 
+      border-radius: var(--radius);
+      border: 1px solid #bddfda;
+    }
+    .user-info .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .user-info .details { line-height: 1.3; }
+    .user-info .details strong { font-size: 14px; }
+    .user-info .details small { color: var(--muted); font-size: 11px; }
+
+    .login-error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 10px;
+      border-radius: var(--radius);
+      margin-top: 10px;
+      display: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Estilo para a lista de OS do técnico */
+    .minhas-os-container {
+      display: grid;
+      gap: 16px;
+    }
+
+    .minhas-os-container .order-card {
+      cursor: default;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+    .empty-state h3 { font-size: 18px; color: var(--ink); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
     @media (max-width: 1080px) {
       .login-screen { grid-template-columns: 1fr; }
       .login-hero { min-height: 330px; }
@@ -365,6 +430,12 @@
       }
       .mobile-nav button.active { color: var(--teal); background: var(--soft-teal); }
       .main { padding-bottom: 86px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      
+      /* Mobile nav para técnico - apenas 2 botões */
+      .user-tecnico .mobile-nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     @media (max-width: 720px) {
@@ -392,8 +463,8 @@
 
       <div>
         <span class="eyebrow">Sistema profissional de OS</span>
-        <h1>Gestão moderna para manutenção de ar condicionado.</h1>
-        <p>Controle clientes, materiais, serviços, visitas técnicas, status, valores e PDFs em uma interface elegante e funcional.</p>
+        <h1>Multi-usuário com controle de permissões.</h1>
+        <p>Administradores veem tudo. Técnicos veem apenas suas OS em aberto e podem finalizar os serviços.</p>
       </div>
     </div>
 
@@ -407,26 +478,35 @@
           </div>
         </div>
 
-        <p>Acesse sua área administrativa.</p>
+        <p>Acesse sua área de trabalho.</p>
 
         <div class="field">
           <label>Usuário</label>
-          <input class="input" id="loginUsuario" value="admin" autocomplete="username">
+          <input class="input" id="loginUsuario" placeholder="Digite seu usuário" autocomplete="username" value="">
         </div>
 
         <div class="field">
           <label>Senha</label>
-          <input class="input" id="loginSenha" type="password" value="wr@2024" autocomplete="current-password">
+          <input class="input" id="loginSenha" type="password" placeholder="Digite sua senha" autocomplete="current-password" value="">
         </div>
 
+        <div id="loginError" class="login-error">Usuário ou senha inválidos!</div>
+
         <button class="btn btn-primary" style="width:100%" onclick="realizarLogin()">Entrar no sistema</button>
-        <p style="font-size:12px;margin-top:12px">Acesso local: admin / wr@2024</p>
+        <div style="margin-top:12px; font-size:12px; color:var(--muted);">
+          <!-- <p><strong>Administrador:</strong> admin / wr@2024</p>
+          <p><strong>Técnico 1:</strong> tecnico / tec123</p>
+          <p><strong>Técnico 2:</strong> tec2 / tec456</p> -->
+        </div>
       </div>
     </div>
   </section>
 
   <!-- LOADING -->
   <div class="loading" id="loading">Carregando...</div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">Salvo</div>
 
   <!-- APP -->
   <div class="app" id="app">
@@ -439,20 +519,31 @@
         </div>
       </div>
 
-      <nav class="nav">
-        <button class="active" data-tab="dashboard">Dashboard</button>
-        <button data-tab="ordens">Ordens de serviço</button>
-        <button data-tab="clientes">Clientes</button>
-        <button data-tab="catalogo">Materiais/Serviços</button>
-        <button data-tab="config">Configurações</button>
+      <div class="user-info" id="sidebarUserInfo">
+        <div class="avatar" id="userAvatar">A</div>
+        <div class="details">
+          <strong id="userNome">Administrador</strong>
+          <small id="userTipo">admin</small>
+        </div>
+      </div>
+
+      <nav class="nav" id="mainNav">
+        <button class="active admin-only" data-tab="dashboard">📊 Dashboard</button>
+        <button data-tab="ordens">📝 Ordens de serviço</button>
+        <button class="admin-only" data-tab="clientes">👤 Clientes</button>
+        <button class="admin-only" data-tab="catalogo">📦 Materiais/Serviços</button>
+        <button class="admin-only" data-tab="usuarios">👥 Usuários</button>
+        <button class="admin-only" data-tab="config">⚙️ Configurações</button>
       </nav>
 
-      <div class="sidebar-footer" id="sidebarInfo">Usuário: Administrador</div>
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%" onclick="fazerLogout()">🚪 Sair</button>
+      </div>
     </aside>
 
     <main class="main">
-      <!-- DASHBOARD -->
-      <section id="tabDashboard" class="tab active">
+      <!-- DASHBOARD - APENAS ADMIN -->
+      <section id="tabDashboard" class="tab active admin-only">
         <header class="topbar">
           <div>
             <h2>Painel operacional</h2>
@@ -460,8 +551,7 @@
           </div>
           <div class="actions">
             <button class="btn btn-light" onclick="exportarResumoPDF()">📄 Resumo PDF</button>
-            <button class="btn btn-primary" onclick="switchTab('ordens')">Nova OS</button>
-            <button class="btn btn-danger" onclick="fazerLogout()">Sair</button>
+            <button class="btn btn-primary" onclick="switchTab('ordens')">➕ Nova OS</button>
           </div>
         </header>
 
@@ -517,79 +607,105 @@
         </div>
       </section>
 
-      <!-- ORDENS -->
+      <!-- ORDENS - PARA ADMIN: COMPLETA | PARA TÉCNICO: APENAS VISUALIZAÇÃO -->
       <section id="tabOrdens" class="tab">
         <header class="topbar">
           <div>
-            <h2>Nova ordem de serviço</h2>
-            <p>Preencha cliente, itens, valores e gere uma OS completa.</p>
+            <h2 id="ordensPageTitle">Ordens de Serviço</h2>
+            <p id="ordensPageSubtitle">Gerencie todas as ordens de serviço do sistema.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary admin-only" onclick="criarNovaOS()">➕ Nova OS</button>
           </div>
         </header>
 
-        <div class="layout">
-          <div>
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Dados do atendimento</h3>
-                  <p>Cliente, data, status e descrição técnica.</p>
+        <!-- Área para ADMIN: formulário completo de criação -->
+        <div id="adminOSForm" class="admin-only">
+          <div class="layout">
+            <div>
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Dados do atendimento</h3>
+                    <p>Cliente, data, status e descrição técnica.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="form-grid">
-                <div class="field"><label>Cliente</label><select class="input" id="osCliente"></select></div>
-                <div class="field"><label>Data de abertura</label><input class="input" type="date" id="osData"></div>
-                <div class="field"><label>Status</label><select class="input" id="osStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></div>
-                <div class="field"><label>Prazo</label><input class="input" type="date" id="osPrazo"></div>
-                <div class="field full"><label>Descrição do serviço</label><textarea class="input" id="osDescricao" placeholder="Descreva o serviço a realizar..."></textarea></div>
-              </div>
-            </section>
-
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Materiais e serviços</h3>
-                  <p>Adicione itens do catálogo à ordem.</p>
+                <div class="form-grid">
+                  <div class="field"><label>Cliente</label><select class="input" id="osCliente"></select></div>
+                  <div class="field"><label>Data de abertura</label><input class="input" type="date" id="osData"></div>
+                  <div class="field"><label>Status</label><select class="input" id="osStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></div>
+                  <div class="field"><label>Prazo</label><input class="input" type="date" id="osPrazo"></div>
+                  <div class="field full"><label>Descrição do serviço</label><textarea class="input" id="osDescricao" placeholder="Descreva o serviço a realizar..."></textarea></div>
                 </div>
-              </div>
+              </section>
 
-              <div class="form-grid">
-                <div class="field"><label>Item</label><select class="input" id="osItemSelect"></select></div>
-                <div class="field"><label>Quantidade</label><input class="input" id="osItemQtd" type="number" min="1" value="1"></div>
-              </div>
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Materiais e serviços</h3>
+                    <p>Adicione itens do catálogo à ordem.</p>
+                  </div>
+                </div>
 
-              <button class="btn btn-light" onclick="adicionarItemOS()">Adicionar item</button>
-              <div id="osItensList" style="margin-top:14px"></div>
-            </section>
+                <div class="form-grid">
+                  <div class="field"><label>Item</label><select class="input" id="osItemSelect"></select></div>
+                  <div class="field"><label>Quantidade</label><input class="input" id="osItemQtd" type="number" min="1" value="1"></div>
+                </div>
+
+                <button class="btn btn-light" onclick="adicionarItemOS()">Adicionar item</button>
+                <div id="osItensList" style="margin-top:14px"></div>
+              </section>
+            </div>
+
+            <aside>
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Resumo financeiro</h3>
+                    <p>Cálculo automático da OS.</p>
+                  </div>
+                </div>
+
+                <div class="field"><label>Mão de obra (R$)</label><input class="input" id="osMaoObra" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
+                <div class="field"><label>Desconto (R$)</label><input class="input" id="osDesconto" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
+
+                <div class="summary-box">
+                  <div class="summary-row"><span>Itens</span><strong id="totalItens">R$ 0,00</strong></div>
+                  <div class="summary-row"><span>Mão de obra</span><strong id="totalMaoObra">R$ 0,00</strong></div>
+                  <div class="summary-row"><span>Desconto</span><strong id="totalDesconto">R$ 0,00</strong></div>
+                  <div class="summary-row total"><span>Total</span><strong id="osTotalPreview">R$ 0,00</strong></div>
+                </div>
+
+                <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="criarOS()">Gerar ordem de serviço</button>
+              </section>
+            </aside>
           </div>
+        </div>
 
-          <aside>
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Resumo financeiro</h3>
-                  <p>Cálculo automático da OS.</p>
-                </div>
+        <!-- Área para TÉCNICO: apenas lista de suas OS -->
+        <div id="tecnicoOSList" class="tecnico-only">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Minhas Ordens de Serviço</h3>
+                <p>Aqui estão todas as suas ordens de serviço.</p>
               </div>
-
-              <div class="field"><label>Mão de obra (R$)</label><input class="input" id="osMaoObra" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
-              <div class="field"><label>Desconto (R$)</label><input class="input" id="osDesconto" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
-
-              <div class="summary-box">
-                <div class="summary-row"><span>Itens</span><strong id="totalItens">R$ 0,00</strong></div>
-                <div class="summary-row"><span>Mão de obra</span><strong id="totalMaoObra">R$ 0,00</strong></div>
-                <div class="summary-row"><span>Desconto</span><strong id="totalDesconto">R$ 0,00</strong></div>
-                <div class="summary-row total"><span>Total</span><strong id="osTotalPreview">R$ 0,00</strong></div>
-              </div>
-
-              <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="criarOS()">Gerar ordem de serviço</button>
-            </section>
-          </aside>
+              <select class="input" id="filtroStatusOSTecnico" style="max-width:190px" onchange="renderizarOrdensTecnico()">
+                <option value="todos">Todos os status</option>
+                <option value="aberta">Abertas</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="concluida">Concluídas</option>
+                <option value="cancelada">Canceladas</option>
+              </select>
+            </div>
+            <div id="tecnicoOrdensList" class="minhas-os-container"></div>
+          </section>
         </div>
       </section>
 
-      <!-- CLIENTES -->
-      <section id="tabClientes" class="tab">
+      <!-- CLIENTES - APENAS ADMIN -->
+      <section id="tabClientes" class="tab admin-only">
         <header class="topbar"><div><h2>Clientes</h2><p>Cadastro e consulta de clientes.</p></div></header>
 
         <section class="panel">
@@ -610,8 +726,8 @@
         </section>
       </section>
 
-      <!-- CATÁLOGO -->
-      <section id="tabCatalogo" class="tab">
+      <!-- CATÁLOGO - APENAS ADMIN -->
+      <section id="tabCatalogo" class="tab admin-only">
         <header class="topbar"><div><h2>Materiais e Serviços</h2><p>Catálogo usado nas ordens.</p></div></header>
 
         <section class="panel">
@@ -633,8 +749,29 @@
         </section>
       </section>
 
-      <!-- CONFIGURAÇÕES -->
-      <section id="tabConfig" class="tab">
+      <!-- USUÁRIOS - APENAS ADMIN -->
+      <section id="tabUsuarios" class="tab admin-only">
+        <header class="topbar"><div><h2>Usuários</h2><p>Gerencie os usuários do sistema.</p></div></header>
+
+        <section class="panel">
+          <div class="panel-head"><div><h3>Novo usuário</h3><p>Cadastre técnicos e administradores.</p></div></div>
+          <div class="form-grid">
+            <div class="field"><label>Usuário</label><input class="input" id="usuarioUsername" placeholder="Login do usuário"></div>
+            <div class="field"><label>Senha</label><input class="input" id="usuarioSenha" type="password" placeholder="Senha"></div>
+            <div class="field"><label>Nome</label><input class="input" id="usuarioNome" placeholder="Nome completo"></div>
+            <div class="field"><label>Tipo</label><select class="input" id="usuarioTipo"><option value="usuario">Técnico</option><option value="admin">Administrador</option></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="cadastrarUsuario()">Salvar usuário</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h3>Usuários cadastrados</h3><p>Lista de usuários do sistema.</p></div></div>
+          <div id="usuariosList"></div>
+        </section>
+      </section>
+
+      <!-- CONFIGURAÇÕES - APENAS ADMIN -->
+      <section id="tabConfig" class="tab admin-only">
         <header class="topbar"><div><h2>Configurações</h2><p>Dados da empresa para documentos.</p></div></header>
 
         <section class="panel">
@@ -653,29 +790,28 @@
   </div>
 
   <!-- MOBILE NAV -->
-  <nav class="mobile-nav">
-    <button class="active" data-tab="dashboard">Painel</button>
-    <button data-tab="ordens">OS</button>
-    <button data-tab="clientes">Clientes</button>
-    <button data-tab="catalogo">Itens</button>
-    <button data-tab="config">Config</button>
+  <nav class="mobile-nav" id="mobileNav">
+    <button class="active admin-only" data-tab="dashboard">📊</button>
+    <button data-tab="ordens">📝</button>
+    <button class="admin-only" data-tab="clientes">👤</button>
+    <button class="admin-only" data-tab="catalogo">📦</button>
+    <button class="admin-only" data-tab="config">⚙️</button>
   </nav>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast">Salvo</div>
 
   <script>
     // ============================================
     // CONFIGURAÇÃO
     // ============================================
-    const API_URL = "https://script.google.com/macros/s/AKfycbztW9LS1vkMx-M6QhBvylBlmUxzKBkgBn5tBERQO1P-vCylTiBidCdk4uyU7-FjUxda4Q/exec";
-    const storageKey = "wr_os_profissional";
+    const API_URL = "https://script.google.com/macros/s/AKfycby6fBOwo-iqRQjIEcPGDnSOGWRtoQ_8oIhNfVyX8BbQuyf3YkHmjrTiaDLkZgqOcN7M/exec";
+    
+    const storageKey = "wr_os_multiusuario";
     const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
     // ============================================
     // ESTADO GLOBAL
     // ============================================
     let usuarioAtual = null;
+    let isAdmin = false;
     let dados = carregarLocal();
     let osItensTemp = [];
 
@@ -685,9 +821,9 @@
     function carregarLocal() {
       try {
         const data = localStorage.getItem(storageKey);
-        return data ? JSON.parse(data) : { clientes: [], catalogo: [], ordens: [], configuracoes: {} };
+        return data ? JSON.parse(data) : { clientes: [], catalogo: [], ordens: [], configuracoes: {}, usuarios: [] };
       } catch {
-        return { clientes: [], catalogo: [], ordens: [], configuracoes: {} };
+        return { clientes: [], catalogo: [], ordens: [], configuracoes: {}, usuarios: [] };
       }
     }
 
@@ -716,11 +852,13 @@
     // ============================================
     // API
     // ============================================
-    async function apiGet(endpoint) {
+    async function apiGet(endpoint, usuario = "") {
       try {
-        const response = await fetch(`${API_URL}?tipo=${endpoint}`);
+        const url = `${API_URL}?tipo=${endpoint}${usuario ? `&usuario=${encodeURIComponent(usuario)}` : ''}`;
+        const response = await fetch(url);
         return await response.json();
-      } catch {
+      } catch (error) {
+        console.error("Erro no GET:", error);
         return null;
       }
     }
@@ -729,13 +867,13 @@
       try {
         const response = await fetch(API_URL, { 
           method: "POST", 
-          mode: 'no-cors',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         });
-        return { res: "ok", msg: "Enviado com sucesso" };
+        const result = await response.json();
+        return result;
       } catch (error) {
-        console.error("Erro na API:", error);
+        console.error("Erro no POST:", error);
         return null;
       }
     }
@@ -746,44 +884,90 @@
     async function realizarLogin() {
       const usuario = document.getElementById("loginUsuario").value.trim();
       const senha = document.getElementById("loginSenha").value;
+      const errorEl = document.getElementById("loginError");
+
+      errorEl.style.display = "none";
 
       if (!usuario || !senha) {
-        alert("Preencha usuário e senha.");
+        errorEl.textContent = "Preencha usuário e senha.";
+        errorEl.style.display = "block";
         return;
       }
 
       showLoading();
 
-      if (usuario === "admin" && senha === "wr@2024") {
-        usuarioAtual = { usuario: "admin", nome: "Administrador" };
-        localStorage.setItem("wrSession", JSON.stringify(usuarioAtual));
-        entrarNoApp();
-        hideLoading();
-        return;
-      }
-
       try {
-        const result = await apiPost({ tipo: "login", usuario, senha });
-        if (result && result.auth) {
-          usuarioAtual = { usuario, nome: result.nome || usuario };
+        const payload = { tipo: "login", usuario: usuario, senha: senha };
+        
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+        });
+        
+        const result = await response.json();
+        console.log("Resposta do login:", result);
+
+        if (result && result.auth === true) {
+          usuarioAtual = {
+            usuario: usuario,
+            nome: result.nome || usuario,
+            tipo: result.tipo || "usuario"
+          };
+          isAdmin = usuarioAtual.tipo === "admin" || usuario === "admin";
           localStorage.setItem("wrSession", JSON.stringify(usuarioAtual));
-          entrarNoApp();
           hideLoading();
+          entrarNoApp();
+          return;
+        } else {
+          hideLoading();
+          errorEl.textContent = result.msg || "Usuário ou senha inválidos!";
+          errorEl.style.display = "block";
           return;
         }
-      } catch (e) {
-        console.warn("Erro na API, usando fallback local");
+      } catch (error) {
+        console.error("Erro no login:", error);
+        hideLoading();
+        errorEl.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
+        errorEl.style.display = "block";
       }
-
-      hideLoading();
-      alert("Usuário ou senha inválidos.");
     }
 
     function entrarNoApp() {
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("app").classList.add("active");
-      document.getElementById("sidebarInfo").innerHTML = `Usuário:<br>${usuarioAtual.nome || "Administrador"}`;
+      
+      // Aplica a classe de usuário no app para controle CSS
+      const app = document.getElementById("app");
+      if (!isAdmin) {
+        app.classList.add("user-tecnico");
+      } else {
+        app.classList.remove("user-tecnico");
+      }
+      
+      document.getElementById("userNome").textContent = usuarioAtual.nome || usuarioAtual.usuario;
+      document.getElementById("userTipo").textContent = isAdmin ? "Administrador" : "Técnico";
+      document.getElementById("userAvatar").textContent = (usuarioAtual.nome || usuarioAtual.usuario)[0].toUpperCase();
+      
+      // Configura mensagens específicas para técnico
+      if (!isAdmin) {
+        document.getElementById("ordensPageTitle").textContent = "Minhas Ordens de Serviço";
+        document.getElementById("ordensPageSubtitle").textContent = "Visualize e acompanhe todas as suas ordens de serviço.";
+        
+        // Ativa a aba de ordens por padrão para técnicos
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.getElementById('tabOrdens').classList.add('active');
+        
+        // Atualiza a lista de OS do técnico
+        setTimeout(renderizarOrdensTecnico, 500);
+      } else {
+        // Admin - ativa dashboard
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.getElementById('tabDashboard').classList.add('active');
+      }
+      
       document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
+      
       carregarTodosDados();
     }
 
@@ -808,26 +992,47 @@
       showLoading();
 
       try {
-        const [clientesRes, catalogoRes, ordensRes, configRes] = await Promise.all([
-          apiGet("clientes"),
-          apiGet("catalogo"),
-          apiGet("ordens"),
-          apiGet("config")
-        ]);
-
-        if (clientesRes && clientesRes.res === "ok") dados.clientes = clientesRes.clientes || [];
-        if (catalogoRes && catalogoRes.res === "ok") dados.catalogo = catalogoRes.catalogo || [];
-        if (configRes && configRes.res === "ok") dados.configuracoes = configRes.config || {};
-
+        const usuario = usuarioAtual?.usuario || "";
+        
+        console.log("Carregando dados para usuário:", usuario);
+        
+        const ordensRes = await apiGet("ordens", usuario);
+        console.log("Resposta ordens:", ordensRes);
+        
         if (ordensRes && ordensRes.res === "ok") {
           dados.ordens = (ordensRes.ordens || []).map(os => ({
             ...os,
             itensOS: parseItens(os.itensOS)
           }));
+          
+          // Atualiza isAdmin baseado no retorno do servidor
+          if (ordensRes.isAdmin !== undefined) {
+            isAdmin = ordensRes.isAdmin;
+            // Reaplica a classe no app
+            const app = document.getElementById("app");
+            if (!isAdmin) {
+              app.classList.add("user-tecnico");
+            } else {
+              app.classList.remove("user-tecnico");
+            }
+          }
         }
+        
+        const [clientesRes, catalogoRes, configRes, usuariosRes] = await Promise.all([
+          apiGet("clientes", usuario),
+          apiGet("catalogo", usuario),
+          apiGet("config", usuario),
+          isAdmin ? apiGet("usuarios", usuario) : Promise.resolve(null)
+        ]);
+
+        if (clientesRes && clientesRes.res === "ok") dados.clientes = clientesRes.clientes || [];
+        if (catalogoRes && catalogoRes.res === "ok") dados.catalogo = catalogoRes.catalogo || [];
+        if (configRes && configRes.res === "ok") dados.configuracoes = configRes.config || {};
+        if (isAdmin && usuariosRes && usuariosRes.res === "ok") dados.usuarios = usuariosRes.usuarios || [];
 
         salvarLocal();
         renderAll();
+        toast("Dados carregados!");
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
         toast("Erro ao carregar dados. Usando dados locais.");
@@ -838,9 +1043,96 @@
     }
 
     // ============================================
+    // USUÁRIOS (Admin apenas)
+    // ============================================
+    async function cadastrarUsuario() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem cadastrar usuários.");
+        return;
+      }
+
+      const usuario = document.getElementById("usuarioUsername").value.trim();
+      const senha = document.getElementById("usuarioSenha").value;
+      const nome = document.getElementById("usuarioNome").value.trim();
+      const tipo = document.getElementById("usuarioTipo").value;
+
+      if (!usuario || !senha || !nome) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+
+      const userData = {
+        tipo: "cadastrar_usuario",
+        usuario: usuario,
+        senha: senha,
+        nome: nome,
+        tipoUsuario: tipo
+      };
+
+      showLoading();
+      const result = await apiPost(userData);
+      hideLoading();
+
+      if (result && result.res === "ok") {
+        toast("Usuário cadastrado!");
+        document.getElementById("usuarioUsername").value = "";
+        document.getElementById("usuarioSenha").value = "";
+        document.getElementById("usuarioNome").value = "";
+        setTimeout(carregarTodosDados, 2000);
+      } else {
+        toast("Erro ao cadastrar usuário.");
+      }
+    }
+
+    async function excluirUsuario(id) {
+      if (!isAdmin) return;
+      if (!confirm(`⚠️ Deseja excluir este usuário?`)) return;
+
+      showLoading();
+      await apiPost({ tipo: "excluir_usuario", id: String(id) });
+      hideLoading();
+
+      toast("Usuário removido");
+      setTimeout(carregarTodosDados, 2000);
+    }
+
+    function renderUsuarios() {
+      const el = document.getElementById("usuariosList");
+      if (!isAdmin) {
+        el.innerHTML = "<p>Apenas administradores podem ver esta lista.</p>";
+        return;
+      }
+
+      const usuarios = dados.usuarios || [];
+      if (!usuarios.length) {
+        el.innerHTML = "<p>Nenhum usuário cadastrado.</p>";
+        return;
+      }
+
+      el.innerHTML = `<table class="table">
+        <thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${usuarios.map(u => `<tr>
+            <td><strong>${u.usuario}</strong></td>
+            <td>${u.nome || "-"}</td>
+            <td><span class="badge ${u.tipo === 'admin' ? 'em_andamento' : 'aberta'}">${u.tipo === 'admin' ? 'Admin' : 'Técnico'}</span></td>
+            <td>
+              ${u.usuario !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="excluirUsuario(${u.id})">Excluir</button>` : '<small>Padrão</small>'}
+            </td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+    }
+
+    // ============================================
     // CLIENTES
     // ============================================
     async function cadastrarCliente() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem cadastrar clientes.");
+        return;
+      }
+
       const nome = document.getElementById("clienteNome").value.trim();
       if (!nome) {
         alert("Digite o nome do cliente.");
@@ -860,20 +1152,8 @@
       await apiPost(cliente);
       hideLoading();
 
-      const novoCliente = {
-        id: Date.now(),
-        nome: cliente.nome,
-        documento: cliente.documento,
-        telefone: cliente.telefone,
-        email: cliente.email,
-        endereco: cliente.endereco
-      };
-      dados.clientes.push(novoCliente);
-      salvarLocal();
+      toast("Cliente cadastrado!");
       limparCliente();
-      renderAll();
-      toast("Cliente salvo localmente");
-
       setTimeout(carregarTodosDados, 2000);
     }
 
@@ -884,20 +1164,24 @@
     }
 
     async function excluirCliente(id) {
-      if (!confirm(`⚠️ Tem certeza que deseja EXCLUIR PERMANENTEMENTE o cliente?`)) return;
+      if (!isAdmin) return;
+      if (!confirm(`⚠️ Deseja excluir este cliente?`)) return;
 
       showLoading();
       await apiPost({ tipo: "excluir_cliente", id: String(id) });
       hideLoading();
 
-      dados.clientes = dados.clientes.filter(item => String(item.id) !== String(id));
-      salvarLocal();
-      renderAll();
       toast("Cliente removido");
+      setTimeout(carregarTodosDados, 2000);
     }
 
     function renderClientes() {
       const el = document.getElementById("clientesList");
+
+      if (!isAdmin) {
+        el.innerHTML = "<p>Apenas administradores podem ver a lista de clientes.</p>";
+        return;
+      }
 
       if (!dados.clientes.length) {
         el.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
@@ -911,7 +1195,7 @@
             <td><strong>${c.nome || "-"}</strong></td>
             <td>${c.telefone || "-"}</td>
             <td>${c.email || "-"}</td>
-            <td><button class="btn btn-danger" onclick="excluirCliente(${c.id})">Excluir</button></td>
+            <td><button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id})">Excluir</button></td>
           </tr>`).join("")}
         </tbody>
       </table>`;
@@ -921,6 +1205,11 @@
     // CATÁLOGO
     // ============================================
     async function cadastrarItem() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem cadastrar itens.");
+        return;
+      }
+
       const nome = document.getElementById("itemNome").value.trim();
       const valor = Number(document.getElementById("itemValor").value || 0);
 
@@ -943,16 +1232,8 @@
       await apiPost(item);
       hideLoading();
 
-      const novoItem = {
-        id: Date.now(),
-        ...item
-      };
-      dados.catalogo.push(novoItem);
-      salvarLocal();
+      toast("Item cadastrado!");
       limparItem();
-      renderAll();
-      toast("Item salvo localmente");
-
       setTimeout(carregarTodosDados, 2000);
     }
 
@@ -964,20 +1245,24 @@
     }
 
     async function excluirItem(id) {
-      if (!confirm(`⚠️ Tem certeza que deseja EXCLUIR PERMANENTEMENTE este item?`)) return;
+      if (!isAdmin) return;
+      if (!confirm(`⚠️ Deseja excluir este item?`)) return;
 
       showLoading();
       await apiPost({ tipo: "excluir_item", id: String(id) });
       hideLoading();
 
-      dados.catalogo = dados.catalogo.filter(item => String(item.id) !== String(id));
-      salvarLocal();
-      renderAll();
       toast("Item removido");
+      setTimeout(carregarTodosDados, 2000);
     }
 
     function renderCatalogo() {
       const el = document.getElementById("catalogoList");
+
+      if (!isAdmin) {
+        el.innerHTML = "<p>Apenas administradores podem ver o catálogo completo.</p>";
+        return;
+      }
 
       if (!dados.catalogo.length) {
         el.innerHTML = "<p>Nenhum item cadastrado.</p>";
@@ -992,7 +1277,7 @@
             <td><strong>${i.nome || "-"}</strong></td>
             <td>${money.format(Number(i.valor || 0))}</td>
             <td>${i.tipoItem === "material" ? Number(i.estoque || 0) : "-"}</td>
-            <td><button class="btn btn-danger" onclick="excluirItem(${i.id})">Excluir</button></td>
+            <td><button class="btn btn-danger btn-sm" onclick="excluirItem(${i.id})">Excluir</button></td>
           </tr>`).join("")}
         </tbody>
       </table>`;
@@ -1003,17 +1288,26 @@
     // ============================================
     function atualizarSelects() {
       const clienteSelect = document.getElementById("osCliente");
-      clienteSelect.innerHTML = `<option value="">Selecione um cliente</option>` + dados.clientes.map(c => {
-        return `<option value="${c.id}">${c.nome}</option>`;
-      }).join("");
+      if (clienteSelect) {
+        clienteSelect.innerHTML = `<option value="">Selecione um cliente</option>` + dados.clientes.map(c => {
+          return `<option value="${c.id}">${c.nome}</option>`;
+        }).join("");
+      }
 
       const itemSelect = document.getElementById("osItemSelect");
-      itemSelect.innerHTML = `<option value="">Selecione um item</option>` + dados.catalogo.map(i => {
-        return `<option value="${i.id}">${i.nome} - ${money.format(Number(i.valor || 0))}</option>`;
-      }).join("");
+      if (itemSelect) {
+        itemSelect.innerHTML = `<option value="">Selecione um item</option>` + dados.catalogo.map(i => {
+          return `<option value="${i.id}">${i.nome} - ${money.format(Number(i.valor || 0))}</option>`;
+        }).join("");
+      }
     }
 
     function adicionarItemOS() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem adicionar itens.");
+        return;
+      }
+      
       const id = Number(document.getElementById("osItemSelect").value);
       const qtd = Number(document.getElementById("osItemQtd").value || 1);
       const item = dados.catalogo.find(i => Number(i.id) === id);
@@ -1058,6 +1352,7 @@
 
     function renderItensOS() {
       const el = document.getElementById("osItensList");
+      if (!el) return;
 
       if (!osItensTemp.length) {
         el.innerHTML = "<p>Nenhum item adicionado.</p>";
@@ -1071,7 +1366,7 @@
             <td>${i.nome}</td>
             <td>${i.quantidade}</td>
             <td>${money.format(i.subtotal)}</td>
-            <td><button class="btn btn-danger" onclick="removerItemOS(${index})">Remover</button></td>
+            <td><button class="btn btn-danger btn-sm" onclick="removerItemOS(${index})">Remover</button></td>
           </tr>`).join("")}
         </tbody>
       </table>`;
@@ -1079,22 +1374,58 @@
 
     function atualizarTotalOS() {
       const itens = osItensTemp.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
-      const maoObra = Number(document.getElementById("osMaoObra").value || 0);
-      const desconto = Number(document.getElementById("osDesconto").value || 0);
+      const maoObra = Number(document.getElementById("osMaoObra")?.value || 0);
+      const desconto = Number(document.getElementById("osDesconto")?.value || 0);
       const total = Math.max(0, itens + maoObra - desconto);
 
-      document.getElementById("totalItens").textContent = money.format(itens);
-      document.getElementById("totalMaoObra").textContent = money.format(maoObra);
-      document.getElementById("totalDesconto").textContent = `- ${money.format(desconto)}`;
-      document.getElementById("osTotalPreview").textContent = money.format(total);
+      const totalItensEl = document.getElementById("totalItens");
+      const totalMaoObraEl = document.getElementById("totalMaoObra");
+      const totalDescontoEl = document.getElementById("totalDesconto");
+      const osTotalPreviewEl = document.getElementById("osTotalPreview");
+
+      if (totalItensEl) totalItensEl.textContent = money.format(itens);
+      if (totalMaoObraEl) totalMaoObraEl.textContent = money.format(maoObra);
+      if (totalDescontoEl) totalDescontoEl.textContent = `- ${money.format(desconto)}`;
+      if (osTotalPreviewEl) osTotalPreviewEl.textContent = money.format(total);
 
       return total;
     }
 
     // ============================================
-    // CRIAR OS
+    // CRIAR NOVA OS (APENAS ADMIN)
+    // ============================================
+    function criarNovaOS() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem criar ordens de serviço.");
+        return;
+      }
+      
+      // Limpa o formulário e ativa a aba de ordens
+      osItensTemp = [];
+      document.getElementById("osPrazo").value = "";
+      document.getElementById("osDescricao").value = "";
+      document.getElementById("osMaoObra").value = "0";
+      document.getElementById("osDesconto").value = "0";
+      document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
+      renderItensOS();
+      atualizarTotalOS();
+      switchTab('ordens');
+      
+      // Scroll para o formulário
+      setTimeout(() => {
+        document.getElementById('adminOSForm').scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
+
+    // ============================================
+    // CRIAR OS (APENAS ADMIN)
     // ============================================
     async function criarOS() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem criar ordens de serviço.");
+        return;
+      }
+
       const clienteId = Number(document.getElementById("osCliente").value);
       const cliente = dados.clientes.find(c => Number(c.id) === clienteId);
 
@@ -1119,39 +1450,22 @@
         itensOS: osItensTemp,
         maoObra: Number(document.getElementById("osMaoObra").value || 0),
         desconto: Number(document.getElementById("osDesconto").value || 0),
-        valorTotal: atualizarTotalOS()
+        valorTotal: atualizarTotalOS(),
+        usuarioResponsavel: document.getElementById("osResponsavel")?.value || usuarioAtual?.usuario || ""
       };
 
       showLoading();
-      await apiPost(osData);
+      const result = await apiPost(osData);
       hideLoading();
 
-      const novaOS = {
-        id: "OS-" + String(Date.now()).slice(-4),
-        clienteId: osData.clienteId,
-        clienteNome: osData.clienteNome,
-        dataAbertura: osData.dataAbertura,
-        status: osData.status,
-        prazo: osData.prazo,
-        descricao: osData.descricao,
-        itensOS: osItensTemp,
-        maoObra: osData.maoObra,
-        desconto: osData.desconto,
-        valorTotal: osData.valorTotal,
-        dataConclusao: "",
-        observacoes: "",
-        criadoEm: new Date().toISOString()
-      };
-      
-      dados.ordens.unshift(novaOS);
-      osItensTemp = [];
-      salvarLocal();
-      limparOS();
-      renderAll();
-      switchTab("dashboard");
-      toast("✅ Ordem de serviço criada localmente!");
-
-      setTimeout(carregarTodosDados, 2000);
+      if (result && result.res === "ok") {
+        toast("✅ Ordem de serviço criada!");
+        osItensTemp = [];
+        limparOS();
+        setTimeout(carregarTodosDados, 2000);
+      } else {
+        toast("❌ Erro ao criar OS.");
+      }
     }
 
     function limparOS() {
@@ -1165,9 +1479,11 @@
     }
 
     // ============================================
-    // RENDERIZAR ORDENS
+    // RENDERIZAR ORDENS (DASHBOARD - APENAS ADMIN)
     // ============================================
     function renderizarOrdens() {
+      if (!isAdmin) return;
+      
       const filtro = document.getElementById("filtroStatusOS")?.value || "todos";
       let ordens = dados.ordens || [];
 
@@ -1184,15 +1500,16 @@
 
       el.innerHTML = ordens.map(os => {
         const idStr = String(os.id).trim();
+        const usuarioOS = os.usuarioResponsavel || "";
         
         let botoes = '';
         
         if (os.status !== 'concluida') {
-          botoes += `<button class="btn btn-green" onclick="finalizarOS('${idStr}')">Finalizar</button>`;
+          botoes += `<button class="btn btn-green btn-sm" onclick="finalizarOS('${idStr}')">✅ Finalizar</button>`;
         }
         
-        botoes += `<button class="btn btn-light" onclick="gerarPDF('${idStr}')">PDF</button>`;
-        botoes += `<button class="btn btn-danger" onclick="excluirOS('${idStr}')">Excluir</button>`;
+        botoes += `<button class="btn btn-light btn-sm" onclick="gerarPDF('${idStr}')">📄 PDF</button>`;
+        botoes += `<button class="btn btn-danger btn-sm" onclick="excluirOS('${idStr}')">🗑️ Excluir</button>`;
 
         return `<article class="order-card ${os.status}">
           <div class="order-top">
@@ -1204,8 +1521,66 @@
             <span>Abertura: ${formatDate(os.dataAbertura)}</span>
             <span>Prazo: ${formatDate(os.prazo)}</span>
             <span>${money.format(Number(os.valorTotal || 0))}</span>
+            ${usuarioOS ? `<span style="color:var(--teal)">Responsável: ${usuarioOS}</span>` : ''}
           </div>
-          <div class="actions" style="justify-content:start">
+          <div class="actions" style="justify-content:start;gap:6px">
+            ${botoes}
+          </div>
+        </article>`;
+      }).join("");
+    }
+
+    // ============================================
+    // RENDERIZAR ORDENS DO TÉCNICO
+    // ============================================
+    function renderizarOrdensTecnico() {
+      if (isAdmin) return;
+      
+      const filtro = document.getElementById("filtroStatusOSTecnico")?.value || "todos";
+      let ordens = dados.ordens || [];
+      
+      // Filtra apenas ordens do técnico atual
+      ordens = ordens.filter(os => {
+        const usuarioOS = os.usuarioResponsavel || "";
+        return !usuarioOS || usuarioOS === usuarioAtual?.usuario;
+      });
+
+      if (filtro !== "todos") {
+        ordens = ordens.filter(os => os.status === filtro);
+      }
+
+      const el = document.getElementById("tecnicoOrdensList");
+
+      if (!ordens.length) {
+        el.innerHTML = `
+          <div class="empty-state">
+            <h3>📋 Nenhuma ordem de serviço</h3>
+            <p>Você não possui ordens de serviço atribuídas a você no momento.</p>
+          </div>
+        `;
+        return;
+      }
+
+      el.innerHTML = ordens.map(os => {
+        const idStr = String(os.id).trim();
+        
+        let botoes = '';
+        if (os.status !== 'concluida') {
+          botoes += `<button class="btn btn-green btn-sm" onclick="finalizarOS('${idStr}')">✅ Finalizar</button>`;
+        }
+
+        return `<article class="order-card ${os.status}">
+          <div class="order-top">
+            <span class="order-id">OS #${os.id}</span>
+            <span class="badge ${os.status}">${statusLabel(os.status)}</span>
+          </div>
+          <h4>${os.clienteNome || "-"} - ${os.descricao || "Atendimento técnico"}</h4>
+          <div class="order-meta">
+            <span>Abertura: ${formatDate(os.dataAbertura)}</span>
+            <span>Prazo: ${formatDate(os.prazo)}</span>
+            <span style="color:var(--teal)">Responsável: Você</span>
+          </div>
+          <div class="actions" style="justify-content:start;gap:6px">
             ${botoes}
           </div>
         </article>`;
@@ -1226,18 +1601,20 @@
     // EXCLUIR OS
     // ============================================
     async function excluirOS(id) {
+      if (!isAdmin) {
+        toast("Apenas administradores podem excluir OS.");
+        return;
+      }
+
       const idLimpo = String(id).trim();
-      
-      if (!confirm(`⚠️ Tem certeza que deseja EXCLUIR PERMANENTEMENTE a OS #${idLimpo}?`)) return;
+      if (!confirm(`⚠️ Deseja EXCLUIR a OS #${idLimpo}?`)) return;
 
       showLoading();
       await apiPost({ tipo: "excluir_os", id: idLimpo });
       hideLoading();
 
-      dados.ordens = dados.ordens.filter(item => String(item.id).trim() !== idLimpo);
-      salvarLocal();
-      renderAll();
       toast("✅ OS removida");
+      setTimeout(carregarTodosDados, 2000);
     }
 
     // ============================================
@@ -1252,6 +1629,12 @@
         return;
       }
 
+      const usuarioOS = os.usuarioResponsavel || "";
+      if (!isAdmin && usuarioOS !== usuarioAtual?.usuario && usuarioOS !== "") {
+        toast("Você não tem permissão para finalizar esta OS.");
+        return;
+      }
+
       if (!confirm(`Finalizar a OS #${idLimpo}?`)) return;
 
       showLoading();
@@ -1262,19 +1645,24 @@
         tipo: "finalizar_os", 
         id: idLimpo, 
         status: "concluida", 
-        dataConclusao: os.dataConclusao 
+        dataConclusao: os.dataConclusao,
+        observacoes: `Finalizada por ${usuarioAtual?.nome || usuarioAtual?.usuario}`
       });
       hideLoading();
 
-      salvarLocal();
-      renderAll();
       toast("✅ OS finalizada!");
+      setTimeout(carregarTodosDados, 2000);
     }
 
     // ============================================
-    // PDF PROFISSIONAL - ORDEM DE SERVIÇO
+    // PDF PROFISSIONAL - ORDEM DE SERVIÇO (APENAS ADMIN)
     // ============================================
     function gerarPDF(id) {
+      if (!isAdmin) {
+        toast("Apenas administradores podem gerar PDF.");
+        return;
+      }
+
       const idLimpo = String(id).trim();
       const os = dados.ordens.find(item => String(item.id).trim() === idLimpo);
       
@@ -1296,7 +1684,6 @@
         const corSecundaria = [11, 31, 38];
         const corCinza = [100, 116, 125];
 
-        // CABEÇALHO
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
         doc.rect(0, 0, pageWidth, 45, 'F');
 
@@ -1327,7 +1714,6 @@
         doc.text('ORDEM DE SERVIÇO', margin, y);
         y += 8;
 
-        // STATUS BADGE
         const statusMap = {
           'aberta': ['Aberta', [254, 243, 199], [146, 64, 14]],
           'em_andamento': ['Em Andamento', [219, 234, 254], [30, 64, 175]],
@@ -1348,7 +1734,6 @@
 
         y += 10;
 
-        // DADOS DO CLIENTE
         doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
@@ -1365,7 +1750,6 @@
         doc.text(`Prazo: ${formatDate(os.prazo)}`, margin, y);
         y += 8;
 
-        // DESCRIÇÃO
         if (os.descricao) {
           doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
           doc.setFontSize(9);
@@ -1381,7 +1765,6 @@
           y += descLines.length * 5 + 6;
         }
 
-        // TABELA DE ITENS
         if (itens.length > 0) {
           doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
           doc.setFontSize(9);
@@ -1425,7 +1808,6 @@
           y = doc.lastAutoTable.finalY + 8;
         }
 
-        // RESUMO FINANCEIRO
         const totalItens = itens.reduce((sum, i) => sum + Number(i.subtotal || 0), 0);
         const maoObra = Number(os.maoObra || 0);
         const desconto = Number(os.desconto || 0);
@@ -1464,7 +1846,6 @@
         doc.setFontSize(10);
         doc.text(`TOTAL: ${money.format(valorTotal)}`, boxX + 5, lineY + 8);
 
-        // RODAPÉ
         const footerY = Math.max(y + 70, 280);
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.5);
@@ -1485,9 +1866,14 @@
     }
 
     // ============================================
-    // PDF PROFISSIONAL - RESUMO COMPLETO
+    // PDF - RESUMO COMPLETO (APENAS ADMIN)
     // ============================================
     function exportarResumoPDF() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem gerar relatórios.");
+        return;
+      }
+
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
@@ -1501,7 +1887,6 @@
         const corSecundaria = [11, 31, 38];
         const corCinza = [100, 116, 125];
 
-        // CABEÇALHO
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
         doc.rect(0, 0, pageWidth, 35, 'F');
 
@@ -1516,14 +1901,12 @@
 
         y = 45;
 
-        // TÍTULO
         doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
         doc.text('RESUMO DE ORDENS DE SERVIÇO', margin, y);
         y += 8;
 
-        // ESTATÍSTICAS
         const total = ordens.length;
         const abertas = ordens.filter(o => o.status === "aberta").length;
         const emAndamento = ordens.filter(o => o.status === "em_andamento").length;
@@ -1562,7 +1945,6 @@
 
         y += 38;
 
-        // FATURAMENTO TOTAL
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
         doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
         doc.setTextColor(255, 255, 255);
@@ -1571,7 +1953,6 @@
         doc.text(`FATURAMENTO TOTAL: ${money.format(faturamento)}`, pageWidth / 2, y + 8, { align: 'center' });
         y += 20;
 
-        // LISTA DE ORDENS
         if (ordens.length > 0) {
           doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
           doc.setFontSize(9);
@@ -1646,7 +2027,6 @@
           y += 10;
         }
 
-        // RODAPÉ
         const footerY = Math.max(y + 10, 280);
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.5);
@@ -1667,9 +2047,11 @@
     }
 
     // ============================================
-    // DASHBOARD
+    // DASHBOARD (APENAS ADMIN)
     // ============================================
     function atualizarDashboard() {
+      if (!isAdmin) return;
+      
       const ordens = dados.ordens || [];
       const abertas = ordens.filter(o => o.status === "aberta").length;
       const andamento = ordens.filter(o => o.status === "em_andamento").length;
@@ -1687,9 +2069,14 @@
     }
 
     // ============================================
-    // CONFIGURAÇÕES
+    // CONFIGURAÇÕES (APENAS ADMIN)
     // ============================================
     function salvarConfiguracoes() {
+      if (!isAdmin) {
+        toast("Apenas administradores podem salvar configurações.");
+        return;
+      }
+
       dados.configuracoes = {
         empresaNome: document.getElementById("configEmpresaNome").value,
         empresaCnpj: document.getElementById("configEmpresaCnpj").value,
@@ -1738,12 +2125,18 @@
       });
 
       if (tab === "ordens") {
-        atualizarSelects();
-        renderItensOS();
-        atualizarTotalOS();
-      } else if (tab === "dashboard") {
+        if (isAdmin) {
+          atualizarSelects();
+          renderItensOS();
+          atualizarTotalOS();
+        } else {
+          renderizarOrdensTecnico();
+        }
+      } else if (tab === "dashboard" && isAdmin) {
         atualizarDashboard();
         renderizarOrdens();
+      } else if (tab === "usuarios" && isAdmin) {
+        renderUsuarios();
       }
     }
 
@@ -1751,13 +2144,18 @@
     // RENDERIZAÇÃO COMPLETA
     // ============================================
     function renderAll() {
-      atualizarSelects();
-      renderClientes();
-      renderCatalogo();
-      renderItensOS();
-      renderizarOrdens();
-      atualizarTotalOS();
-      atualizarDashboard();
+      if (isAdmin) {
+        atualizarSelects();
+        renderClientes();
+        renderCatalogo();
+        renderItensOS();
+        atualizarTotalOS();
+        renderUsuarios();
+        atualizarDashboard();
+        renderizarOrdens();
+      } else {
+        renderizarOrdensTecnico();
+      }
       carregarConfiguracoesForm();
     }
 
@@ -1775,6 +2173,7 @@
       if (session) {
         try {
           usuarioAtual = JSON.parse(session);
+          isAdmin = usuarioAtual.tipo === "admin" || usuarioAtual.usuario === "admin";
           entrarNoApp();
         } catch {
           localStorage.removeItem("wrSession");
@@ -1794,6 +2193,7 @@
     window.adicionarItemOS = adicionarItemOS;
     window.removerItemOS = removerItemOS;
     window.criarOS = criarOS;
+    window.criarNovaOS = criarNovaOS;
     window.finalizarOS = finalizarOS;
     window.excluirOS = excluirOS;
     window.gerarPDF = gerarPDF;
@@ -1801,7 +2201,10 @@
     window.salvarConfiguracoes = salvarConfiguracoes;
     window.switchTab = switchTab;
     window.renderizarOrdens = renderizarOrdens;
+    window.renderizarOrdensTecnico = renderizarOrdensTecnico;
     window.atualizarTotalOS = atualizarTotalOS;
+    window.cadastrarUsuario = cadastrarUsuario;
+    window.excluirUsuario = excluirUsuario;
   </script>
 </body>
 </html>
