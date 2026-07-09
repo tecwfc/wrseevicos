@@ -53,6 +53,8 @@
       --orange-50: #fff7ed;
       --orange-500: #f97316;
       --orange-600: #ea580c;
+      --blue: #2563eb;
+      --purple: #7c3aed;
     }
 
     /* ══════════════════════════════════════════════════
@@ -103,10 +105,17 @@
       font-size: 14px;
       margin-top: 2px;
     }
-    .login-logo img {
-      width: 140px;
-      height: auto;
-      margin-bottom: 8px;
+    .login-logo .logo-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius);
+      background: var(--primary-gradient);
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      font-size: 36px;
+      font-weight: 900;
+      color: #fff;
     }
 
     .field {
@@ -240,9 +249,16 @@
       align-items: center;
       gap: 12px;
     }
-    .logo-top {
+    .logo-placeholder-sm {
+      width: 36px;
       height: 36px;
-      width: auto;
+      border-radius: 8px;
+      background: var(--primary-gradient);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 16px;
     }
     .unidade-sm {
       font-size: 13px;
@@ -297,14 +313,39 @@
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .logo-sidebar {
-      height: 40px;
-      width: auto;
-      filter: brightness(0) invert(1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-sidebar .placeholder {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius);
+      background: var(--primary-gradient);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .logo-sidebar .text {
+      font-weight: 900;
+      font-size: 16px;
+      color: #fff;
+    }
+    .logo-sidebar .sub {
+      font-size: 10px;
+      color: #9fb5bd;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
     }
     .unit-badge {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      margin-top: 4px;
     }
     .lbl2 {
       font-size: 10px;
@@ -351,6 +392,7 @@
       font-size: 18px;
       width: 28px;
     }
+    .nav-item.admin-only { display: flex; }
 
     .user-box {
       border-top: 1px solid rgba(255,255,255,.08);
@@ -454,6 +496,8 @@
     .card-stat.rose .val { color: var(--rose-600); }
     .card-stat.orange .val { color: var(--orange-600); }
     .card-stat.slate .val { color: var(--slate-600); }
+    .card-stat.blue .val { color: var(--blue); }
+    .card-stat.purple .val { color: var(--purple); }
     .card-stat.highlight {
       background: var(--primary-gradient);
       border-color: var(--primary);
@@ -510,11 +554,16 @@
       border-radius: var(--radius);
       padding: 24px;
       box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
-      max-width: 640px;
+      max-width: 100%;
     }
     .row2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 14px;
     }
     .form-actions {
@@ -558,127 +607,6 @@
       background: var(--slate-200);
     }
     .btn-icon { font-size: 16px; }
-
-    /* Livro de Caixa */
-    .livro-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .saldo-previo-banner {
-      background: var(--primary-light);
-      border: 1px solid #bddfda;
-      border-radius: var(--radius);
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .saldo-previo-banner .lbl {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--muted);
-    }
-    .saldo-previo-banner .val {
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--primary-dark);
-    }
-
-    /* Progresso do Caixa */
-    .progresso-caixa {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
-    }
-    .progresso-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .progresso-header h4 {
-      font-size: 15px;
-      font-weight: 800;
-    }
-    .progresso-total {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .progresso-item {
-      margin-bottom: 12px;
-    }
-    .progresso-item:last-child { margin-bottom: 0; }
-    .progresso-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .progresso-titulo { color: var(--slate-600); }
-    .progresso-valor { font-weight: 800; }
-    .progresso-bar-container {
-      position: relative;
-      height: 20px;
-      background: var(--slate-100);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .progresso-bar {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.6s ease;
-      position: relative;
-    }
-    .progresso-bar.recebido { background: var(--green-500); }
-    .progresso-bar.pago { background: var(--rose-500); }
-    .progresso-bar.fluxo { background: var(--orange-500); }
-    .progresso-porcentagem {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 10px;
-      font-weight: 800;
-      color: #fff;
-      text-shadow: 0 1px 4px rgba(0,0,0,.3);
-    }
-    .progresso-legenda {
-      display: flex;
-      gap: 16px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
-      flex-wrap: wrap;
-    }
-    .legenda-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--slate-600);
-    }
-    .legenda-cor {
-      width: 14px;
-      height: 14px;
-      border-radius: 4px;
-    }
-    .legenda-cor.recebido { background: var(--green-500); }
-    .legenda-cor.pago { background: var(--rose-500); }
-    .legenda-cor.fluxo { background: var(--orange-500); }
 
     /* Filter strip */
     .filter-strip {
@@ -727,48 +655,14 @@
       font-size: 13px;
       transition: var(--transition);
       min-height: 38px;
-      position: relative;
     }
     .btn-pdf:hover {
       background: var(--primary-dark);
       transform: translateY(-1px);
     }
-    .btn-pdf-loading {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--primary);
-      border-radius: var(--radius);
-    }
-    .lupa-animada {
-      animation: pulse 0.8s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
-    .btn-clear-all {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 18px;
-      background: #fee2e2;
-      color: #991b1b;
-      border-radius: var(--radius);
-      font-weight: 700;
-      font-size: 13px;
-      transition: var(--transition);
-      min-height: 38px;
-      border: 1px solid #fecaca;
-    }
-    .btn-clear-all:hover {
-      background: #fecaca;
-    }
 
-    /* Cards do livro */
-    #libroCards {
+    /* Entry cards */
+    #ordensList, #clientesList, #catalogoList, #usuariosList {
       display: grid;
       gap: 12px;
     }
@@ -794,13 +688,21 @@
       padding: 4px 12px;
       border-radius: 999px;
     }
-    .badge-tipo.recebido {
-      background: var(--green-100);
-      color: var(--green-700);
+    .badge-tipo.aberta {
+      background: #fef3c7;
+      color: #92400e;
     }
-    .badge-tipo.pago {
-      background: var(--rose-50);
-      color: var(--rose-600);
+    .badge-tipo.em_andamento {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .badge-tipo.concluida {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .badge-tipo.cancelada {
+      background: #fee2e2;
+      color: #991b1b;
     }
     .entry-card .info {
       display: flex;
@@ -816,13 +718,6 @@
       color: var(--muted);
       font-weight: 600;
     }
-    .entry-card .valor {
-      font-size: 18px;
-      font-weight: 900;
-      text-align: right;
-    }
-    .entry-card .valor.recebido { color: var(--green-600); }
-    .entry-card .valor.pago { color: var(--rose-600); }
     .entry-card .actions {
       display: flex;
       gap: 6px;
@@ -918,39 +813,6 @@
       text-transform: uppercase;
       letter-spacing: .05em;
     }
-    .input-with-prefix {
-      display: flex;
-      align-items: center;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: #fff;
-      overflow: hidden;
-      transition: var(--transition);
-    }
-    .input-with-prefix:focus-within {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
-    }
-    .input-prefix {
-      padding: 0 12px;
-      font-weight: 800;
-      color: var(--muted);
-      font-size: 14px;
-      background: var(--slate-50);
-      min-height: 44px;
-      display: grid;
-      place-items: center;
-      border-right: 1px solid var(--line);
-    }
-    .input-with-prefix .field-input {
-      border: none;
-      padding: 10px 14px;
-      flex: 1;
-      outline: 0;
-      font-size: 14px;
-      min-height: 44px;
-      background: transparent;
-    }
     .field-input {
       width: 100%;
       min-height: 44px;
@@ -965,28 +827,6 @@
     .field-input:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
-    }
-    .input-with-button {
-      display: flex;
-      gap: 8px;
-    }
-    .input-with-button .field-input {
-      flex: 1;
-    }
-    .btn-add {
-      min-height: 44px;
-      width: 44px;
-      border-radius: var(--radius);
-      background: var(--primary);
-      color: #fff;
-      font-size: 20px;
-      transition: var(--transition);
-      display: grid;
-      place-items: center;
-    }
-    .btn-add:hover {
-      background: var(--primary-dark);
-      transform: scale(1.05);
     }
     .btn-save {
       display: inline-flex;
@@ -1006,103 +846,13 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(15, 118, 110, .35);
     }
-    .config-messages {
-      margin: 4px 0;
-    }
-    .msg-sucesso {
-      padding: 10px 14px;
-      border-radius: var(--radius);
-      background: #d1fae5;
-      color: #065f46;
-      font-weight: 600;
-      font-size: 13px;
-      display: none;
-    }
 
-    /* Descrições lista */
-    .descricoes-container {
-      margin-top: 8px;
-    }
-    .container-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .container-header h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--slate-600);
-    }
-    .badge-count {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 12px;
-    }
-    .descricoes-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .desc-tag {
-      background: var(--slate-100);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 4px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
-      color: var(--slate-700);
-    }
-    .desc-tag:hover {
-      background: var(--slate-200);
-    }
-    .desc-tag .remove {
-      cursor: pointer;
-      color: var(--rose-500);
-      font-weight: 800;
-      font-size: 14px;
-      line-height: 1;
-      padding: 0 2px;
-    }
-    .desc-tag .remove:hover {
-      color: var(--rose-600);
-    }
-
-    /* Info card */
-    .info-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
-      margin-top: 8px;
-    }
-    .info-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .info-icon {
-      font-size: 20px;
-    }
-    .info-header h4 {
-      font-size: 15px;
-      font-weight: 800;
-    }
-    .info-content p {
+    .info-content {
       font-size: 13px;
       color: var(--slate-600);
-      margin-bottom: 6px;
       line-height: 1.6;
     }
+    .info-content p { margin-bottom: 6px; }
     .info-footer {
       display: flex;
       gap: 16px;
@@ -1156,85 +906,81 @@
     .nav-btn.active .nav-icon {
       transform: scale(1.1);
     }
+    .nav-btn.admin-only { 
+      display: flex; 
+    }
 
-    /* Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(16, 32, 39, .6);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      place-items: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: grid; }
-    .modal-box {
-      background: var(--panel);
-      border-radius: var(--radius);
-      padding: 28px 32px;
-      max-width: 520px;
-      width: 100%;
-      box-shadow: var(--shadow-hover);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .modal-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .modal-top h3 {
-      font-size: 20px;
-      font-weight: 900;
-    }
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--slate-100);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--slate-600);
-      transition: var(--transition);
+    /* ══════════════════════════════════════════════════
+       RELATÓRIO DE FATURAMENTO
+       ══════════════════════════════════════════════════ */
+    .relatorio-resumo {
       display: grid;
-      place-items: center;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
     }
-    .modal-close:hover {
-      background: var(--slate-200);
-    }
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 18px;
-    }
-    .btn-cancel {
-      padding: 10px 24px;
-      border-radius: var(--radius);
-      background: var(--slate-100);
-      color: var(--slate-700);
-      font-weight: 700;
-      font-size: 14px;
-      transition: var(--transition);
+    .relatorio-card {
+      background: var(--panel);
       border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      text-align: center;
     }
-    .btn-cancel:hover {
-      background: var(--slate-200);
+    .relatorio-card .lbl {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 800;
+      color: var(--muted);
     }
-    .modal-select {
+    .relatorio-card .val {
+      font-size: 26px;
+      font-weight: 900;
+      margin-top: 4px;
+      color: var(--primary);
+    }
+    .relatorio-card .val.recebido { color: var(--green-600); }
+    .relatorio-card .val.pago { color: var(--rose-600); }
+    .relatorio-card .val.lucro { color: var(--blue); }
+
+    .tabela-faturamento {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    .tabela-faturamento table {
       width: 100%;
-      min-height: 44px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      outline: 0;
-      font-size: 14px;
-      background: #fff;
+      border-collapse: collapse;
     }
-    .modal-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
+    .tabela-faturamento th {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 12px 16px;
+      text-align: left;
+    }
+    .tabela-faturamento td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .tabela-faturamento tr:last-child td {
+      border-bottom: none;
+    }
+    .tabela-faturamento tr:hover td {
+      background: var(--slate-50);
+    }
+    .tabela-faturamento .total-row {
+      background: var(--primary-light);
+      font-weight: 800;
+    }
+    .tabela-faturamento .total-row td {
+      border-top: 2px solid var(--primary);
     }
 
     /* ══════════════════════════════════════════════════
@@ -1244,12 +990,17 @@
       .config-grid {
         grid-template-columns: 1fr;
       }
+      .row3 {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     @media (max-width: 768px) {
       .sidebar { display: none !important; }
       .topbar { display: flex; }
-      .bottom-nav { display: flex; }
+      .bottom-nav { 
+        display: flex !important; 
+      }
       .content-scroll {
         margin-left: 0;
         padding: 16px 16px 90px;
@@ -1260,7 +1011,7 @@
       .chart-row {
         grid-template-columns: 1fr;
       }
-      .row2 {
+      .row2, .row3 {
         grid-template-columns: 1fr;
       }
       .filter-row {
@@ -1270,7 +1021,7 @@
       .filter-row select, .filter-row input {
         width: 100%;
       }
-      .btn-pdf, .btn-clear-all {
+      .btn-pdf {
         justify-content: center;
       }
       .form-actions {
@@ -1288,14 +1039,8 @@
         grid-template-columns: 1fr;
         gap: 8px;
       }
-      .entry-card .valor {
-        text-align: left;
-      }
       .entry-card .actions {
         justify-content: flex-start;
-      }
-      .modal-box {
-        padding: 20px;
       }
       .greeting h1 {
         font-size: 22px;
@@ -1303,23 +1048,36 @@
       .card-stat .val {
         font-size: 20px;
       }
-      .saldo-previo-banner {
-        flex-direction: column;
-        text-align: center;
-        gap: 4px;
+      .relatorio-resumo {
+        grid-template-columns: 1fr 1fr;
       }
-      .saldo-previo-banner .val {
-        font-size: 18px;
+      .relatorio-card .val {
+        font-size: 20px;
       }
-      .progresso-caixa {
-        padding: 16px;
+      .tabela-faturamento {
+        overflow-x: auto;
       }
-      .progresso-header {
-        flex-direction: column;
-        align-items: flex-start;
+      .tabela-faturamento table {
+        min-width: 500px;
       }
-      .progresso-legenda {
-        gap: 10px;
+      
+      /* ═══ CONTROLE DE BOTÕES MOBILE ═══ */
+      /* Admin - mostra todos os botões */
+      .bottom-nav .admin-only { 
+        display: flex !important; 
+      }
+      
+      /* Técnico - esconde botões admin */
+      .user-tecnico .bottom-nav .admin-only { 
+        display: none !important; 
+      }
+      
+      /* Ajuste para técnico - centraliza os botões disponíveis */
+      .user-tecnico .bottom-nav { 
+        justify-content: center; 
+      }
+      .user-tecnico .bottom-nav .nav-btn:not(.admin-only) { 
+        max-width: 50%; 
       }
     }
 
@@ -1340,8 +1098,8 @@
       .topbar {
         padding: 10px 12px;
       }
-      .logo-top {
-        height: 30px;
+      .relatorio-resumo {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -1360,7 +1118,7 @@
   <div id="telaLogin">
     <div class="login-card">
       <div class="login-logo">
-        <div style="width:80px;height:80px;border-radius:var(--radius);background:var(--primary-gradient);margin:0 auto 12px;display:grid;place-items:center;font-size:36px;font-weight:900;color:#fff;">WR</div>
+        <div class="logo-placeholder">WR</div>
         <h2>WR Manutenção</h2>
         <p>Ordens de Serviço</p>
       </div>
@@ -1407,7 +1165,7 @@
     <!-- Top bar (mobile) -->
     <div class="topbar">
       <div class="logo-sm">
-        <div style="width:36px;height:36px;border-radius:8px;background:var(--primary-gradient);display:grid;place-items:center;font-weight:900;color:#fff;font-size:16px;">WR</div>
+        <div class="logo-placeholder-sm">WR</div>
         <div class="unidade-sm" id="topUnidade">—</div>
       </div>
       <div class="topbar-actions">
@@ -1418,11 +1176,11 @@
     <!-- Sidebar (desktop) -->
     <aside class="sidebar">
       <div class="logo-area">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:44px;height:44px;border-radius:var(--radius);background:var(--primary-gradient);display:grid;place-items:center;font-weight:900;color:#fff;font-size:20px;">WR</div>
+        <div class="logo-sidebar">
+          <div class="placeholder">WR</div>
           <div>
-            <div style="font-weight:900;font-size:16px;color:#fff;">WR Manutenção</div>
-            <div style="font-size:10px;color:#9fb5bd;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">ordens de serviço</div>
+            <div class="text">WR Manutenção</div>
+            <div class="sub">ordens de serviço</div>
           </div>
         </div>
         <div class="unit-badge">
@@ -1432,25 +1190,28 @@
       </div>
       
       <nav>
-        <button class="nav-item active" onclick="mudarTab('dash', this)">
+        <button class="nav-item active" data-tab="dash" onclick="mudarTab('dash', this)">
           <span class="nav-icon">📊</span> Dashboard
         </button>
-        <button class="nav-item admin-only" onclick="mudarTab('novaos', this)">
+        <button class="nav-item admin-only" data-tab="novaos" onclick="mudarTab('novaos', this)">
           <span class="nav-icon">➕</span> Nova OS
         </button>
-        <button class="nav-item" onclick="mudarTab('ordens', this)">
+        <button class="nav-item" data-tab="ordens" onclick="mudarTab('ordens', this)">
           <span class="nav-icon">📝</span> Ordens
         </button>
-        <button class="nav-item admin-only" onclick="mudarTab('clientes', this)">
+        <button class="nav-item admin-only" data-tab="faturamento" onclick="mudarTab('faturamento', this)">
+          <span class="nav-icon">💰</span> Faturamento
+        </button>
+        <button class="nav-item admin-only" data-tab="clientes" onclick="mudarTab('clientes', this)">
           <span class="nav-icon">👤</span> Clientes
         </button>
-        <button class="nav-item admin-only" onclick="mudarTab('catalogo', this)">
+        <button class="nav-item admin-only" data-tab="catalogo" onclick="mudarTab('catalogo', this)">
           <span class="nav-icon">📦</span> Catálogo
         </button>
-        <button class="nav-item admin-only" onclick="mudarTab('usuarios', this)">
+        <button class="nav-item admin-only" data-tab="usuarios" onclick="mudarTab('usuarios', this)">
           <span class="nav-icon">👥</span> Usuários
         </button>
-        <button class="nav-item admin-only" onclick="mudarTab('config', this)">
+        <button class="nav-item admin-only" data-tab="config" onclick="mudarTab('config', this)">
           <span class="nav-icon">⚙️</span> Configurações
         </button>
       </nav>
@@ -1480,7 +1241,7 @@
             <div class="lbl">Abertas</div>
             <div class="val" id="cardAbertas">0</div>
           </div>
-          <div class="card-stat blue" style="border-left-color:var(--blue);">
+          <div class="card-stat blue">
             <div class="lbl">Em andamento</div>
             <div class="val" id="cardAndamento">0</div>
           </div>
@@ -1624,11 +1385,109 @@
               <option value="cancelada">Canceladas</option>
             </select>
             <button class="btn-pdf admin-only" onclick="exportarResumoPDF()">📄 Resumo PDF</button>
-            <button class="btn-primary admin-only" onclick="mudarTab('novaos', document.querySelector('.nav-item[data-tab=\'novaos\']'))">➕ Nova OS</button>
+            <button class="btn-primary admin-only" onclick="irParaNovaOS()">➕ Nova OS</button>
           </div>
         </div>
         
         <div id="ordensList" style="display:grid;gap:12px;"></div>
+      </div>
+
+      <!-- ── FATURAMENTO (APENAS ADMIN) ── -->
+      <div class="page admin-only" id="tab-faturamento">
+        <div class="page-header"><span class="bar"></span> Relatório de Faturamento</div>
+        
+        <div class="filter-strip">
+          <div class="filter-label">📊 Selecione o período</div>
+          <div class="filter-row">
+            <select id="filtroFaturamento" onchange="toggleFaturamentoPeriodo()" style="min-width:150px;">
+              <option value="mensal">📅 Mensal</option>
+              <option value="periodo">📆 Por Período</option>
+              <option value="anual">📊 Anual</option>
+            </select>
+            
+            <!-- Mensal -->
+            <div id="wrapFaturamentoMes" style="display:flex;gap:8px;align-items:center;">
+              <select id="filtroFaturamentoMes" style="min-width:120px;">
+                <option value="01">Janeiro</option>
+                <option value="02">Fevereiro</option>
+                <option value="03">Março</option>
+                <option value="04">Abril</option>
+                <option value="05">Maio</option>
+                <option value="06">Junho</option>
+                <option value="07">Julho</option>
+                <option value="08">Agosto</option>
+                <option value="09">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+              </select>
+              <input type="number" id="filtroFaturamentoAno" value="2024" style="width:80px;min-height:38px;padding:6px 10px;border:1px solid var(--line);border-radius:var(--radius);" />
+            </div>
+            
+            <!-- Período -->
+            <div id="wrapFaturamentoPeriodo" style="display:none;flex-wrap:wrap;gap:8px;align-items:center;">
+              <span style="font-size:12px;font-weight:700;color:var(--muted);">De:</span>
+              <input type="date" id="filtroFaturamentoInicio" style="min-height:38px;padding:6px 10px;border:1px solid var(--line);border-radius:var(--radius);" />
+              <span style="font-size:12px;font-weight:700;color:var(--muted);">Até:</span>
+              <input type="date" id="filtroFaturamentoFim" style="min-height:38px;padding:6px 10px;border:1px solid var(--line);border-radius:var(--radius);" />
+            </div>
+            
+            <button class="btn-primary" onclick="gerarRelatorioFaturamento()" style="min-height:38px;padding:8px 20px;">
+              <span class="btn-icon">📊</span> Gerar
+            </button>
+            <button class="btn-pdf" onclick="exportarFaturamentoPDF()" style="min-height:38px;padding:8px 20px;">
+              📄 PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Resumo -->
+        <div class="relatorio-resumo" id="relatorioResumo" style="display:none;">
+          <div class="relatorio-card">
+            <div class="lbl">Total de OS Concluídas</div>
+            <div class="val" id="relTotalOS">0</div>
+          </div>
+          <div class="relatorio-card">
+            <div class="lbl">Receita Total</div>
+            <div class="val recebido" id="relReceitaTotal">R$ 0,00</div>
+          </div>
+          <div class="relatorio-card">
+            <div class="lbl">Mão de Obra Total</div>
+            <div class="val pago" id="relMaoObraTotal">R$ 0,00</div>
+          </div>
+          <div class="relatorio-card">
+            <div class="lbl">Materiais Total</div>
+            <div class="val lucro" id="relMateriaisTotal">R$ 0,00</div>
+          </div>
+        </div>
+
+        <!-- Tabela -->
+        <div id="relatorioTabela" style="display:none;">
+          <div class="tabela-faturamento">
+            <table>
+              <thead>
+                <tr>
+                  <th>OS</th>
+                  <th>Cliente</th>
+                  <th>Data</th>
+                  <th>Status</th>
+                  <th style="text-align:right;">Mão de Obra</th>
+                  <th style="text-align:right;">Materiais</th>
+                  <th style="text-align:right;">Desconto</th>
+                  <th style="text-align:right;">Total</th>
+                </tr>
+              </thead>
+              <tbody id="relatorioTabelaBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="relatorioVazio" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted);">
+          <div style="font-size:40px;margin-bottom:8px;">📊</div>
+          <h3 style="color:var(--ink);">Nenhum dado encontrado</h3>
+          <p style="font-size:14px;">Selecione um período e clique em "Gerar" para visualizar o relatório.</p>
+        </div>
       </div>
 
       <!-- ── CLIENTES (APENAS ADMIN) ── -->
@@ -1817,16 +1676,19 @@
 
     <!-- Bottom nav (mobile) -->
     <nav class="bottom-nav">
-      <button class="nav-btn active" onclick="mudarTab('dash', this)">
+      <button class="nav-btn active" data-tab="dash" onclick="mudarTab('dash', this)">
         <span class="nav-icon">📊</span> Dashboard
       </button>
-      <button class="nav-btn admin-only" onclick="mudarTab('novaos', this)">
+      <button class="nav-btn admin-only" data-tab="novaos" onclick="mudarTab('novaos', this)">
         <span class="nav-icon">➕</span> Nova
       </button>
-      <button class="nav-btn" onclick="mudarTab('ordens', this)">
+      <button class="nav-btn" data-tab="ordens" onclick="mudarTab('ordens', this)">
         <span class="nav-icon">📝</span> Ordens
       </button>
-      <button class="nav-btn admin-only" onclick="mudarTab('config', this)">
+      <button class="nav-btn admin-only" data-tab="faturamento" onclick="mudarTab('faturamento', this)">
+        <span class="nav-icon">💰</span> Fatura
+      </button>
+      <button class="nav-btn admin-only" data-tab="config" onclick="mudarTab('config', this)">
         <span class="nav-icon">⚙️</span> Config
       </button>
     </nav>
@@ -1846,6 +1708,65 @@
     let osItensTemp = [];
     let graficoPizza = null;
     let graficoBarras = null;
+
+    // ══════════════════════════════════════════════════
+    // FUNÇÃO FORMATAR DATA
+    // ══════════════════════════════════════════════════
+    function formatDate(date) {
+      if (!date) return "-";
+      
+      if (typeof date === 'string' && date.includes('T')) {
+        date = date.split('T')[0];
+      }
+      
+      if (typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = date.split("-");
+        return `${day}/${month}/${year}`;
+      }
+      
+      try {
+        const d = new Date(date);
+        if (!isNaN(d.getTime())) {
+          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const year = d.getFullYear();
+          return `${day}/${month}/${year}`;
+        }
+      } catch(e) {}
+      
+      return date;
+    }
+
+    function formatarDataParaInput(date) {
+      if (!date) return "";
+      
+      if (typeof date === 'string' && date.includes('T')) {
+        date = date.split('T')[0];
+      }
+      
+      if (typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return date;
+      }
+      
+      try {
+        const d = new Date(date);
+        if (!isNaN(d.getTime())) {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        }
+      } catch(e) {}
+      
+      return "";
+    }
+
+    function formatDateBR(date) {
+      if (!date) return "-";
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return date;
+      return d.toLocaleDateString('pt-BR');
+    }
 
     // ══════════════════════════════════════════════════
     // PERSISTÊNCIA
@@ -1886,6 +1807,26 @@
       } else {
         input.type = 'password';
         btn.textContent = '👁️';
+      }
+    }
+
+    // ══════════════════════════════════════════════════
+    // FUNÇÃO PARA IR PARA NOVA OS
+    // ══════════════════════════════════════════════════
+    function irParaNovaOS() {
+      const btn = document.querySelector('.nav-item[data-tab="novaos"]');
+      if (btn) {
+        mudarTab('novaos', btn);
+      } else {
+        // Fallback: tenta encontrar pelo texto
+        const btns = document.querySelectorAll('.nav-item');
+        for (let b of btns) {
+          if (b.textContent.includes('Nova OS')) {
+            mudarTab('novaos', b);
+            return;
+          }
+        }
+        mudarTab('novaos', null);
       }
     }
 
@@ -1951,10 +1892,12 @@
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.nav-item.admin-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.bottom-nav .admin-only').forEach(el => el.style.display = 'none');
+        document.getElementById('app').classList.add('user-tecnico');
       } else {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
         document.querySelectorAll('.nav-item.admin-only').forEach(el => el.style.display = 'flex');
         document.querySelectorAll('.bottom-nav .admin-only').forEach(el => el.style.display = 'flex');
+        document.getElementById('app').classList.remove('user-tecnico');
       }
 
       // Atualiza informações do usuário
@@ -1966,6 +1909,13 @@
       document.getElementById("sideUnidade").textContent = unidade;
 
       document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
+
+      // Define data inicial para o relatório
+      const hoje = new Date();
+      const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      document.getElementById("filtroFaturamentoInicio").value = primeiroDia.toISOString().slice(0, 10);
+      document.getElementById("filtroFaturamentoFim").value = hoje.toISOString().slice(0, 10);
+      document.getElementById("filtroFaturamentoAno").value = hoje.getFullYear();
 
       carregarTodosDados();
     }
@@ -2071,6 +2021,10 @@
         atualizarTotalOS();
       } else if (tab === 'ordens') {
         renderizarOrdens();
+      } else if (tab === 'faturamento' && isAdmin) {
+        const hoje = new Date();
+        document.getElementById("filtroFaturamentoMes").value = String(hoje.getMonth() + 1).padStart(2, '0');
+        gerarRelatorioFaturamento();
       } else if (tab === 'clientes' && isAdmin) {
         renderClientes();
       } else if (tab === 'catalogo' && isAdmin) {
@@ -2108,7 +2062,6 @@
       const concluidas = ordens.filter(o => o.status === "concluida").length;
       const canceladas = ordens.filter(o => o.status === "cancelada").length;
 
-      // Gráfico de Pizza
       const ctxPizza = document.getElementById('graficoPizza').getContext('2d');
       if (graficoPizza) graficoPizza.destroy();
       graficoPizza = new Chart(ctxPizza, {
@@ -2134,7 +2087,6 @@
         }
       });
 
-      // Gráfico de Barras (apenas dados numéricos)
       const ctxBarras = document.getElementById('graficoBarras').getContext('2d');
       if (graficoBarras) graficoBarras.destroy();
       graficoBarras = new Chart(ctxBarras, {
@@ -2167,7 +2119,309 @@
     }
 
     // ══════════════════════════════════════════════════
-    // ORDENS
+    // RELATÓRIO DE FATURAMENTO
+    // ══════════════════════════════════════════════════
+    function toggleFaturamentoPeriodo() {
+      const tipo = document.getElementById("filtroFaturamento").value;
+      document.getElementById("wrapFaturamentoMes").style.display = tipo === "mensal" ? "flex" : "none";
+      document.getElementById("wrapFaturamentoPeriodo").style.display = tipo === "periodo" ? "flex" : "none";
+    }
+
+    function gerarRelatorioFaturamento() {
+      const tipo = document.getElementById("filtroFaturamento").value;
+      let ordensFiltradas = dados.ordens || [];
+      
+      ordensFiltradas = ordensFiltradas.filter(os => os.status === "concluida");
+
+      let dataInicio, dataFim;
+      
+      if (tipo === "mensal") {
+        const mes = document.getElementById("filtroFaturamentoMes").value;
+        const ano = document.getElementById("filtroFaturamentoAno").value;
+        dataInicio = `${ano}-${mes}-01`;
+        const ultimoDia = new Date(ano, mes, 0).getDate();
+        dataFim = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+      } else if (tipo === "periodo") {
+        dataInicio = document.getElementById("filtroFaturamentoInicio").value;
+        dataFim = document.getElementById("filtroFaturamentoFim").value;
+      } else {
+        const ano = document.getElementById("filtroFaturamentoAno").value;
+        dataInicio = `${ano}-01-01`;
+        dataFim = `${ano}-12-31`;
+      }
+
+      if (dataInicio && dataFim) {
+        ordensFiltradas = ordensFiltradas.filter(os => {
+          const dataOS = os.dataAbertura || "";
+          return dataOS >= dataInicio && dataOS <= dataFim;
+        });
+      }
+
+      const resumoEl = document.getElementById("relatorioResumo");
+      const tabelaEl = document.getElementById("relatorioTabela");
+      const vazioEl = document.getElementById("relatorioVazio");
+
+      if (!ordensFiltradas.length) {
+        resumoEl.style.display = "none";
+        tabelaEl.style.display = "none";
+        vazioEl.style.display = "block";
+        return;
+      }
+
+      resumoEl.style.display = "grid";
+      tabelaEl.style.display = "block";
+      vazioEl.style.display = "none";
+
+      let totalOS = ordensFiltradas.length;
+      let receitaTotal = 0;
+      let maoObraTotal = 0;
+      let materiaisTotal = 0;
+
+      ordensFiltradas.forEach(os => {
+        const valor = Number(os.valorTotal || 0);
+        const maoObra = Number(os.maoObra || 0);
+        const itens = parseItens(os.itensOS);
+        const totalItens = itens.reduce((sum, i) => sum + (Number(i.valor || 0) * (Number(i.quantidade) || 0)), 0);
+        
+        receitaTotal += valor;
+        maoObraTotal += maoObra;
+        materiaisTotal += totalItens;
+      });
+
+      document.getElementById("relTotalOS").textContent = totalOS;
+      document.getElementById("relReceitaTotal").textContent = money.format(receitaTotal);
+      document.getElementById("relMaoObraTotal").textContent = money.format(maoObraTotal);
+      document.getElementById("relMateriaisTotal").textContent = money.format(materiaisTotal);
+
+      const tbody = document.getElementById("relatorioTabelaBody");
+      tbody.innerHTML = ordensFiltradas.map(os => {
+        const itens = parseItens(os.itensOS);
+        const totalItens = itens.reduce((sum, i) => sum + (Number(i.valor || 0) * (Number(i.quantidade) || 0)), 0);
+        const maoObra = Number(os.maoObra || 0);
+        const desconto = Number(os.desconto || 0);
+        const valorTotal = Number(os.valorTotal || 0);
+        
+        return `<tr>
+          <td><strong>${os.id}</strong></td>
+          <td>${os.clienteNome || "-"}</td>
+          <td>${formatDate(os.dataAbertura)}</td>
+          <td><span class="badge-tipo concluida">Concluída</span></td>
+          <td style="text-align:right;">${money.format(maoObra)}</td>
+          <td style="text-align:right;">${money.format(totalItens)}</td>
+          <td style="text-align:right;color:var(--rose-600);">${desconto > 0 ? '- ' + money.format(desconto) : '-'}</td>
+          <td style="text-align:right;font-weight:800;color:var(--primary);">${money.format(valorTotal)}</td>
+        </tr>`;
+      }).join("");
+
+      tbody.innerHTML += `<tr class="total-row">
+        <td colspan="4" style="text-align:right;font-weight:800;">TOTAL</td>
+        <td style="text-align:right;font-weight:800;">${money.format(maoObraTotal)}</td>
+        <td style="text-align:right;font-weight:800;">${money.format(materiaisTotal)}</td>
+        <td style="text-align:right;font-weight:800;">-</td>
+        <td style="text-align:right;font-weight:800;color:var(--primary-dark);">${money.format(receitaTotal)}</td>
+      </tr>`;
+    }
+
+    function exportarFaturamentoPDF() {
+      if (!isAdmin) { toast("Apenas administradores podem gerar PDF."); return; }
+
+      const tipo = document.getElementById("filtroFaturamento").value;
+      let titulo = "Relatório de Faturamento";
+      
+      if (tipo === "mensal") {
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const mes = parseInt(document.getElementById("filtroFaturamentoMes").value) - 1;
+        const ano = document.getElementById("filtroFaturamentoAno").value;
+        titulo = `Relatório de Faturamento - ${meses[mes]} ${ano}`;
+      } else if (tipo === "periodo") {
+        const inicio = document.getElementById("filtroFaturamentoInicio").value;
+        const fim = document.getElementById("filtroFaturamentoFim").value;
+        titulo = `Relatório de Faturamento - ${formatDate(inicio)} a ${formatDate(fim)}`;
+      } else {
+        const ano = document.getElementById("filtroFaturamentoAno").value;
+        titulo = `Relatório de Faturamento - ${ano}`;
+      }
+
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const cfg = dados.configuracoes || {};
+        const pageWidth = 210;
+        const margin = 15;
+        let y = 20;
+
+        const corPrimaria = [15, 118, 110];
+
+        doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
+        doc.rect(0, 0, pageWidth, 35, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text(cfg.empresaNome || "WR Manutenção e Serviços", margin, 16);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(titulo, margin, 26);
+
+        y = 45;
+        doc.setTextColor(11, 31, 38);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(titulo, margin, y);
+        y += 8;
+
+        const ordensFiltradas = obterDadosRelatorio();
+        
+        if (!ordensFiltradas.length) {
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'normal');
+          doc.text('Nenhum dado encontrado para o período selecionado.', margin, y);
+          doc.save(`Relatorio_Faturamento.pdf`);
+          return;
+        }
+
+        let totalOS = ordensFiltradas.length;
+        let receitaTotal = 0;
+        let maoObraTotal = 0;
+        let materiaisTotal = 0;
+
+        ordensFiltradas.forEach(os => {
+          const valor = Number(os.valorTotal || 0);
+          const maoObra = Number(os.maoObra || 0);
+          const itens = parseItens(os.itensOS);
+          const totalItens = itens.reduce((sum, i) => sum + (Number(i.valor || 0) * (Number(i.quantidade) || 0)), 0);
+          receitaTotal += valor;
+          maoObraTotal += maoObra;
+          materiaisTotal += totalItens;
+        });
+
+        const resumoData = [
+          ['Total de OS', String(totalOS)],
+          ['Receita Total', money.format(receitaTotal)],
+          ['Mão de Obra Total', money.format(maoObraTotal)],
+          ['Materiais Total', money.format(materiaisTotal)]
+        ];
+
+        doc.autoTable({
+          startY: y,
+          head: [['Indicador', 'Valor']],
+          body: resumoData,
+          theme: 'striped',
+          headStyles: {
+            fillColor: corPrimaria,
+            textColor: [255, 255, 255],
+            fontSize: 9,
+            fontStyle: 'bold'
+          },
+          styles: {
+            fontSize: 10,
+            cellPadding: 6
+          },
+          columnStyles: {
+            0: { cellWidth: 80 },
+            1: { cellWidth: 'auto', halign: 'right', fontStyle: 'bold' }
+          },
+          margin: { left: margin, right: margin }
+        });
+
+        y = doc.lastAutoTable.finalY + 10;
+
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Detalhamento das Ordens', margin, y);
+        y += 6;
+
+        const tableData = ordensFiltradas.map(os => {
+          const itens = parseItens(os.itensOS);
+          const totalItens = itens.reduce((sum, i) => sum + (Number(i.valor || 0) * (Number(i.quantidade) || 0)), 0);
+          const maoObra = Number(os.maoObra || 0);
+          const valorTotal = Number(os.valorTotal || 0);
+          return [
+            os.id || "-",
+            os.clienteNome || "-",
+            formatDate(os.dataAbertura),
+            money.format(maoObra),
+            money.format(totalItens),
+            money.format(valorTotal)
+          ];
+        });
+
+        doc.autoTable({
+          startY: y,
+          head: [['OS', 'Cliente', 'Data', 'Mão de Obra', 'Materiais', 'Total']],
+          body: tableData,
+          theme: 'striped',
+          headStyles: {
+            fillColor: corPrimaria,
+            textColor: [255, 255, 255],
+            fontSize: 8,
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          styles: {
+            fontSize: 8,
+            cellPadding: 4
+          },
+          columnStyles: {
+            0: { cellWidth: 30 },
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 30, halign: 'center' },
+            3: { cellWidth: 35, halign: 'right' },
+            4: { cellWidth: 35, halign: 'right' },
+            5: { cellWidth: 35, halign: 'right', fontStyle: 'bold' }
+          },
+          margin: { left: margin, right: margin },
+          didDrawPage: function(data) {
+            const pageCount = doc.internal.getNumberOfPages();
+            const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+            doc.setFontSize(7);
+            doc.setTextColor(100, 116, 125);
+            doc.text(`Página ${currentPage} de ${pageCount}`, pageWidth - margin, 285, { align: 'right' });
+            doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, margin, 285);
+          }
+        });
+
+        doc.save(`Relatorio_Faturamento.pdf`);
+        toast("✅ PDF gerado com sucesso!");
+      } catch (e) {
+        console.error("Erro ao gerar PDF:", e);
+        alert("Erro ao gerar PDF: " + e.message);
+      }
+    }
+
+    function obterDadosRelatorio() {
+      const tipo = document.getElementById("filtroFaturamento").value;
+      let ordensFiltradas = dados.ordens || [];
+      ordensFiltradas = ordensFiltradas.filter(os => os.status === "concluida");
+
+      let dataInicio, dataFim;
+      
+      if (tipo === "mensal") {
+        const mes = document.getElementById("filtroFaturamentoMes").value;
+        const ano = document.getElementById("filtroFaturamentoAno").value;
+        dataInicio = `${ano}-${mes}-01`;
+        const ultimoDia = new Date(ano, mes, 0).getDate();
+        dataFim = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+      } else if (tipo === "periodo") {
+        dataInicio = document.getElementById("filtroFaturamentoInicio").value;
+        dataFim = document.getElementById("filtroFaturamentoFim").value;
+      } else {
+        const ano = document.getElementById("filtroFaturamentoAno").value;
+        dataInicio = `${ano}-01-01`;
+        dataFim = `${ano}-12-31`;
+      }
+
+      if (dataInicio && dataFim) {
+        ordensFiltradas = ordensFiltradas.filter(os => {
+          const dataOS = os.dataAbertura || "";
+          return dataOS >= dataInicio && dataOS <= dataFim;
+        });
+      }
+
+      return ordensFiltradas;
+    }
+
+    // ══════════════════════════════════════════════════
+    // ORDENS - RENDERIZAÇÃO
     // ══════════════════════════════════════════════════
     function renderizarOrdens() {
       const filtro = document.getElementById("filtroStatusOS")?.value || "todos";
@@ -2211,12 +2465,15 @@
 
         const mostrarValor = isAdmin;
 
+        const dataAbertura = formatDate(os.dataAbertura);
+        const dataPrazo = formatDate(os.prazo);
+
         return `<div class="entry-card">
           <div class="badge-tipo ${os.status}">${statusLabel(os.status)}</div>
           <div class="info">
             <div class="desc">${os.clienteNome || "-"} - ${os.descricao || "Atendimento técnico"}</div>
             <div class="meta">
-              OS #${os.id} • Abertura: ${formatDate(os.dataAbertura)} • Prazo: ${formatDate(os.prazo)}
+              OS #${os.id} • Abertura: ${dataAbertura} • Prazo: ${dataPrazo}
               ${usuarioOS ? `• Responsável: ${usuarioOS}` : ''}
               ${mostrarValor ? `• ${money.format(Number(os.valorTotal || 0))}` : ''}
             </div>
@@ -2234,12 +2491,6 @@
         cancelada: "Cancelada"
       };
       return labels[status] || status;
-    }
-
-    function formatDate(date) {
-      if (!date) return "-";
-      const [year, month, day] = date.split("-");
-      return `${day}/${month}/${year}`;
     }
 
     // ══════════════════════════════════════════════════
@@ -2275,17 +2526,15 @@
         return;
       }
 
-      el.innerHTML = `<div style="display:grid;gap:10px;">
-        ${dados.clientes.map(c => `
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div>
-              <strong>${c.nome || "-"}</strong>
-              <div style="font-size:12px;color:var(--muted);">${c.telefone || ""} ${c.email ? '• ' + c.email : ''}</div>
-            </div>
-            <button class="btn-del" onclick="excluirCliente(${c.id})">🗑️ Excluir</button>
+      el.innerHTML = dados.clientes.map(c => `
+        <div class="entry-card" style="grid-template-columns:1fr auto;">
+          <div>
+            <strong>${c.nome || "-"}</strong>
+            <div style="font-size:12px;color:var(--muted);">${c.telefone || ""} ${c.email ? '• ' + c.email : ''}</div>
           </div>
-        `).join("")}
-      </div>`;
+          <button class="btn-del" onclick="excluirCliente(${c.id})">🗑️ Excluir</button>
+        </div>
+      `).join("");
     }
 
     async function excluirCliente(id) {
@@ -2332,17 +2581,15 @@
         return;
       }
 
-      el.innerHTML = `<div style="display:grid;gap:10px;">
-        ${dados.catalogo.map(i => `
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div>
-              <strong>${i.nome || "-"}</strong>
-              <div style="font-size:12px;color:var(--muted);">${i.tipoItem || i.tipo || "material"} • ${money.format(Number(i.valor || 0))} ${i.estoque !== undefined ? '• Estoque: ' + i.estoque : ''}</div>
-            </div>
-            <button class="btn-del" onclick="excluirItem(${i.id})">🗑️ Excluir</button>
+      el.innerHTML = dados.catalogo.map(i => `
+        <div class="entry-card" style="grid-template-columns:1fr auto;">
+          <div>
+            <strong>${i.nome || "-"}</strong>
+            <div style="font-size:12px;color:var(--muted);">${i.tipoItem || i.tipo || "material"} • ${money.format(Number(i.valor || 0))} ${i.estoque !== undefined ? '• Estoque: ' + i.estoque : ''}</div>
           </div>
-        `).join("")}
-      </div>`;
+          <button class="btn-del" onclick="excluirItem(${i.id})">🗑️ Excluir</button>
+        </div>
+      `).join("");
     }
 
     async function excluirItem(id) {
@@ -2389,17 +2636,15 @@
         return;
       }
 
-      el.innerHTML = `<div style="display:grid;gap:10px;">
-        ${dados.usuarios.map(u => `
-          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div>
-              <strong>${u.nome || u.usuario}</strong>
-              <div style="font-size:12px;color:var(--muted);">@${u.usuario} • ${u.tipo === 'admin' ? '👑 Admin' : '🔧 Técnico'}</div>
-            </div>
-            ${u.usuario !== 'admin' ? `<button class="btn-del" onclick="excluirUsuario(${u.id})">🗑️ Excluir</button>` : '<span style="font-size:12px;color:var(--muted);">Padrão</span>'}
+      el.innerHTML = dados.usuarios.map(u => `
+        <div class="entry-card" style="grid-template-columns:1fr auto;">
+          <div>
+            <strong>${u.nome || u.usuario}</strong>
+            <div style="font-size:12px;color:var(--muted);">@${u.usuario} • ${u.tipo === 'admin' ? '👑 Admin' : '🔧 Técnico'}</div>
           </div>
-        `).join("")}
-      </div>`;
+          ${u.usuario !== 'admin' ? `<button class="btn-del" onclick="excluirUsuario(${u.id})">🗑️ Excluir</button>` : '<span style="font-size:12px;color:var(--muted);">Padrão</span>'}
+        </div>
+      `).join("");
     }
 
     async function excluirUsuario(id) {
@@ -2472,20 +2717,18 @@
         return;
       }
 
-      el.innerHTML = `<div style="display:grid;gap:6px;">
-        ${osItensTemp.map((i, index) => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--slate-50);border-radius:var(--radius);border:1px solid var(--line);">
-            <div>
-              <strong>${i.nome}</strong>
-              <span style="font-size:12px;color:var(--muted);"> ${i.quantidade}x ${money.format(i.valor)}</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-weight:700;">${money.format(i.subtotal)}</span>
-              <button class="btn-del" onclick="removerItemOS(${index})" style="padding:4px 8px;font-size:11px;">✕</button>
-            </div>
+      el.innerHTML = osItensTemp.map((i, index) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--slate-50);border-radius:var(--radius);border:1px solid var(--line);margin-bottom:4px;">
+          <div>
+            <strong>${i.nome}</strong>
+            <span style="font-size:12px;color:var(--muted);"> ${i.quantidade}x ${money.format(i.valor)}</span>
           </div>
-        `).join("")}
-      </div>`;
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-weight:700;">${money.format(i.subtotal)}</span>
+            <button class="btn-del" onclick="removerItemOS(${index})" style="padding:4px 8px;font-size:11px;">✕</button>
+          </div>
+        </div>
+      `).join("");
     }
 
     function atualizarTotalOS() {
@@ -2602,7 +2845,6 @@
         const corPrimaria = [15, 118, 110];
         const corSecundaria = [11, 31, 38];
 
-        // Cabeçalho
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
         doc.rect(0, 0, pageWidth, 45, 'F');
         doc.setTextColor(255, 255, 255);
@@ -2628,7 +2870,6 @@
         doc.text('ORDEM DE SERVIÇO', margin, y);
         y += 8;
 
-        // Status
         const statusMap = {
           'aberta': ['Aberta', [254, 243, 199], [146, 64, 14]],
           'em_andamento': ['Em Andamento', [219, 234, 254], [30, 64, 175]],
@@ -2647,7 +2888,6 @@
         doc.text(statusText, statusX + 5, y);
         y += 10;
 
-        // Dados do cliente
         doc.setTextColor([100, 116, 125]);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
@@ -2663,7 +2903,6 @@
         doc.text(`Prazo: ${formatDate(os.prazo)}`, margin, y);
         y += 8;
 
-        // Descrição
         if (os.descricao) {
           doc.setTextColor([100, 116, 125]);
           doc.setFontSize(8);
@@ -2678,7 +2917,6 @@
           y += descLines.length * 5 + 6;
         }
 
-        // Itens
         if (itens.length > 0) {
           doc.setTextColor([100, 116, 125]);
           doc.setFontSize(8);
@@ -2717,7 +2955,6 @@
           y = doc.lastAutoTable.finalY + 8;
         }
 
-        // Total
         const totalItens = itens.reduce((sum, i) => sum + Number(i.subtotal || 0), 0);
         const maoObra = Number(os.maoObra || 0);
         const desconto = Number(os.desconto || 0);
@@ -2892,7 +3129,6 @@
       atualizarDashboard();
       atualizarGraficos();
 
-      // Carrega configurações no form
       const cfg = dados.configuracoes || {};
       document.getElementById("configEmpresaNome").value = cfg.empresaNome || "WR Manutenção e Serviços";
       document.getElementById("configEmpresaCnpj").value = cfg.empresaCnpj || "";
@@ -2942,6 +3178,12 @@
     window.atualizarTotalOS = atualizarTotalOS;
     window.cadastrarUsuario = cadastrarUsuario;
     window.excluirUsuario = excluirUsuario;
+    window.formatDate = formatDate;
+    window.formatarDataParaInput = formatarDataParaInput;
+    window.toggleFaturamentoPeriodo = toggleFaturamentoPeriodo;
+    window.gerarRelatorioFaturamento = gerarRelatorioFaturamento;
+    window.exportarFaturamentoPDF = exportarFaturamentoPDF;
+    window.irParaNovaOS = irParaNovaOS;
   </script>
 </body>
 </html>
