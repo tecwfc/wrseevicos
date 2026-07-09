@@ -867,7 +867,9 @@
       color: var(--green-500);
     }
 
-    /* Bottom nav */
+    /* ══════════════════════════════════════════════════
+       BOTTOM NAV - MOBILE
+       ══════════════════════════════════════════════════ */
     .bottom-nav {
       display: none;
       position: fixed;
@@ -879,6 +881,7 @@
       border-top: 1px solid var(--line);
       padding: 4px 0 env(safe-area-inset-bottom, 4px);
       justify-content: space-around;
+      flex-wrap: wrap;
     }
     .nav-btn {
       display: flex;
@@ -888,16 +891,18 @@
       gap: 2px;
       min-height: 54px;
       flex: 1;
+      min-width: 50px;
+      max-width: 70px;
       color: var(--muted);
       font-weight: 700;
-      font-size: 10px;
+      font-size: 9px;
       transition: var(--transition);
       border: none;
       background: none;
-      padding: 4px;
+      padding: 4px 2px;
     }
     .nav-btn .nav-icon {
-      font-size: 20px;
+      font-size: 18px;
       width: auto;
     }
     .nav-btn.active {
@@ -907,7 +912,7 @@
       transform: scale(1.1);
     }
     .nav-btn.admin-only { 
-      display: flex; 
+      display: flex !important; 
     }
 
     /* ══════════════════════════════════════════════════
@@ -1000,6 +1005,10 @@
       .topbar { display: flex; }
       .bottom-nav { 
         display: flex !important; 
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2px;
+        padding: 8px 4px env(safe-area-inset-bottom, 8px);
       }
       .content-scroll {
         margin-left: 0;
@@ -1061,18 +1070,29 @@
         min-width: 500px;
       }
       
-      /* ═══ CONTROLE DE BOTÕES MOBILE ═══ */
-      /* Admin - mostra todos os botões */
-      .bottom-nav .admin-only { 
+      .nav-btn {
+        min-height: 48px;
+        min-width: 44px;
+        max-width: 60px;
+        font-size: 8px;
+        padding: 4px 2px;
+        flex: 0 1 auto;
+      }
+      .nav-btn .nav-icon {
+        font-size: 16px;
+      }
+      
+      /* ADMIN - mostra todos os botões */
+      .bottom-nav .nav-btn { 
         display: flex !important; 
       }
       
-      /* Técnico - esconde botões admin */
-      .user-tecnico .bottom-nav .admin-only { 
+      /* TÉCNICO - esconde botões admin */
+      .user-tecnico .bottom-nav .nav-btn.admin-only { 
         display: none !important; 
       }
       
-      /* Ajuste para técnico - centraliza os botões disponíveis */
+      /* Técnico - centraliza os botões disponíveis */
       .user-tecnico .bottom-nav { 
         justify-content: center; 
       }
@@ -1100,6 +1120,16 @@
       }
       .relatorio-resumo {
         grid-template-columns: 1fr;
+      }
+      .nav-btn {
+        min-height: 42px;
+        min-width: 38px;
+        max-width: 50px;
+        font-size: 7px;
+        padding: 2px 1px;
+      }
+      .nav-btn .nav-icon {
+        font-size: 14px;
       }
     }
 
@@ -1674,7 +1704,7 @@
       </div>
     </div>
 
-    <!-- Bottom nav (mobile) -->
+    <!-- Bottom nav (mobile) - TODOS OS BOTÕES PARA ADMIN -->
     <nav class="bottom-nav">
       <button class="nav-btn active" data-tab="dash" onclick="mudarTab('dash', this)">
         <span class="nav-icon">📊</span> Dashboard
@@ -1687,6 +1717,15 @@
       </button>
       <button class="nav-btn admin-only" data-tab="faturamento" onclick="mudarTab('faturamento', this)">
         <span class="nav-icon">💰</span> Fatura
+      </button>
+      <button class="nav-btn admin-only" data-tab="clientes" onclick="mudarTab('clientes', this)">
+        <span class="nav-icon">👤</span> Clientes
+      </button>
+      <button class="nav-btn admin-only" data-tab="catalogo" onclick="mudarTab('catalogo', this)">
+        <span class="nav-icon">📦</span> Catálogo
+      </button>
+      <button class="nav-btn admin-only" data-tab="usuarios" onclick="mudarTab('usuarios', this)">
+        <span class="nav-icon">👥</span> Usuários
       </button>
       <button class="nav-btn admin-only" data-tab="config" onclick="mudarTab('config', this)">
         <span class="nav-icon">⚙️</span> Config
@@ -1818,7 +1857,6 @@
       if (btn) {
         mudarTab('novaos', btn);
       } else {
-        // Fallback: tenta encontrar pelo texto
         const btns = document.querySelectorAll('.nav-item');
         for (let b of btns) {
           if (b.textContent.includes('Nova OS')) {
@@ -1887,7 +1925,6 @@
       document.getElementById("telaLogin").style.display = "none";
       document.getElementById("app").classList.add("active");
 
-      // Configura visibilidade admin/tecnico
       if (!isAdmin) {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.nav-item.admin-only').forEach(el => el.style.display = 'none');
@@ -1900,7 +1937,6 @@
         document.getElementById('app').classList.remove('user-tecnico');
       }
 
-      // Atualiza informações do usuário
       document.getElementById("nomeOperador").textContent = usuarioAtual.nome || usuarioAtual.usuario;
       document.getElementById("sideUsuario").textContent = usuarioAtual.nome || usuarioAtual.usuario;
       const unidade = usuarioAtual.empresa === "filial" ? "Filial" : "Matriz";
@@ -1910,7 +1946,6 @@
 
       document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
 
-      // Define data inicial para o relatório
       const hoje = new Date();
       const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
       document.getElementById("filtroFaturamentoInicio").value = primeiroDia.toISOString().slice(0, 10);
