@@ -1,847 +1,1855 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WR Manutenção - Ar Condicionado</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>WR Manutenção - Ordens de Serviço</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <style>
+    /* ══════════════════════════════════════════════════
+       ROOT VARIÁVEIS - CORES WR MANUTENÇÃO
+       ══════════════════════════════════════════════════ */
     :root {
+      --primary: #0f766e;
+      --primary-dark: #0b5f59;
+      --primary-light: #e5f4f2;
+      --primary-gradient: linear-gradient(135deg, #0f766e, #0ea5e9);
       --bg: #eef4f6;
       --panel: #ffffff;
       --ink: #102027;
       --muted: #64747d;
       --line: #d7e2e6;
-      --teal: #0f766e;
-      --teal-dark: #0b5f59;
-      --cyan: #0ea5e9;
-      --blue: #2563eb;
-      --amber: #d97706;
-      --green: #059669;
-      --red: #dc2626;
-      --soft-teal: #e5f4f2;
-      --radius: 8px;
+      --radius: 12px;
       --shadow: 0 18px 45px rgba(16, 32, 39, .11);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --shadow-hover: 0 24px 60px rgba(16, 32, 39, .18);
+      --transition: 0.25s ease;
+      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      
+      --green-50: #f0fdf4;
+      --green-100: #dcfce7;
+      --green-500: #22c55e;
+      --green-600: #16a34a;
+      --green-700: #15803d;
+      
+      --rose-50: #fff1f2;
+      --rose-500: #f43f5e;
+      --rose-600: #e11d48;
+      
+      --orange-50: #fff7ed;
+      --orange-500: #f97316;
+      --orange-600: #ea580c;
     }
 
+    /* ══════════════════════════════════════════════════
+       RESET & BASE
+       ══════════════════════════════════════════════════ */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { min-height: 100vh; background: var(--bg); color: var(--ink); line-height: 1.5; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
     button, input, select, textarea { font: inherit; }
-    button { border: 0; cursor: pointer; }
+    button { border: 0; cursor: pointer; background: none; }
 
-    .login-screen {
+    /* ══════════════════════════════════════════════════
+       LOGIN SCREEN
+       ══════════════════════════════════════════════════ */
+    #telaLogin {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      background: #0b1f26;
-    }
-
-    .login-hero {
-      color: white;
-      padding: clamp(28px, 5vw, 58px);
-      background:
-        linear-gradient(90deg, rgba(8, 36, 44, .96), rgba(8, 36, 44, .72), rgba(8, 36, 44, .18)),
-        url("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=80") center / cover;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 40px;
-    }
-
-    .login-hero h1 {
-      font-size: clamp(38px, 6vw, 70px);
-      line-height: .96;
-      font-weight: 900;
-      max-width: 760px;
-      margin-bottom: 18px;
-    }
-
-    .login-hero p {
-      color: rgba(255,255,255,.84);
-      max-width: 620px;
-      font-weight: 600;
-      font-size: 17px;
-    }
-
-    .login-card-wrap {
-      display: grid;
       place-items: center;
-      padding: 24px;
       background: var(--bg);
+      padding: 20px;
     }
-
     .login-card {
-      width: min(100%, 430px);
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px;
-    }
-
-    .login-card h2 { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
-    .login-card p { color: var(--muted); font-weight: 600; margin-bottom: 18px; }
-
-    .app { min-height: 100vh; display: none; grid-template-columns: 270px minmax(0, 1fr); }
-    .app.active { display: grid; }
-
-    .sidebar {
-      background: #0b1f26;
-      color: #e8f6f8;
-      padding: 22px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-mark {
-      width: 46px;
-      height: 46px;
-      border-radius: var(--radius);
-      background: linear-gradient(135deg, var(--teal), var(--cyan));
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      color: white;
-    }
-
-    .brand h1 { font-size: 18px; line-height: 1.08; font-weight: 900; }
-    .brand span { color: #9fb5bd; font-size: 12px; font-weight: 700; }
-
-    .nav { display: grid; gap: 8px; }
-    .nav button {
-      min-height: 44px;
-      border-radius: var(--radius);
-      background: transparent;
-      color: #b7cbd1;
-      font-weight: 800;
-      padding: 0 12px;
-      text-align: left;
-    }
-
-    .nav button:hover, .nav button.active { background: rgba(255,255,255,.1); color: #fff; }
-    
-    /* Classes de controle de visibilidade - por padrão tudo visível */
-    .admin-only { display: block; }
-    .tecnico-only { display: none; }
-    
-    /* Quando o usuário é técnico, esconde admin-only e mostra tecnico-only */
-    .user-tecnico .admin-only { display: none !important; }
-    .user-tecnico .tecnico-only { display: block !important; }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: var(--radius);
-      color: #b7cbd1;
-      font-size: 13px;
-    }
-    .sidebar-footer small { display: block; color: #6a8b96; font-weight: 400; }
-
-    .main { min-width: 0; padding: 22px clamp(18px, 3vw, 34px) 42px; }
-    .tab { display: none; }
-    .tab.active { display: block; }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .topbar h2 { font-size: 28px; line-height: 1; font-weight: 900; }
-    .topbar p { color: var(--muted); margin-top: 6px; font-weight: 600; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-
-    .btn {
-      min-height: 42px;
-      border-radius: var(--radius);
-      padding: 0 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-weight: 900;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn-primary { background: var(--teal); color: #fff; }
-    .btn-primary:hover { background: var(--teal-dark); }
-    .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
-    .btn-danger { background: #fff1f2; color: #b91c1c; border: 1px solid #fecdd3; }
-    .btn-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-    .btn-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
-    .btn-sm { min-height: 32px; padding: 0 10px; font-size: 12px; }
-
-    .hero {
-      min-height: 200px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      background:
-        linear-gradient(90deg, rgba(8, 36, 44, .93), rgba(8, 36, 44, .62), rgba(8, 36, 44, .06)),
-        url("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=80") center / cover;
-      box-shadow: var(--shadow);
-      color: white;
-      padding: clamp(24px, 4vw, 44px);
-      display: flex;
-      align-items: end;
-      margin-bottom: 18px;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      border-radius: 999px;
-      background: rgba(255,255,255,.14);
-      border: 1px solid rgba(255,255,255,.18);
-      padding: 6px 11px;
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 12px;
-    }
-
-    .hero h2 { font-size: clamp(34px, 5.5vw, 62px); line-height: .96; font-weight: 900; margin-bottom: 14px; }
-    .hero p { max-width: 610px; color: rgba(255,255,255,.86); font-size: 16px; }
-
-    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .stat, .panel, .order-card {
+      width: min(100%, 440px);
       background: var(--panel);
-      border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: 0 10px 24px rgba(16, 32, 39, .06);
+      box-shadow: var(--shadow);
+      padding: 40px 32px;
+      border: 1px solid var(--line);
     }
-
-    .stat { padding: 16px; display: grid; gap: 8px; border-left: 5px solid var(--teal); }
-    .stat.blue { border-left-color: var(--blue); }
-    .stat.amber { border-left-color: var(--amber); }
-    .stat.green { border-left-color: var(--green); }
-    .stat span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 900; }
-    .stat strong { font-size: 28px; font-weight: 900; line-height: 1; }
-
-    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr); gap: 18px; align-items: start; }
-    .panel { padding: 18px; margin-bottom: 18px; }
-
-    .panel-head {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
+    .login-logo {
+      text-align: center;
+      margin-bottom: 28px;
     }
-
-    .panel-head h3 { font-size: 20px; font-weight: 900; }
-    .panel-head p { color: var(--muted); font-size: 13px; font-weight: 600; margin-top: 3px; }
-
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .full { grid-column: 1 / -1; }
-
-    .field { display: grid; gap: 6px; margin-bottom: 12px; }
-    .field label {
-      color: #40545c;
-      font-size: 12px;
+    .login-logo h2 {
+      font-size: 26px;
       font-weight: 900;
+      color: var(--primary);
+      margin-top: 4px;
+    }
+    .login-logo p {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .login-logo img {
+      width: 140px;
+      height: auto;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .field label {
+      font-size: 12px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: .05em;
+      color: var(--muted);
     }
-
-    .input {
+    .field input, .field select {
       width: 100%;
       min-height: 44px;
       border: 1px solid var(--line);
       background: #fff;
       border-radius: var(--radius);
-      padding: 10px 12px;
+      padding: 10px 14px;
       color: var(--ink);
       outline: 0;
+      transition: var(--transition);
+      font-size: 14px;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
     }
 
-    textarea.input { min-height: 86px; resize: vertical; }
-    .input:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(15, 118, 110, .12); }
+    .pwd-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .pwd-wrap input {
+      flex: 1;
+      padding-right: 48px;
+    }
+    .pwd-toggle {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+    }
+    .pwd-toggle:hover { color: var(--ink); }
 
-    .summary-box {
-      background: linear-gradient(180deg, var(--soft-teal), #fff);
-      border: 1px solid #bddfda;
+    .empresa-select {
+      min-height: 44px;
+    }
+
+    .msg-erro {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 10px 14px;
       border-radius: var(--radius);
-      padding: 15px;
-      display: grid;
-      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      margin: 8px 0 12px;
     }
 
-    .summary-row { display: flex; justify-content: space-between; gap: 12px; color: #36575f; font-weight: 800; font-size: 14px; }
-    .summary-row.total { border-top: 1px solid #bddfda; padding-top: 10px; color: var(--teal-dark); font-size: 22px; font-weight: 900; }
+    .btn-login {
+      width: 100%;
+      min-height: 48px;
+      background: var(--primary-gradient);
+      color: #fff;
+      border-radius: var(--radius);
+      font-weight: 800;
+      font-size: 16px;
+      transition: var(--transition);
+      margin-top: 4px;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(15, 118, 110, .35);
+    }
 
-    .order-list, .list { display: grid; gap: 12px; }
-    .order-card { padding: 14px; border-left: 5px solid var(--amber); display: grid; gap: 9px; }
-    .order-card.em_andamento { border-left-color: var(--blue); }
-    .order-card.concluida { border-left-color: var(--green); }
-    .order-card.cancelada { border-left-color: var(--red); }
+    .spinner-wrap {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .spinner-wrap p {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 4px solid var(--line);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .order-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-    .order-id { color: var(--muted); font-size: 12px; font-weight: 900; }
+    /* ══════════════════════════════════════════════════
+       APP
+       ══════════════════════════════════════════════════ */
+    #app {
+      display: none;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+    #app.active { display: block; }
 
-    .badge {
+    /* Topbar mobile */
+    .topbar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .logo-sm {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-top {
+      height: 36px;
+      width: auto;
+    }
+    .unidade-sm {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 4px 12px;
       border-radius: 999px;
-      padding: 5px 10px;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      white-space: nowrap;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-logout {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 18px;
+      transition: var(--transition);
+      display: grid;
+      place-items: center;
+    }
+    .btn-logout:hover {
+      background: #fecaca;
+      transform: scale(1.05);
     }
 
-    .badge.aberta { background: #fef3c7; color: #92400e; }
-    .badge.em_andamento { background: #dbeafe; color: #1e40af; }
-    .badge.concluida { background: #d1fae5; color: #065f46; }
-    .badge.cancelada { background: #fee2e2; color: #991b1b; }
-
-    .order-card h4 { font-size: 16px; font-weight: 900; line-height: 1.2; }
-    .order-meta { display: flex; flex-wrap: wrap; gap: 9px; color: var(--muted); font-size: 12px; font-weight: 700; }
-
-    .table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: var(--radius); }
-    .table th, .table td { padding: 11px; border-bottom: 1px solid var(--line); text-align: left; font-size: 13px; }
-    .table th { background: #f8fafc; color: #475569; text-transform: uppercase; font-size: 12px; letter-spacing: .04em; }
-
-    .toast {
+    /* Sidebar */
+    .sidebar {
       position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 50;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 280px;
       background: #0b1f26;
-      color: white;
-      padding: 12px 14px;
+      color: #e8f6f8;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 30;
+      overflow-y: auto;
+    }
+    .logo-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .logo-sidebar {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+    }
+    .unit-badge {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .lbl2 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #9fb5bd;
+      font-weight: 700;
+    }
+    .val2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      padding: 0 14px;
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
-      transition: .2s ease;
+      color: #b7cbd1;
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition);
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,.08);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+    .nav-icon {
+      font-size: 18px;
+      width: 28px;
+    }
+
+    .user-box {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .user-box .lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #9fb5bd;
+      font-weight: 700;
+    }
+    .user-box .name {
+      font-weight: 800;
+      color: #fff;
+      font-size: 15px;
+    }
+    .btn-logout-desk {
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: var(--radius);
+      background: rgba(220, 38, 38, .15);
+      color: #f87171;
+      font-weight: 700;
+      font-size: 13px;
+      transition: var(--transition);
+      width: 100%;
+      text-align: center;
+    }
+    .btn-logout-desk:hover {
+      background: rgba(220, 38, 38, .25);
+    }
+
+    /* Content */
+    .content-scroll {
+      margin-left: 280px;
+      padding: 24px 32px 100px;
+      min-height: 100vh;
+    }
+
+    /* Pages */
+    .page {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Greeting */
+    .greeting h1 {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 2px;
+    }
+    .greeting h1 span { color: var(--primary); }
+    .greeting p {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .greeting .unit {
+      color: var(--primary);
       font-weight: 800;
     }
 
-    .toast.show { opacity: 1; transform: translateY(0); }
-
-    .loading {
-      position: fixed;
-      inset: 0;
-      background: rgba(11,31,38,.58);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      z-index: 100;
+    /* Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 18px 0 20px;
+    }
+    .card-stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+      transition: var(--transition);
+    }
+    .card-stat:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+    .card-stat .lbl {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .card-stat .val {
+      font-size: 24px;
       font-weight: 900;
+      margin-top: 4px;
+    }
+    .card-stat.green .val { color: var(--green-600); }
+    .card-stat.rose .val { color: var(--rose-600); }
+    .card-stat.orange .val { color: var(--orange-600); }
+    .card-stat.slate .val { color: var(--slate-600); }
+    .card-stat.highlight {
+      background: var(--primary-gradient);
+      border-color: var(--primary);
+    }
+    .card-stat.highlight .lbl { color: rgba(255,255,255,.8); }
+    .card-stat.highlight .val { color: #fff; }
+
+    /* Charts */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 8px;
+    }
+    .chart-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+    }
+    .chart-box h4 {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+    .chart-box canvas {
+      max-height: 200px;
+      max-width: 100%;
     }
 
-    .loading.active { display: flex; }
+    /* Page header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+    .page-header .bar {
+      display: inline-block;
+      width: 4px;
+      height: 28px;
+      background: var(--primary-gradient);
+      border-radius: 999px;
+    }
 
-    .mobile-nav { 
-      display: none; 
+    /* Form card */
+    .form-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+      max-width: 640px;
+    }
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--primary-gradient);
+      color: #fff;
+      border-radius: var(--radius);
+      font-weight: 800;
+      font-size: 14px;
+      transition: var(--transition);
+      min-height: 44px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(15, 118, 110, .35);
+    }
+    .btn-clean {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--slate-100);
+      color: var(--slate-700);
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition);
+      min-height: 44px;
+      border: 1px solid var(--line);
+    }
+    .btn-clean:hover {
+      background: var(--slate-200);
+    }
+    .btn-icon { font-size: 16px; }
+
+    /* Livro de Caixa */
+    .livro-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .saldo-previo-banner {
+      background: var(--primary-light);
+      border: 1px solid #bddfda;
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .saldo-previo-banner .lbl {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+    }
+    .saldo-previo-banner .val {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+
+    /* Progresso do Caixa */
+    .progresso-caixa {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+    }
+    .progresso-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .progresso-header h4 {
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .progresso-total {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .progresso-item {
+      margin-bottom: 12px;
+    }
+    .progresso-item:last-child { margin-bottom: 0; }
+    .progresso-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .progresso-titulo { color: var(--slate-600); }
+    .progresso-valor { font-weight: 800; }
+    .progresso-bar-container {
+      position: relative;
+      height: 20px;
+      background: var(--slate-100);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progresso-bar {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s ease;
+      position: relative;
+    }
+    .progresso-bar.recebido { background: var(--green-500); }
+    .progresso-bar.pago { background: var(--rose-500); }
+    .progresso-bar.fluxo { background: var(--orange-500); }
+    .progresso-porcentagem {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+    .progresso-legenda {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-600);
+    }
+    .legenda-cor {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+    .legenda-cor.recebido { background: var(--green-500); }
+    .legenda-cor.pago { background: var(--rose-500); }
+    .legenda-cor.fluxo { background: var(--orange-500); }
+
+    /* Filter strip */
+    .filter-strip {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+    }
+    .filter-label {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--slate-600);
+      margin-bottom: 8px;
+    }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .filter-row select, .filter-row input {
+      min-height: 38px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      font-size: 13px;
+      outline: 0;
+      transition: var(--transition);
+    }
+    .filter-row select:focus, .filter-row input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .12);
+    }
+    .btn-pdf {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 13px;
+      transition: var(--transition);
+      min-height: 38px;
+      position: relative;
+    }
+    .btn-pdf:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    .btn-pdf-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      border-radius: var(--radius);
+    }
+    .lupa-animada {
+      animation: pulse 0.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    .btn-clear-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 13px;
+      transition: var(--transition);
+      min-height: 38px;
+      border: 1px solid #fecaca;
+    }
+    .btn-clear-all:hover {
+      background: #fecaca;
+    }
+
+    /* Cards do livro */
+    #libroCards {
+      display: grid;
+      gap: 12px;
+    }
+    .entry-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      box-shadow: 0 2px 8px rgba(16, 32, 39, .05);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      transition: var(--transition);
+    }
+    .entry-card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+    .entry-card .badge-tipo {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .badge-tipo.recebido {
+      background: var(--green-100);
+      color: var(--green-700);
+    }
+    .badge-tipo.pago {
+      background: var(--rose-50);
+      color: var(--rose-600);
+    }
+    .entry-card .info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .entry-card .info .desc {
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .entry-card .info .meta {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .entry-card .valor {
+      font-size: 18px;
+      font-weight: 900;
+      text-align: right;
+    }
+    .entry-card .valor.recebido { color: var(--green-600); }
+    .entry-card .valor.pago { color: var(--rose-600); }
+    .entry-card .actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-edit {
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      background: var(--slate-100);
+      color: var(--slate-600);
+      font-weight: 700;
+      font-size: 12px;
+      transition: var(--transition);
+    }
+    .btn-edit:hover {
+      background: var(--slate-200);
+    }
+    .btn-del {
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+      font-size: 12px;
+      transition: var(--transition);
+    }
+    .btn-del:hover {
+      background: #fecaca;
+    }
+
+    /* Configurações */
+    .config-header {
+      margin-bottom: 24px;
+    }
+    .config-subtitle {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .config-section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+    }
+    .section-header {
+      display: flex;
+      align-items: start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .section-icon {
+      font-size: 28px;
+      width: 44px;
+      height: 44px;
+      background: var(--primary-light);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .config-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .field-group {
+      display: grid;
+      gap: 6px;
+    }
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .input-with-prefix {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .input-with-prefix:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
+    }
+    .input-prefix {
+      padding: 0 12px;
+      font-weight: 800;
+      color: var(--muted);
+      font-size: 14px;
+      background: var(--slate-50);
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-right: 1px solid var(--line);
+    }
+    .input-with-prefix .field-input {
+      border: none;
+      padding: 10px 14px;
+      flex: 1;
+      outline: 0;
+      font-size: 14px;
+      min-height: 44px;
+      background: transparent;
+    }
+    .field-input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      outline: 0;
+      font-size: 14px;
+      transition: var(--transition);
+      background: #fff;
+    }
+    .field-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
+    }
+    .input-with-button {
+      display: flex;
+      gap: 8px;
+    }
+    .input-with-button .field-input {
+      flex: 1;
+    }
+    .btn-add {
+      min-height: 44px;
+      width: 44px;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      font-size: 20px;
+      transition: var(--transition);
+      display: grid;
+      place-items: center;
+    }
+    .btn-add:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    .btn-save {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--primary-gradient);
+      color: #fff;
+      border-radius: var(--radius);
+      font-weight: 800;
+      font-size: 14px;
+      transition: var(--transition);
+      min-height: 44px;
+      align-self: start;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(15, 118, 110, .35);
+    }
+    .config-messages {
+      margin: 4px 0;
+    }
+    .msg-sucesso {
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      background: #d1fae5;
+      color: #065f46;
+      font-weight: 600;
+      font-size: 13px;
+      display: none;
+    }
+
+    /* Descrições lista */
+    .descricoes-container {
+      margin-top: 8px;
+    }
+    .container-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .container-header h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--slate-600);
+    }
+    .badge-count {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .descricoes-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .desc-tag {
+      background: var(--slate-100);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      color: var(--slate-700);
+    }
+    .desc-tag:hover {
+      background: var(--slate-200);
+    }
+    .desc-tag .remove {
+      cursor: pointer;
+      color: var(--rose-500);
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .desc-tag .remove:hover {
+      color: var(--rose-600);
+    }
+
+    /* Info card */
+    .info-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: 0 4px 12px rgba(16, 32, 39, .06);
+      margin-top: 8px;
+    }
+    .info-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .info-icon {
+      font-size: 20px;
+    }
+    .info-header h4 {
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .info-content p {
+      font-size: 13px;
+      color: var(--slate-600);
+      margin-bottom: 6px;
+      line-height: 1.6;
+    }
+    .info-footer {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .info-footer .status {
+      color: var(--green-500);
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      display: none;
       position: fixed;
       left: 0;
       right: 0;
       bottom: 0;
       z-index: 30;
-      background: #fff;
+      background: var(--panel);
       border-top: 1px solid var(--line);
+      padding: 4px 0 env(safe-area-inset-bottom, 4px);
+      justify-content: space-around;
     }
-    
-    .mobile-nav button {
-      min-height: 62px;
-      background: #fff;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 900;
-      border: none;
-      cursor: pointer;
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-height: 54px;
       flex: 1;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 10px;
+      transition: var(--transition);
+      border: none;
+      background: none;
+      padding: 4px;
     }
-    
-    .mobile-nav button.active { 
-      color: var(--teal); 
-      background: var(--soft-teal); 
+    .nav-btn .nav-icon {
+      font-size: 20px;
+      width: auto;
+    }
+    .nav-btn.active {
+      color: var(--primary);
+    }
+    .nav-btn.active .nav-icon {
+      transform: scale(1.1);
     }
 
-    .user-info { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      padding: 8px 14px; 
-      background: var(--soft-teal); 
-      border-radius: var(--radius);
-      border: 1px solid #bddfda;
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(16, 32, 39, .6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      place-items: center;
+      padding: 20px;
     }
-    .user-info .avatar {
+    .modal-overlay.open { display: grid; }
+    .modal-box {
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: var(--shadow-hover);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .modal-top h3 {
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .modal-close {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: var(--teal);
-      color: white;
+      background: var(--slate-100);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--slate-600);
+      transition: var(--transition);
       display: grid;
       place-items: center;
-      font-weight: 900;
-      font-size: 14px;
     }
-    .user-info .details { line-height: 1.3; }
-    .user-info .details strong { font-size: 14px; }
-    .user-info .details small { color: var(--muted); font-size: 11px; }
-
-    .login-error {
-      background: #fee2e2;
-      color: #991b1b;
-      padding: 10px;
+    .modal-close:hover {
+      background: var(--slate-200);
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .btn-cancel {
+      padding: 10px 24px;
       border-radius: var(--radius);
-      margin-top: 10px;
-      display: none;
-      font-size: 13px;
-      font-weight: 600;
+      background: var(--slate-100);
+      color: var(--slate-700);
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition);
+      border: 1px solid var(--line);
+    }
+    .btn-cancel:hover {
+      background: var(--slate-200);
+    }
+    .modal-select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      outline: 0;
+      font-size: 14px;
+      background: #fff;
+    }
+    .modal-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, .12);
     }
 
-    /* Estilo para a lista de OS do técnico */
-    .minhas-os-container {
-      display: grid;
-      gap: 16px;
-    }
-
-    .minhas-os-container .order-card {
-      cursor: default;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-    }
-    .empty-state h3 { font-size: 18px; color: var(--ink); margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; }
-
-    /* ============================================
-       RESPONSIVIDADE MOBILE
-    ============================================ */
-    @media (max-width: 1080px) {
-      .login-screen { grid-template-columns: 1fr; }
-      .login-hero { min-height: 330px; }
-      .app.active { display: block; }
-      .sidebar { display: none; }
-      .layout { grid-template-columns: 1fr; }
-      
-      .mobile-nav { 
-        display: flex !important;
-        justify-content: space-around;
+    /* ══════════════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .config-grid {
+        grid-template-columns: 1fr;
       }
-      
-      .main { padding-bottom: 86px; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      
-      /* Mobile nav - oculta botões admin para técnico */
-      .user-tecnico .mobile-nav .admin-only { 
-        display: none !important; 
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none !important; }
+      .topbar { display: flex; }
+      .bottom-nav { display: flex; }
+      .content-scroll {
+        margin-left: 0;
+        padding: 16px 16px 90px;
       }
-      
-      /* Mobile nav - mostra apenas botões disponíveis para técnico */
-      .user-tecnico .mobile-nav {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .chart-row {
+        grid-template-columns: 1fr;
+      }
+      .row2 {
+        grid-template-columns: 1fr;
+      }
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-row select, .filter-row input {
+        width: 100%;
+      }
+      .btn-pdf, .btn-clear-all {
         justify-content: center;
       }
-      .user-tecnico .mobile-nav button {
-        max-width: 50%;
+      .form-actions {
+        flex-direction: column;
+      }
+      .form-actions .btn-primary,
+      .form-actions .btn-clean {
+        justify-content: center;
+        width: 100%;
+      }
+      .login-card {
+        padding: 28px 20px;
+      }
+      .entry-card {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .entry-card .valor {
+        text-align: left;
+      }
+      .entry-card .actions {
+        justify-content: flex-start;
+      }
+      .modal-box {
+        padding: 20px;
+      }
+      .greeting h1 {
+        font-size: 22px;
+      }
+      .card-stat .val {
+        font-size: 20px;
+      }
+      .saldo-previo-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 4px;
+      }
+      .saldo-previo-banner .val {
+        font-size: 18px;
+      }
+      .progresso-caixa {
+        padding: 16px;
+      }
+      .progresso-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .progresso-legenda {
+        gap: 10px;
       }
     }
 
-    @media (max-width: 720px) {
-      .topbar { align-items: start; flex-direction: column; }
-      .actions { justify-content: start; width: 100%; }
-      .actions .btn { flex: 1; }
-      .hero { min-height: 390px; background: linear-gradient(0deg, rgba(8, 36, 44, .94), rgba(8, 36, 44, .45)), url("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=80") center / cover; }
-      .stats, .form-grid { grid-template-columns: 1fr; }
-      .full { grid-column: auto; }
+    @media (max-width: 480px) {
+      .cards-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .card-stat {
+        padding: 12px 14px;
+      }
+      .card-stat .val {
+        font-size: 18px;
+      }
+      .content-scroll {
+        padding: 12px 12px 80px;
+      }
+      .topbar {
+        padding: 10px 12px;
+      }
+      .logo-top {
+        height: 30px;
+      }
     }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
   </style>
 </head>
 
 <body>
-  <!-- TELA DE LOGIN -->
-  <section class="login-screen" id="loginScreen">
-    <div class="login-hero">
-      <div class="brand">
-        <div class="brand-mark">WR</div>
-        <div>
-          <h1>WR Manutenção e Serviços</h1>
-          <span>climatização e assistência técnica</span>
-        </div>
+  <!-- ══════════════════════════════════════════════════
+     LOGIN SCREEN
+     ══════════════════════════════════════════════════ -->
+  <div id="telaLogin">
+    <div class="login-card">
+      <div class="login-logo">
+        <div style="width:80px;height:80px;border-radius:var(--radius);background:var(--primary-gradient);margin:0 auto 12px;display:grid;place-items:center;font-size:36px;font-weight:900;color:#fff;">WR</div>
+        <h2>WR Manutenção</h2>
+        <p>Ordens de Serviço</p>
       </div>
 
-      <div>
-        <span class="eyebrow">Sistema profissional de OS</span>
-        <!-- <h1>Multi-usuário com controle de permissões.</h1> -->
-        <!-- <p>Administradores veem tudo. Técnicos veem apenas suas OS em aberto e podem finalizar os serviços.</p> -->
-      </div>
-    </div>
-
-    <div class="login-card-wrap">
-      <div class="login-card">
-        <div class="brand" style="margin-bottom:18px">
-          <div class="brand-mark">WR</div>
-          <div>
-            <h1>Entrar no sistema</h1>
-            <span>Ordens de serviço</span>
-          </div>
+      <div id="loginForm">
+        <div class="field">
+          <label>Unidade</label>
+          <select id="inputEmpresa" class="empresa-select">
+            <option value="">Selecione a unidade</option>
+            <option value="matriz">Matriz</option>
+            <option value="filial">Filial</option>
+          </select>
         </div>
-
-        <p>Acesse sua área de trabalho.</p>
-
+        
         <div class="field">
           <label>Usuário</label>
-          <input class="input" id="loginUsuario" placeholder="Digite seu usuário" autocomplete="username" value="">
+          <input type="text" id="inputUsuario" placeholder="Digite seu usuário" autocomplete="off" />
         </div>
-
+        
         <div class="field">
           <label>Senha</label>
-          <input class="input" id="loginSenha" type="password" placeholder="Digite sua senha" autocomplete="current-password" value="">
+          <div class="pwd-wrap">
+            <input type="password" id="inputSenha" placeholder="Digite sua senha" autocomplete="off" />
+            <button type="button" class="pwd-toggle" onclick="toggleSenha('inputSenha', this)">👁️</button>
+          </div>
         </div>
-
-        <div id="loginError" class="login-error">Usuário ou senha inválidos!</div>
-
-        <button class="btn btn-primary" style="width:100%" onclick="realizarLogin()">Entrar no sistema</button>
-        <div style="margin-top:12px; font-size:12px; color:var(--muted);">
-          <!-- <p><strong>Administrador:</strong> admin / wr@2024</p>
-          <p><strong>Técnico 1:</strong> tecnico / tec123</p>
-          <p><strong>Técnico 2:</strong> tec2 / tec456</p> -->
-        </div>
+        
+        <div class="msg-erro" id="msgErro">❌ Usuário ou senha inválidos!</div>
+        
+        <button class="btn-login" onclick="verificarLogin()">Entrar no Sistema</button>
+      </div>
+      
+      <div class="spinner-wrap" id="carregando">
+        <div class="spinner"></div>
+        <p>Verificando credenciais…</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- LOADING -->
-  <div class="loading" id="loading">Carregando...</div>
+  <!-- ══════════════════════════════════════════════════
+     APP
+     ══════════════════════════════════════════════════ -->
+  <div id="app">
+    <!-- Top bar (mobile) -->
+    <div class="topbar">
+      <div class="logo-sm">
+        <div style="width:36px;height:36px;border-radius:8px;background:var(--primary-gradient);display:grid;place-items:center;font-weight:900;color:#fff;font-size:16px;">WR</div>
+        <div class="unidade-sm" id="topUnidade">—</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-logout" onclick="fazerLogout()">🚪</button>
+      </div>
+    </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast">Salvo</div>
-
-  <!-- APP -->
-  <div class="app" id="app">
+    <!-- Sidebar (desktop) -->
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">WR</div>
-        <div>
-          <h1>WR Manutenção</h1>
-          <span>ordens de serviço</span>
+      <div class="logo-area">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:var(--radius);background:var(--primary-gradient);display:grid;place-items:center;font-weight:900;color:#fff;font-size:20px;">WR</div>
+          <div>
+            <div style="font-weight:900;font-size:16px;color:#fff;">WR Manutenção</div>
+            <div style="font-size:10px;color:#9fb5bd;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">ordens de serviço</div>
+          </div>
+        </div>
+        <div class="unit-badge">
+          <div class="lbl2">Unidade</div>
+          <div class="val2" id="sideUnidade">—</div>
         </div>
       </div>
-
-      <div class="user-info" id="sidebarUserInfo">
-        <div class="avatar" id="userAvatar">A</div>
-        <div class="details">
-          <strong id="userNome">Administrador</strong>
-          <small id="userTipo">admin</small>
-        </div>
-      </div>
-
-      <nav class="nav" id="mainNav">
-        <button class="active admin-only" data-tab="dashboard">📊 Dashboard</button>
-        <button data-tab="ordens">📝 Ordens de serviço</button>
-        <button class="admin-only" data-tab="clientes">👤 Clientes</button>
-        <button class="admin-only" data-tab="catalogo">📦 Materiais/Serviços</button>
-        <button class="admin-only" data-tab="usuarios">👥 Usuários</button>
-        <button class="admin-only" data-tab="config">⚙️ Configurações</button>
+      
+      <nav>
+        <button class="nav-item active" onclick="mudarTab('dash', this)">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-item admin-only" onclick="mudarTab('novaos', this)">
+          <span class="nav-icon">➕</span> Nova OS
+        </button>
+        <button class="nav-item" onclick="mudarTab('ordens', this)">
+          <span class="nav-icon">📝</span> Ordens
+        </button>
+        <button class="nav-item admin-only" onclick="mudarTab('clientes', this)">
+          <span class="nav-icon">👤</span> Clientes
+        </button>
+        <button class="nav-item admin-only" onclick="mudarTab('catalogo', this)">
+          <span class="nav-icon">📦</span> Catálogo
+        </button>
+        <button class="nav-item admin-only" onclick="mudarTab('usuarios', this)">
+          <span class="nav-icon">👥</span> Usuários
+        </button>
+        <button class="nav-item admin-only" onclick="mudarTab('config', this)">
+          <span class="nav-icon">⚙️</span> Configurações
+        </button>
       </nav>
-
-      <div class="sidebar-footer">
-        <button class="btn btn-danger" style="width:100%" onclick="fazerLogout()">🚪 Sair</button>
+      
+      <div class="user-box">
+        <div class="lbl">Logado como</div>
+        <div class="name" id="sideUsuario">—</div>
+        <button class="btn-logout-desk" onclick="fazerLogout()">Sair do Sistema</button>
       </div>
     </aside>
 
-    <main class="main">
-      <!-- DASHBOARD - APENAS ADMIN -->
-      <section id="tabDashboard" class="tab active admin-only">
-        <header class="topbar">
-          <div>
-            <h2>Painel operacional</h2>
-            <p>Gestão de manutenção, instalação e higienização de ar condicionado.</p>
+    <!-- Content -->
+    <div class="content-scroll">
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="tab-dash">
+        <div class="greeting">
+          <h1>Olá, <span id="nomeOperador">Operador</span> 👋</h1>
+          <p>Unidade: <span class="unit" id="txtUnidade">—</span></p>
+        </div>
+        
+        <div class="cards-grid">
+          <div class="card-stat green">
+            <div class="lbl">Total de OS</div>
+            <div class="val" id="cardTotal">0</div>
           </div>
-          <div class="actions">
-            <button class="btn btn-light" onclick="exportarResumoPDF()">📄 Resumo PDF</button>
-            <button class="btn btn-primary" onclick="switchTab('ordens')">➕ Nova OS</button>
+          <div class="card-stat orange">
+            <div class="lbl">Abertas</div>
+            <div class="val" id="cardAbertas">0</div>
           </div>
-        </header>
-
-        <section class="hero">
-          <div>
-            <span class="eyebrow">WR Manutenção e Serviços</span>
-            <h2>Ordens de serviço claras para equipes de climatização.</h2>
-            <p>Organize atendimentos, clientes, materiais, serviços, prazos e faturamento em um painel rápido e profissional.</p>
+          <div class="card-stat blue" style="border-left-color:var(--blue);">
+            <div class="lbl">Em andamento</div>
+            <div class="val" id="cardAndamento">0</div>
           </div>
-        </section>
+          <div class="card-stat highlight">
+            <div class="lbl">Concluídas</div>
+            <div class="val" id="cardConcluidas">0</div>
+          </div>
+        </div>
 
-        <section class="stats">
-          <div class="stat"><span>Total de OS</span><strong id="statTotal">0</strong></div>
-          <div class="stat blue"><span>Em andamento</span><strong id="statAndamento">0</strong></div>
-          <div class="stat amber"><span>Abertas</span><strong id="statAbertas">0</strong></div>
-          <div class="stat green"><span>Faturamento</span><strong id="statFaturamento">R$ 0,00</strong></div>
-        </section>
-
-        <div class="layout">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Ordens recentes</h3>
-                <p>Acompanhe os atendimentos mais importantes.</p>
+        <div class="chart-row">
+          <div class="chart-box">
+            <h4>Status das OS</h4>
+            <canvas id="graficoPizza"></canvas>
+          </div>
+          <div class="chart-box">
+            <h4>Resumo rápido</h4>
+            <div style="display:grid;gap:12px;padding:8px 0;">
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--slate-50);border-radius:var(--radius);">
+                <span style="font-weight:700;">Clientes</span>
+                <span style="font-weight:900;color:var(--primary);" id="resumoClientes">0</span>
               </div>
-              <select class="input" id="filtroStatusOS" style="max-width:190px" onchange="renderizarOrdens()">
-                <option value="todos">Todos os status</option>
-                <option value="aberta">Abertas</option>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--slate-50);border-radius:var(--radius);">
+                <span style="font-weight:700;">Itens no catálogo</span>
+                <span style="font-weight:900;color:var(--primary);" id="resumoCatalogo">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--slate-50);border-radius:var(--radius);">
+                <span style="font-weight:700;">Usuários</span>
+                <span style="font-weight:900;color:var(--primary);" id="resumoUsuarios">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── NOVA OS (APENAS ADMIN) ── -->
+      <div class="page admin-only" id="tab-novaos">
+        <div class="page-header"><span class="bar"></span> Nova Ordem de Serviço</div>
+        
+        <div class="form-card">
+          <div class="row2">
+            <div class="field">
+              <label>Cliente</label>
+              <select id="osCliente" class="field-input"></select>
+            </div>
+            <div class="field">
+              <label>Data de abertura</label>
+              <input type="date" id="osData" class="field-input" />
+            </div>
+          </div>
+          
+          <div class="row2">
+            <div class="field">
+              <label>Status</label>
+              <select id="osStatus" class="field-input">
+                <option value="aberta">Aberta</option>
                 <option value="em_andamento">Em andamento</option>
-                <option value="concluida">Concluídas</option>
-                <option value="cancelada">Canceladas</option>
+                <option value="concluida">Concluída</option>
+                <option value="cancelada">Cancelada</option>
               </select>
             </div>
-            <div class="order-list" id="ordensList"></div>
-          </section>
-
-          <aside>
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Resumo rápido</h3>
-                  <p>Visão geral da operação.</p>
-                </div>
-              </div>
-              <div class="summary-box">
-                <div class="summary-row"><span>Clientes</span><strong id="resumoClientes">0</strong></div>
-                <div class="summary-row"><span>Itens no catálogo</span><strong id="resumoCatalogo">0</strong></div>
-                <div class="summary-row"><span>OS concluídas</span><strong id="statConcluidas">0</strong></div>
-                <div class="summary-row total"><span>Receita</span><strong id="resumoReceita">R$ 0,00</strong></div>
-              </div>
-            </section>
-          </aside>
-        </div>
-      </section>
-
-      <!-- ORDENS - PARA ADMIN: COMPLETA | PARA TÉCNICO: APENAS VISUALIZAÇÃO -->
-      <section id="tabOrdens" class="tab">
-        <header class="topbar">
-          <div>
-            <h2 id="ordensPageTitle">Ordens de Serviço</h2>
-            <p id="ordensPageSubtitle">Gerencie todas as ordens de serviço do sistema.</p>
-          </div>
-          <div class="actions">
-            <button class="btn btn-primary admin-only" onclick="criarNovaOS()">➕ Nova OS</button>
-          </div>
-        </header>
-
-        <!-- Área para ADMIN: formulário completo de criação -->
-        <div id="adminOSForm" class="admin-only">
-          <div class="layout">
-            <div>
-              <section class="panel">
-                <div class="panel-head">
-                  <div>
-                    <h3>Dados do atendimento</h3>
-                    <p>Cliente, data, status e descrição técnica.</p>
-                  </div>
-                </div>
-
-                <div class="form-grid">
-                  <div class="field"><label>Cliente</label><select class="input" id="osCliente"></select></div>
-                  <div class="field"><label>Data de abertura</label><input class="input" type="date" id="osData"></div>
-                  <div class="field"><label>Status</label><select class="input" id="osStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></div>
-                  <div class="field"><label>Prazo</label><input class="input" type="date" id="osPrazo"></div>
-                  <div class="field full"><label>Descrição do serviço</label><textarea class="input" id="osDescricao" placeholder="Descreva o serviço a realizar..."></textarea></div>
-                  <div class="field full"><label>Responsável (técnico)</label><input class="input" id="osResponsavel" placeholder="Nome do técnico responsável"></div>
-                </div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-head">
-                  <div>
-                    <h3>Materiais e serviços</h3>
-                    <p>Adicione itens do catálogo à ordem.</p>
-                  </div>
-                </div>
-
-                <div class="form-grid">
-                  <div class="field"><label>Item</label><select class="input" id="osItemSelect"></select></div>
-                  <div class="field"><label>Quantidade</label><input class="input" id="osItemQtd" type="number" min="1" value="1"></div>
-                </div>
-
-                <button class="btn btn-light" onclick="adicionarItemOS()">Adicionar item</button>
-                <div id="osItensList" style="margin-top:14px"></div>
-              </section>
+            <div class="field">
+              <label>Prazo</label>
+              <input type="date" id="osPrazo" class="field-input" />
             </div>
-
-            <aside>
-              <section class="panel">
-                <div class="panel-head">
-                  <div>
-                    <h3>Resumo financeiro</h3>
-                    <p>Cálculo automático da OS.</p>
-                  </div>
-                </div>
-
-                <div class="field"><label>Mão de obra (R$)</label><input class="input" id="osMaoObra" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
-                <div class="field"><label>Desconto (R$)</label><input class="input" id="osDesconto" type="number" value="0" step="0.01" oninput="atualizarTotalOS()"></div>
-
-                <div class="summary-box">
-                  <div class="summary-row"><span>Itens</span><strong id="totalItens">R$ 0,00</strong></div>
-                  <div class="summary-row"><span>Mão de obra</span><strong id="totalMaoObra">R$ 0,00</strong></div>
-                  <div class="summary-row"><span>Desconto</span><strong id="totalDesconto">R$ 0,00</strong></div>
-                  <div class="summary-row total"><span>Total</span><strong id="osTotalPreview">R$ 0,00</strong></div>
-                </div>
-
-                <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="criarOS()">Gerar ordem de serviço</button>
-              </section>
-            </aside>
+          </div>
+          
+          <div class="field">
+            <label>Descrição do serviço</label>
+            <textarea id="osDescricao" class="field-input" rows="3" placeholder="Descreva o serviço a realizar..."></textarea>
+          </div>
+          
+          <div class="field">
+            <label>Responsável (técnico)</label>
+            <input type="text" id="osResponsavel" class="field-input" placeholder="Nome do técnico responsável" />
+          </div>
+          
+          <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;" />
+          
+          <div style="display:grid;gap:12px;">
+            <div style="font-weight:800;font-size:15px;">Materiais e serviços</div>
+            <div class="row2">
+              <div class="field">
+                <label>Item</label>
+                <select id="osItemSelect" class="field-input"></select>
+              </div>
+              <div class="field">
+                <label>Quantidade</label>
+                <input type="number" id="osItemQtd" class="field-input" min="1" value="1" />
+              </div>
+            </div>
+            <button class="btn-clean" onclick="adicionarItemOS()" style="align-self:start;">
+              <span class="btn-icon">➕</span> Adicionar item
+            </button>
+            <div id="osItensList" style="margin-top:8px;"></div>
+          </div>
+          
+          <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;" />
+          
+          <div class="row2">
+            <div class="field">
+              <label>Mão de obra (R$)</label>
+              <input type="number" id="osMaoObra" class="field-input" value="0" step="0.01" oninput="atualizarTotalOS()" />
+            </div>
+            <div class="field">
+              <label>Desconto (R$)</label>
+              <input type="number" id="osDesconto" class="field-input" value="0" step="0.01" oninput="atualizarTotalOS()" />
+            </div>
+          </div>
+          
+          <div style="background:var(--primary-light);border:1px solid #bddfda;border-radius:var(--radius);padding:16px;display:grid;gap:8px;margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px;color:var(--slate-600);">
+              <span>Total</span>
+              <span id="osTotalPreview" style="font-size:20px;color:var(--primary-dark);">R$ 0,00</span>
+            </div>
+          </div>
+          
+          <div class="form-actions" style="margin-top:16px;">
+            <button class="btn-primary" onclick="criarOS()">
+              <span class="btn-icon">💾</span> Gerar ordem de serviço
+            </button>
+            <button class="btn-clean" onclick="limparOS()">
+              <span class="btn-icon">🧹</span> Limpar
+            </button>
           </div>
         </div>
+      </div>
 
-        <!-- Área para TÉCNICO: apenas lista de suas OS -->
-        <div id="tecnicoOSList" class="tecnico-only">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Minhas Ordens de Serviço</h3>
-                <p>Aqui estão todas as suas ordens de serviço.</p>
-              </div>
-              <select class="input" id="filtroStatusOSTecnico" style="max-width:190px" onchange="renderizarOrdensTecnico()">
-                <option value="todos">Todos os status</option>
-                <option value="aberta">Abertas</option>
-                <option value="em_andamento">Em andamento</option>
-                <option value="concluida">Concluídas</option>
-                <option value="cancelada">Canceladas</option>
+      <!-- ── ORDENS ── -->
+      <div class="page" id="tab-ordens">
+        <div class="page-header"><span class="bar"></span> Ordens de Serviço</div>
+        
+        <!-- Filtros -->
+        <div class="filter-strip">
+          <div class="filter-label">📋 Filtrar ordens</div>
+          <div class="filter-row">
+            <select id="filtroStatusOS" onchange="renderizarOrdens()">
+              <option value="todos">Todos os status</option>
+              <option value="aberta">Abertas</option>
+              <option value="em_andamento">Em andamento</option>
+              <option value="concluida">Concluídas</option>
+              <option value="cancelada">Canceladas</option>
+            </select>
+            <button class="btn-pdf admin-only" onclick="exportarResumoPDF()">📄 Resumo PDF</button>
+            <button class="btn-primary admin-only" onclick="mudarTab('novaos', document.querySelector('.nav-item[data-tab=\'novaos\']'))">➕ Nova OS</button>
+          </div>
+        </div>
+        
+        <div id="ordensList" style="display:grid;gap:12px;"></div>
+      </div>
+
+      <!-- ── CLIENTES (APENAS ADMIN) ── -->
+      <div class="page admin-only" id="tab-clientes">
+        <div class="page-header"><span class="bar"></span> Clientes</div>
+        
+        <div class="form-card" style="max-width:100%;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="field">
+              <label>Nome</label>
+              <input type="text" id="clienteNome" class="field-input" placeholder="Nome do cliente" />
+            </div>
+            <div class="field">
+              <label>CPF/CNPJ</label>
+              <input type="text" id="clienteDocumento" class="field-input" placeholder="CPF ou CNPJ" />
+            </div>
+            <div class="field">
+              <label>Telefone</label>
+              <input type="text" id="clienteTelefone" class="field-input" placeholder="Telefone" />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="clienteEmail" class="field-input" placeholder="Email" />
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Endereço</label>
+              <input type="text" id="clienteEndereco" class="field-input" placeholder="Endereço completo" />
+            </div>
+          </div>
+          <button class="btn-primary" onclick="cadastrarCliente()" style="margin-top:8px;">
+            <span class="btn-icon">💾</span> Salvar cliente
+          </button>
+        </div>
+        
+        <div id="clientesList" style="margin-top:16px;"></div>
+      </div>
+
+      <!-- ── CATÁLOGO (APENAS ADMIN) ── -->
+      <div class="page admin-only" id="tab-catalogo">
+        <div class="page-header"><span class="bar"></span> Catálogo de Materiais e Serviços</div>
+        
+        <div class="form-card" style="max-width:100%;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="field">
+              <label>Tipo</label>
+              <select id="itemTipo" class="field-input">
+                <option value="material">Material</option>
+                <option value="servico">Serviço</option>
               </select>
             </div>
-            <div id="tecnicoOrdensList" class="minhas-os-container"></div>
-          </section>
+            <div class="field">
+              <label>Nome</label>
+              <input type="text" id="itemNome" class="field-input" placeholder="Nome do item" />
+            </div>
+            <div class="field">
+              <label>Valor (R$)</label>
+              <input type="number" id="itemValor" class="field-input" step="0.01" placeholder="0,00" />
+            </div>
+            <div class="field">
+              <label>Estoque</label>
+              <input type="number" id="itemEstoque" class="field-input" value="0" />
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Categoria</label>
+              <input type="text" id="itemCategoria" class="field-input" placeholder="Categoria" />
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Descrição</label>
+              <input type="text" id="itemDescricao" class="field-input" placeholder="Descrição do item" />
+            </div>
+          </div>
+          <button class="btn-primary" onclick="cadastrarItem()" style="margin-top:8px;">
+            <span class="btn-icon">💾</span> Salvar item
+          </button>
         </div>
-      </section>
+        
+        <div id="catalogoList" style="margin-top:16px;"></div>
+      </div>
 
-      <!-- CLIENTES - APENAS ADMIN -->
-      <section id="tabClientes" class="tab admin-only">
-        <header class="topbar"><div><h2>Clientes</h2><p>Cadastro e consulta de clientes.</p></div></header>
-
-        <section class="panel">
-          <div class="panel-head"><div><h3>Novo cliente</h3><p>Inclua clientes no sistema.</p></div></div>
-          <div class="form-grid">
-            <div class="field"><label>Nome</label><input class="input" id="clienteNome"></div>
-            <div class="field"><label>CPF/CNPJ</label><input class="input" id="clienteDocumento"></div>
-            <div class="field"><label>Telefone</label><input class="input" id="clienteTelefone"></div>
-            <div class="field"><label>Email</label><input class="input" id="clienteEmail" type="email"></div>
-            <div class="field full"><label>Endereço</label><input class="input" id="clienteEndereco"></div>
+      <!-- ── USUÁRIOS (APENAS ADMIN) ── -->
+      <div class="page admin-only" id="tab-usuarios">
+        <div class="page-header"><span class="bar"></span> Usuários</div>
+        
+        <div class="form-card" style="max-width:100%;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="field">
+              <label>Usuário</label>
+              <input type="text" id="usuarioUsername" class="field-input" placeholder="Login do usuário" />
+            </div>
+            <div class="field">
+              <label>Senha</label>
+              <div class="pwd-wrap">
+                <input type="password" id="usuarioSenha" class="field-input" placeholder="Senha" />
+                <button type="button" class="pwd-toggle" onclick="toggleSenha('usuarioSenha', this)">👁️</button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Nome</label>
+              <input type="text" id="usuarioNome" class="field-input" placeholder="Nome completo" />
+            </div>
+            <div class="field">
+              <label>Tipo</label>
+              <select id="usuarioTipo" class="field-input">
+                <option value="usuario">Técnico</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="cadastrarCliente()">Salvar cliente</button>
-        </section>
+          <button class="btn-primary" onclick="cadastrarUsuario()" style="margin-top:8px;">
+            <span class="btn-icon">💾</span> Salvar usuário
+          </button>
+        </div>
+        
+        <div id="usuariosList" style="margin-top:16px;"></div>
+      </div>
 
-        <section class="panel">
-          <div class="panel-head"><div><h3>Clientes cadastrados</h3><p>Lista de clientes ativos.</p></div></div>
-          <div id="clientesList"></div>
-        </section>
-      </section>
+      <!-- ── CONFIGURAÇÕES (APENAS ADMIN) ── -->
+      <div class="page admin-only" id="tab-config">
+        <div class="config-header">
+          <div class="page-header"><span class="bar"></span> Configurações</div>
+          <p class="config-subtitle">Gerencie as configurações do sistema</p>
+        </div>
 
-      <!-- CATÁLOGO - APENAS ADMIN -->
-      <section id="tabCatalogo" class="tab admin-only">
-        <header class="topbar"><div><h2>Materiais e Serviços</h2><p>Catálogo usado nas ordens.</p></div></header>
-
-        <section class="panel">
-          <div class="panel-head"><div><h3>Novo item</h3><p>Cadastre peças, materiais e serviços.</p></div></div>
-          <div class="form-grid">
-            <div class="field"><label>Tipo</label><select class="input" id="itemTipo"><option value="material">Material</option><option value="servico">Serviço</option></select></div>
-            <div class="field"><label>Nome</label><input class="input" id="itemNome"></div>
-            <div class="field"><label>Valor</label><input class="input" id="itemValor" type="number" step="0.01"></div>
-            <div class="field"><label>Estoque</label><input class="input" id="itemEstoque" type="number" value="0"></div>
-            <div class="field full"><label>Categoria</label><input class="input" id="itemCategoria"></div>
-            <div class="field full"><label>Descrição</label><input class="input" id="itemDescricao"></div>
+        <div class="config-grid">
+          <div class="config-section">
+            <div class="section-header">
+              <div class="section-icon">🏢</div>
+              <div>
+                <h3 class="section-title">Dados da Empresa</h3>
+                <p class="section-subtitle">Informações que aparecem nos documentos</p>
+              </div>
+            </div>
+            <div class="config-form">
+              <div class="field-group">
+                <label class="field-label">Empresa</label>
+                <input type="text" id="configEmpresaNome" class="field-input" value="WR Manutenção e Serviços" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">CNPJ</label>
+                <input type="text" id="configEmpresaCnpj" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Telefone</label>
+                <input type="text" id="configEmpresaTelefone" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Email</label>
+                <input type="email" id="configEmpresaEmail" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Site</label>
+                <input type="text" id="configEmpresaSite" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Endereço</label>
+                <input type="text" id="configEmpresaEndereco" class="field-input" />
+              </div>
+              <button class="btn-save" onclick="salvarConfiguracoes()">
+                <span class="btn-icon">💾</span> Salvar configurações
+              </button>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="cadastrarItem()">Salvar item</button>
-        </section>
 
-        <section class="panel">
-          <div class="panel-head"><div><h3>Catálogo</h3><p>Itens disponíveis para OS.</p></div></div>
-          <div id="catalogoList"></div>
-        </section>
-      </section>
-
-      <!-- USUÁRIOS - APENAS ADMIN -->
-      <section id="tabUsuarios" class="tab admin-only">
-        <header class="topbar"><div><h2>Usuários</h2><p>Gerencie os usuários do sistema.</p></div></header>
-
-        <section class="panel">
-          <div class="panel-head"><div><h3>Novo usuário</h3><p>Cadastre técnicos e administradores.</p></div></div>
-          <div class="form-grid">
-            <div class="field"><label>Usuário</label><input class="input" id="usuarioUsername" placeholder="Login do usuário"></div>
-            <div class="field"><label>Senha</label><input class="input" id="usuarioSenha" type="password" placeholder="Senha"></div>
-            <div class="field"><label>Nome</label><input class="input" id="usuarioNome" placeholder="Nome completo"></div>
-            <div class="field"><label>Tipo</label><select class="input" id="usuarioTipo"><option value="usuario">Técnico</option><option value="admin">Administrador</option></select></div>
+          <div class="config-section">
+            <div class="section-header">
+              <div class="section-icon">ℹ️</div>
+              <div>
+                <h3 class="section-title">Informações do Sistema</h3>
+                <p class="section-subtitle">Detalhes da versão e status</p>
+              </div>
+            </div>
+            <div class="config-form">
+              <div class="info-content">
+                <p><strong>WR Manutenção</strong> - Sistema de gestão de ordens de serviço</p>
+                <p><strong>Funcionalidades:</strong> Cadastro de clientes, catálogo de materiais, gestão de OS, múltiplos usuários</p>
+                <div class="info-footer">
+                  <span class="version">Versão 2.0.0</span>
+                  <span class="status">● Sistema Operacional</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="cadastrarUsuario()">Salvar usuário</button>
-        </section>
+        </div>
+      </div>
+    </div>
 
-        <section class="panel">
-          <div class="panel-head"><div><h3>Usuários cadastrados</h3><p>Lista de usuários do sistema.</p></div></div>
-          <div id="usuariosList"></div>
-        </section>
-      </section>
-
-      <!-- CONFIGURAÇÕES - APENAS ADMIN -->
-      <section id="tabConfig" class="tab admin-only">
-        <header class="topbar"><div><h2>Configurações</h2><p>Dados da empresa para documentos.</p></div></header>
-
-        <section class="panel">
-          <div class="form-grid">
-            <div class="field full"><label>Empresa</label><input class="input" id="configEmpresaNome" value="WR Manutenção e Serviços"></div>
-            <div class="field"><label>CNPJ</label><input class="input" id="configEmpresaCnpj"></div>
-            <div class="field"><label>Telefone</label><input class="input" id="configEmpresaTelefone"></div>
-            <div class="field"><label>Email</label><input class="input" id="configEmpresaEmail"></div>
-            <div class="field"><label>Site</label><input class="input" id="configEmpresaSite"></div>
-            <div class="field full"><label>Endereço</label><input class="input" id="configEmpresaEndereco"></div>
-          </div>
-          <button class="btn btn-primary" onclick="salvarConfiguracoes()">Salvar configurações</button>
-        </section>
-      </section>
-    </main>
+    <!-- Bottom nav (mobile) -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" onclick="mudarTab('dash', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-btn admin-only" onclick="mudarTab('novaos', this)">
+        <span class="nav-icon">➕</span> Nova
+      </button>
+      <button class="nav-btn" onclick="mudarTab('ordens', this)">
+        <span class="nav-icon">📝</span> Ordens
+      </button>
+      <button class="nav-btn admin-only" onclick="mudarTab('config', this)">
+        <span class="nav-icon">⚙️</span> Config
+      </button>
+    </nav>
   </div>
 
-  <!-- MOBILE NAV -->
-  <nav class="mobile-nav" id="mobileNav">
-    <button class="active admin-only" data-tab="dashboard">📊 Dashboard</button>
-    <button data-tab="ordens">📝 OS</button>
-    <button class="admin-only" data-tab="clientes">👤</button>
-    <button class="admin-only" data-tab="catalogo">📦</button>
-    <button class="admin-only" data-tab="config">⚙️</button>
-  </nav>
-
   <script>
-    // ============================================
+    // ══════════════════════════════════════════════════
     // CONFIGURAÇÃO
-    // ============================================
+    // ══════════════════════════════════════════════════
     const API_URL = "https://script.google.com/macros/s/AKfycby6fBOwo-iqRQjIEcPGDnSOGWRtoQ_8oIhNfVyX8BbQuyf3YkHmjrTiaDLkZgqOcN7M/exec";
-    
     const storageKey = "wr_os_multiusuario";
     const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
-    // ============================================
-    // ESTADO GLOBAL
-    // ============================================
     let usuarioAtual = null;
     let isAdmin = false;
     let dados = carregarLocal();
     let osItensTemp = [];
+    let graficoPizza = null;
+    let graficoBarras = null;
 
-    // ============================================
-    // FUNÇÕES DE PERSISTÊNCIA
-    // ============================================
+    // ══════════════════════════════════════════════════
+    // PERSISTÊNCIA
+    // ══════════════════════════════════════════════════
     function carregarLocal() {
       try {
         const data = localStorage.getItem(storageKey);
@@ -855,159 +1863,110 @@
       localStorage.setItem(storageKey, JSON.stringify(dados));
     }
 
-    // ============================================
+    // ══════════════════════════════════════════════════
     // UI HELPERS
-    // ============================================
-    function showLoading() {
-      document.getElementById("loading").classList.add("active");
-    }
-
-    function hideLoading() {
-      document.getElementById("loading").classList.remove("active");
-    }
-
+    // ══════════════════════════════════════════════════
     function toast(msg) {
-      const el = document.getElementById("toast");
+      const el = document.createElement('div');
+      el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0b1f26;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.3);font-size:14px;';
       el.textContent = msg;
-      el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 2200);
+      document.body.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.3s';
+        setTimeout(() => el.remove(), 300);
+      }, 2500);
     }
 
-    // ============================================
-    // API
-    // ============================================
-    async function apiGet(endpoint, usuario = "") {
-      try {
-        const url = `${API_URL}?tipo=${endpoint}${usuario ? `&usuario=${encodeURIComponent(usuario)}` : ''}`;
-        const response = await fetch(url);
-        return await response.json();
-      } catch (error) {
-        console.error("Erro no GET:", error);
-        return null;
+    function toggleSenha(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
       }
     }
 
-    async function apiPost(payload) {
-      try {
-        const response = await fetch(API_URL, { 
-          method: "POST", 
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-        });
-        const result = await response.json();
-        return result;
-      } catch (error) {
-        console.error("Erro no POST:", error);
-        return null;
-      }
-    }
-
-    // ============================================
+    // ══════════════════════════════════════════════════
     // LOGIN
-    // ============================================
-    async function realizarLogin() {
-      const usuario = document.getElementById("loginUsuario").value.trim();
-      const senha = document.getElementById("loginSenha").value;
-      const errorEl = document.getElementById("loginError");
+    // ══════════════════════════════════════════════════
+    async function verificarLogin() {
+      const usuario = document.getElementById("inputUsuario").value.trim();
+      const senha = document.getElementById("inputSenha").value;
+      const empresa = document.getElementById("inputEmpresa").value;
+      const errorEl = document.getElementById("msgErro");
+      const loadingEl = document.getElementById("carregando");
 
       errorEl.style.display = "none";
 
       if (!usuario || !senha) {
-        errorEl.textContent = "Preencha usuário e senha.";
+        errorEl.textContent = "❌ Preencha usuário e senha!";
         errorEl.style.display = "block";
         return;
       }
 
-      showLoading();
+      loadingEl.style.display = "block";
 
       try {
-        const payload = { tipo: "login", usuario: usuario, senha: senha };
-        
+        const payload = { tipo: "login", usuario, senha };
         const response = await fetch(API_URL, {
           method: "POST",
           body: JSON.stringify(payload),
           headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         });
-        
         const result = await response.json();
-        console.log("Resposta do login:", result);
 
         if (result && result.auth === true) {
           usuarioAtual = {
             usuario: usuario,
             nome: result.nome || usuario,
-            tipo: result.tipo || "usuario"
+            tipo: result.tipo || "usuario",
+            empresa: empresa || "matriz"
           };
           isAdmin = usuarioAtual.tipo === "admin" || usuario === "admin";
           localStorage.setItem("wrSession", JSON.stringify(usuarioAtual));
-          hideLoading();
+          loadingEl.style.display = "none";
           entrarNoApp();
-          return;
         } else {
-          hideLoading();
-          errorEl.textContent = result.msg || "Usuário ou senha inválidos!";
+          loadingEl.style.display = "none";
+          errorEl.textContent = "❌ Usuário ou senha inválidos!";
           errorEl.style.display = "block";
-          return;
         }
       } catch (error) {
-        console.error("Erro no login:", error);
-        hideLoading();
-        errorEl.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
+        loadingEl.style.display = "none";
+        errorEl.textContent = "❌ Erro ao conectar com o servidor!";
         errorEl.style.display = "block";
+        console.error("Erro no login:", error);
       }
     }
 
     function entrarNoApp() {
-      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("telaLogin").style.display = "none";
       document.getElementById("app").classList.add("active");
-      
-      // Aplica a classe de usuário no app para controle CSS
-      const app = document.getElementById("app");
+
+      // Configura visibilidade admin/tecnico
       if (!isAdmin) {
-        app.classList.add("user-tecnico");
-        // Esconde botões admin no mobile nav também via JS
-        document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
-          el.style.display = 'none';
-        });
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.nav-item.admin-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.bottom-nav .admin-only').forEach(el => el.style.display = 'none');
       } else {
-        app.classList.remove("user-tecnico");
-        // Mostra botões admin no mobile nav
-        document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
-          el.style.display = '';
-        });
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+        document.querySelectorAll('.nav-item.admin-only').forEach(el => el.style.display = 'flex');
+        document.querySelectorAll('.bottom-nav .admin-only').forEach(el => el.style.display = 'flex');
       }
-      
-      document.getElementById("userNome").textContent = usuarioAtual.nome || usuarioAtual.usuario;
-      document.getElementById("userTipo").textContent = isAdmin ? "Administrador" : "Técnico";
-      document.getElementById("userAvatar").textContent = (usuarioAtual.nome || usuarioAtual.usuario)[0].toUpperCase();
-      
-      // Configura mensagens específicas para técnico
-      if (!isAdmin) {
-        document.getElementById("ordensPageTitle").textContent = "Minhas Ordens de Serviço";
-        document.getElementById("ordensPageSubtitle").textContent = "Visualize e acompanhe todas as suas ordens de serviço.";
-        
-        // Ativa a aba de ordens por padrão para técnicos
-        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-        document.getElementById('tabOrdens').classList.add('active');
-        
-        // Atualiza botão ativo no mobile nav
-        document.querySelectorAll('#mobileNav button').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('#mobileNav button[data-tab="ordens"]')?.classList.add('active');
-        
-        // Atualiza a lista de OS do técnico
-        setTimeout(renderizarOrdensTecnico, 500);
-      } else {
-        // Admin - ativa dashboard
-        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-        document.getElementById('tabDashboard').classList.add('active');
-        
-        // Atualiza botão ativo no mobile nav
-        document.querySelectorAll('#mobileNav button').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('#mobileNav button[data-tab="dashboard"]')?.classList.add('active');
-      }
-      
+
+      // Atualiza informações do usuário
+      document.getElementById("nomeOperador").textContent = usuarioAtual.nome || usuarioAtual.usuario;
+      document.getElementById("sideUsuario").textContent = usuarioAtual.nome || usuarioAtual.usuario;
+      const unidade = usuarioAtual.empresa === "filial" ? "Filial" : "Matriz";
+      document.getElementById("txtUnidade").textContent = unidade;
+      document.getElementById("topUnidade").textContent = unidade;
+      document.getElementById("sideUnidade").textContent = unidade;
+
       document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
-      
+
       carregarTodosDados();
     }
 
@@ -1017,9 +1976,9 @@
       location.reload();
     }
 
-    // ============================================
+    // ══════════════════════════════════════════════════
     // CARREGAMENTO DE DADOS
-    // ============================================
+    // ══════════════════════════════════════════════════
     function parseItens(value) {
       if (Array.isArray(value)) return value;
       if (typeof value === "string") {
@@ -1029,41 +1988,19 @@
     }
 
     async function carregarTodosDados() {
-      showLoading();
-
       try {
         const usuario = usuarioAtual?.usuario || "";
-        
-        console.log("Carregando dados para usuário:", usuario);
-        
         const ordensRes = await apiGet("ordens", usuario);
-        console.log("Resposta ordens:", ordensRes);
-        
         if (ordensRes && ordensRes.res === "ok") {
           dados.ordens = (ordensRes.ordens || []).map(os => ({
             ...os,
             itensOS: parseItens(os.itensOS)
           }));
-          
-          // Atualiza isAdmin baseado no retorno do servidor
           if (ordensRes.isAdmin !== undefined) {
             isAdmin = ordensRes.isAdmin;
-            // Reaplica a classe no app
-            const app = document.getElementById("app");
-            if (!isAdmin) {
-              app.classList.add("user-tecnico");
-              document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
-                el.style.display = 'none';
-              });
-            } else {
-              app.classList.remove("user-tecnico");
-              document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
-                el.style.display = '';
-              });
-            }
           }
         }
-        
+
         const [clientesRes, catalogoRes, configRes, usuariosRes] = await Promise.all([
           apiGet("clientes", usuario),
           apiGet("catalogo", usuario),
@@ -1084,106 +2021,235 @@
         toast("Erro ao carregar dados. Usando dados locais.");
         renderAll();
       }
-
-      hideLoading();
     }
 
-    // ============================================
-    // USUÁRIOS (Admin apenas)
-    // ============================================
-    async function cadastrarUsuario() {
+    async function apiGet(endpoint, usuario = "") {
+      try {
+        const url = `${API_URL}?tipo=${endpoint}${usuario ? `&usuario=${encodeURIComponent(usuario)}` : ''}`;
+        const response = await fetch(url);
+        return await response.json();
+      } catch (error) {
+        console.error("Erro no GET:", error);
+        return null;
+      }
+    }
+
+    async function apiPost(payload) {
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+        });
+        return await response.json();
+      } catch (error) {
+        console.error("Erro no POST:", error);
+        return null;
+      }
+    }
+
+    // ══════════════════════════════════════════════════
+    // NAVEGAÇÃO
+    // ══════════════════════════════════════════════════
+    function mudarTab(tab, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      const target = document.getElementById(`tab-${tab}`);
+      if (target) target.classList.add('active');
+
+      if (btn) {
+        btn.classList.add('active');
+        document.querySelectorAll(`.nav-item[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
+        document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
+      }
+
+      if (tab === 'novaos' && isAdmin) {
+        atualizarSelects();
+        renderItensOS();
+        atualizarTotalOS();
+      } else if (tab === 'ordens') {
+        renderizarOrdens();
+      } else if (tab === 'clientes' && isAdmin) {
+        renderClientes();
+      } else if (tab === 'catalogo' && isAdmin) {
+        renderCatalogo();
+      } else if (tab === 'usuarios' && isAdmin) {
+        renderUsuarios();
+      } else if (tab === 'dash') {
+        atualizarDashboard();
+        atualizarGraficos();
+      }
+    }
+
+    // ══════════════════════════════════════════════════
+    // DASHBOARD
+    // ══════════════════════════════════════════════════
+    function atualizarDashboard() {
+      const ordens = dados.ordens || [];
+      const abertas = ordens.filter(o => o.status === "aberta").length;
+      const andamento = ordens.filter(o => o.status === "em_andamento").length;
+      const concluidas = ordens.filter(o => o.status === "concluida").length;
+
+      document.getElementById("cardTotal").textContent = ordens.length;
+      document.getElementById("cardAbertas").textContent = abertas;
+      document.getElementById("cardAndamento").textContent = andamento;
+      document.getElementById("cardConcluidas").textContent = concluidas;
+      document.getElementById("resumoClientes").textContent = dados.clientes.length;
+      document.getElementById("resumoCatalogo").textContent = dados.catalogo.length;
+      document.getElementById("resumoUsuarios").textContent = dados.usuarios.length;
+    }
+
+    function atualizarGraficos() {
+      const ordens = dados.ordens || [];
+      const abertas = ordens.filter(o => o.status === "aberta").length;
+      const andamento = ordens.filter(o => o.status === "em_andamento").length;
+      const concluidas = ordens.filter(o => o.status === "concluida").length;
+      const canceladas = ordens.filter(o => o.status === "cancelada").length;
+
+      // Gráfico de Pizza
+      const ctxPizza = document.getElementById('graficoPizza').getContext('2d');
+      if (graficoPizza) graficoPizza.destroy();
+      graficoPizza = new Chart(ctxPizza, {
+        type: 'doughnut',
+        data: {
+          labels: ['Abertas', 'Em andamento', 'Concluídas', 'Canceladas'],
+          datasets: [{
+            data: [abertas, andamento, concluidas, canceladas],
+            backgroundColor: ['#d97706', '#2563eb', '#059669', '#dc2626'],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { font: { size: 11, weight: '700' }, padding: 12 }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+
+      // Gráfico de Barras (apenas dados numéricos)
+      const ctxBarras = document.getElementById('graficoBarras').getContext('2d');
+      if (graficoBarras) graficoBarras.destroy();
+      graficoBarras = new Chart(ctxBarras, {
+        type: 'bar',
+        data: {
+          labels: ['Abertas', 'Em andamento', 'Concluídas', 'Canceladas'],
+          datasets: [{
+            label: 'Ordens de Serviço',
+            data: [abertas, andamento, concluidas, canceladas],
+            backgroundColor: ['#d97706', '#2563eb', '#059669', '#dc2626'],
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, font: { size: 11 } }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════════
+    // ORDENS
+    // ══════════════════════════════════════════════════
+    function renderizarOrdens() {
+      const filtro = document.getElementById("filtroStatusOS")?.value || "todos";
+      let ordens = dados.ordens || [];
+
+      if (filtro !== "todos") {
+        ordens = ordens.filter(os => os.status === filtro);
+      }
+
       if (!isAdmin) {
-        toast("Apenas administradores podem cadastrar usuários.");
+        ordens = ordens.filter(os => {
+          const usuarioOS = os.usuarioResponsavel || "";
+          return !usuarioOS || usuarioOS === usuarioAtual?.usuario;
+        });
+      }
+
+      const el = document.getElementById("ordensList");
+
+      if (!ordens.length) {
+        el.innerHTML = `<div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted);">
+          <div style="font-size:40px;margin-bottom:8px;">📋</div>
+          <h3 style="color:var(--ink);">Nenhuma ordem encontrada</h3>
+          <p style="font-size:14px;">${isAdmin ? 'Crie uma nova ordem de serviço' : 'Você não possui ordens atribuídas'}</p>
+        </div>`;
         return;
       }
 
-      const usuario = document.getElementById("usuarioUsername").value.trim();
-      const senha = document.getElementById("usuarioSenha").value;
-      const nome = document.getElementById("usuarioNome").value.trim();
-      const tipo = document.getElementById("usuarioTipo").value;
+      el.innerHTML = ordens.map(os => {
+        const idStr = String(os.id).trim();
+        const usuarioOS = os.usuarioResponsavel || "";
+        const isMinhaOS = usuarioOS === usuarioAtual?.usuario || !usuarioOS;
 
-      if (!usuario || !senha || !nome) {
-        alert("Preencha todos os campos.");
-        return;
-      }
+        let botoes = '';
+        if (os.status !== 'concluida' && (isAdmin || isMinhaOS)) {
+          botoes += `<button class="btn-edit" onclick="finalizarOS('${idStr}')" style="background:var(--green-100);color:var(--green-700);">✅ Finalizar</button>`;
+        }
+        if (isAdmin) {
+          botoes += `<button class="btn-edit" onclick="gerarPDF('${idStr}')">📄 PDF</button>`;
+          botoes += `<button class="btn-del" onclick="excluirOS('${idStr}')">🗑️</button>`;
+        }
 
-      const userData = {
-        tipo: "cadastrar_usuario",
-        usuario: usuario,
-        senha: senha,
-        nome: nome,
-        tipoUsuario: tipo
+        const mostrarValor = isAdmin;
+
+        return `<div class="entry-card">
+          <div class="badge-tipo ${os.status}">${statusLabel(os.status)}</div>
+          <div class="info">
+            <div class="desc">${os.clienteNome || "-"} - ${os.descricao || "Atendimento técnico"}</div>
+            <div class="meta">
+              OS #${os.id} • Abertura: ${formatDate(os.dataAbertura)} • Prazo: ${formatDate(os.prazo)}
+              ${usuarioOS ? `• Responsável: ${usuarioOS}` : ''}
+              ${mostrarValor ? `• ${money.format(Number(os.valorTotal || 0))}` : ''}
+            </div>
+          </div>
+          <div class="actions">${botoes}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function statusLabel(status) {
+      const labels = {
+        aberta: "Aberta",
+        em_andamento: "Em andamento",
+        concluida: "Concluída",
+        cancelada: "Cancelada"
       };
-
-      showLoading();
-      const result = await apiPost(userData);
-      hideLoading();
-
-      if (result && result.res === "ok") {
-        toast("Usuário cadastrado!");
-        document.getElementById("usuarioUsername").value = "";
-        document.getElementById("usuarioSenha").value = "";
-        document.getElementById("usuarioNome").value = "";
-        setTimeout(carregarTodosDados, 2000);
-      } else {
-        toast("Erro ao cadastrar usuário.");
-      }
+      return labels[status] || status;
     }
 
-    async function excluirUsuario(id) {
-      if (!isAdmin) return;
-      if (!confirm(`⚠️ Deseja excluir este usuário?`)) return;
-
-      showLoading();
-      await apiPost({ tipo: "excluir_usuario", id: String(id) });
-      hideLoading();
-
-      toast("Usuário removido");
-      setTimeout(carregarTodosDados, 2000);
+    function formatDate(date) {
+      if (!date) return "-";
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
     }
 
-    function renderUsuarios() {
-      const el = document.getElementById("usuariosList");
-      if (!isAdmin) {
-        el.innerHTML = "<p>Apenas administradores podem ver esta lista.</p>";
-        return;
-      }
-
-      const usuarios = dados.usuarios || [];
-      if (!usuarios.length) {
-        el.innerHTML = "<p>Nenhum usuário cadastrado.</p>";
-        return;
-      }
-
-      el.innerHTML = `<table class="table">
-        <thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Ações</th></tr></thead>
-        <tbody>
-          ${usuarios.map(u => `<tr>
-            <td><strong>${u.usuario}</strong></td>
-            <td>${u.nome || "-"}</td>
-            <td><span class="badge ${u.tipo === 'admin' ? 'em_andamento' : 'aberta'}">${u.tipo === 'admin' ? 'Admin' : 'Técnico'}</span></td>
-            <td>
-              ${u.usuario !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="excluirUsuario(${u.id})">Excluir</button>` : '<small>Padrão</small>'}
-            </td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
-    }
-
-    // ============================================
-    // CLIENTES
-    // ============================================
+    // ══════════════════════════════════════════════════
+    // CLIENTES (ADMIN)
+    // ══════════════════════════════════════════════════
     async function cadastrarCliente() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem cadastrar clientes.");
-        return;
-      }
+      if (!isAdmin) { toast("Apenas administradores podem cadastrar clientes."); return; }
 
       const nome = document.getElementById("clienteNome").value.trim();
-      if (!nome) {
-        alert("Digite o nome do cliente.");
-        return;
-      }
+      if (!nome) { alert("Digite o nome do cliente."); return; }
 
       const cliente = {
         tipo: "cadastrar_cliente",
@@ -1194,75 +2260,51 @@
         endereco: document.getElementById("clienteEndereco").value
       };
 
-      showLoading();
       await apiPost(cliente);
-      hideLoading();
-
       toast("Cliente cadastrado!");
-      limparCliente();
-      setTimeout(carregarTodosDados, 2000);
-    }
-
-    function limparCliente() {
-      ["clienteNome", "clienteDocumento", "clienteTelefone", "clienteEmail", "clienteEndereco"].forEach(id => {
-        document.getElementById(id).value = "";
-      });
-    }
-
-    async function excluirCliente(id) {
-      if (!isAdmin) return;
-      if (!confirm(`⚠️ Deseja excluir este cliente?`)) return;
-
-      showLoading();
-      await apiPost({ tipo: "excluir_cliente", id: String(id) });
-      hideLoading();
-
-      toast("Cliente removido");
-      setTimeout(carregarTodosDados, 2000);
+      ["clienteNome", "clienteDocumento", "clienteTelefone", "clienteEmail", "clienteEndereco"].forEach(id => document.getElementById(id).value = "");
+      setTimeout(carregarTodosDados, 1500);
     }
 
     function renderClientes() {
       const el = document.getElementById("clientesList");
-
-      if (!isAdmin) {
-        el.innerHTML = "<p>Apenas administradores podem ver a lista de clientes.</p>";
-        return;
-      }
+      if (!isAdmin) return;
 
       if (!dados.clientes.length) {
-        el.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
+        el.innerHTML = `<div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center;color:var(--muted);">Nenhum cliente cadastrado.</div>`;
         return;
       }
 
-      el.innerHTML = `<table class="table">
-        <thead><tr><th>Cliente</th><th>Telefone</th><th>Email</th><th>Ações</th></tr></thead>
-        <tbody>
-          ${dados.clientes.map(c => `<tr>
-            <td><strong>${c.nome || "-"}</strong></td>
-            <td>${c.telefone || "-"}</td>
-            <td>${c.email || "-"}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id})">Excluir</button></td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
+      el.innerHTML = `<div style="display:grid;gap:10px;">
+        ${dados.clientes.map(c => `
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <strong>${c.nome || "-"}</strong>
+              <div style="font-size:12px;color:var(--muted);">${c.telefone || ""} ${c.email ? '• ' + c.email : ''}</div>
+            </div>
+            <button class="btn-del" onclick="excluirCliente(${c.id})">🗑️ Excluir</button>
+          </div>
+        `).join("")}
+      </div>`;
     }
 
-    // ============================================
-    // CATÁLOGO
-    // ============================================
+    async function excluirCliente(id) {
+      if (!isAdmin) return;
+      if (!confirm("⚠️ Deseja excluir este cliente?")) return;
+      await apiPost({ tipo: "excluir_cliente", id: String(id) });
+      toast("Cliente removido");
+      setTimeout(carregarTodosDados, 1500);
+    }
+
+    // ══════════════════════════════════════════════════
+    // CATÁLOGO (ADMIN)
+    // ══════════════════════════════════════════════════
     async function cadastrarItem() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem cadastrar itens.");
-        return;
-      }
+      if (!isAdmin) { toast("Apenas administradores podem cadastrar itens."); return; }
 
       const nome = document.getElementById("itemNome").value.trim();
       const valor = Number(document.getElementById("itemValor").value || 0);
-
-      if (!nome || valor <= 0) {
-        alert("Preencha nome e valor válido.");
-        return;
-      }
+      if (!nome || valor <= 0) { alert("Preencha nome e valor válido."); return; }
 
       const item = {
         tipo: "cadastrar_item",
@@ -1274,64 +2316,103 @@
         descricao: document.getElementById("itemDescricao").value
       };
 
-      showLoading();
       await apiPost(item);
-      hideLoading();
-
       toast("Item cadastrado!");
-      limparItem();
-      setTimeout(carregarTodosDados, 2000);
-    }
-
-    function limparItem() {
-      ["itemNome", "itemValor", "itemCategoria", "itemDescricao"].forEach(id => {
-        document.getElementById(id).value = "";
-      });
+      ["itemNome", "itemValor", "itemCategoria", "itemDescricao"].forEach(id => document.getElementById(id).value = "");
       document.getElementById("itemEstoque").value = "0";
-    }
-
-    async function excluirItem(id) {
-      if (!isAdmin) return;
-      if (!confirm(`⚠️ Deseja excluir este item?`)) return;
-
-      showLoading();
-      await apiPost({ tipo: "excluir_item", id: String(id) });
-      hideLoading();
-
-      toast("Item removido");
-      setTimeout(carregarTodosDados, 2000);
+      setTimeout(carregarTodosDados, 1500);
     }
 
     function renderCatalogo() {
       const el = document.getElementById("catalogoList");
-
-      if (!isAdmin) {
-        el.innerHTML = "<p>Apenas administradores podem ver o catálogo completo.</p>";
-        return;
-      }
+      if (!isAdmin) return;
 
       if (!dados.catalogo.length) {
-        el.innerHTML = "<p>Nenhum item cadastrado.</p>";
+        el.innerHTML = `<div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center;color:var(--muted);">Nenhum item cadastrado.</div>`;
         return;
       }
 
-      el.innerHTML = `<table class="table">
-        <thead><tr><th>Tipo</th><th>Nome</th><th>Valor</th><th>Estoque</th><th>Ações</th></tr></thead>
-        <tbody>
-          ${dados.catalogo.map(i => `<tr>
-            <td>${i.tipoItem || i.tipo || "-"}</td>
-            <td><strong>${i.nome || "-"}</strong></td>
-            <td>${money.format(Number(i.valor || 0))}</td>
-            <td>${i.tipoItem === "material" ? Number(i.estoque || 0) : "-"}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="excluirItem(${i.id})">Excluir</button></td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
+      el.innerHTML = `<div style="display:grid;gap:10px;">
+        ${dados.catalogo.map(i => `
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <strong>${i.nome || "-"}</strong>
+              <div style="font-size:12px;color:var(--muted);">${i.tipoItem || i.tipo || "material"} • ${money.format(Number(i.valor || 0))} ${i.estoque !== undefined ? '• Estoque: ' + i.estoque : ''}</div>
+            </div>
+            <button class="btn-del" onclick="excluirItem(${i.id})">🗑️ Excluir</button>
+          </div>
+        `).join("")}
+      </div>`;
     }
 
-    // ============================================
-    // ORDENS DE SERVIÇO
-    // ============================================
+    async function excluirItem(id) {
+      if (!isAdmin) return;
+      if (!confirm("⚠️ Deseja excluir este item?")) return;
+      await apiPost({ tipo: "excluir_item", id: String(id) });
+      toast("Item removido");
+      setTimeout(carregarTodosDados, 1500);
+    }
+
+    // ══════════════════════════════════════════════════
+    // USUÁRIOS (ADMIN)
+    // ══════════════════════════════════════════════════
+    async function cadastrarUsuario() {
+      if (!isAdmin) { toast("Apenas administradores podem cadastrar usuários."); return; }
+
+      const usuario = document.getElementById("usuarioUsername").value.trim();
+      const senha = document.getElementById("usuarioSenha").value;
+      const nome = document.getElementById("usuarioNome").value.trim();
+      const tipo = document.getElementById("usuarioTipo").value;
+
+      if (!usuario || !senha || !nome) { alert("Preencha todos os campos."); return; }
+
+      const userData = {
+        tipo: "cadastrar_usuario",
+        usuario: usuario,
+        senha: senha,
+        nome: nome,
+        tipoUsuario: tipo
+      };
+
+      await apiPost(userData);
+      toast("Usuário cadastrado!");
+      ["usuarioUsername", "usuarioSenha", "usuarioNome"].forEach(id => document.getElementById(id).value = "");
+      setTimeout(carregarTodosDados, 1500);
+    }
+
+    function renderUsuarios() {
+      const el = document.getElementById("usuariosList");
+      if (!isAdmin) return;
+
+      if (!dados.usuarios.length) {
+        el.innerHTML = `<div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center;color:var(--muted);">Nenhum usuário cadastrado.</div>`;
+        return;
+      }
+
+      el.innerHTML = `<div style="display:grid;gap:10px;">
+        ${dados.usuarios.map(u => `
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <strong>${u.nome || u.usuario}</strong>
+              <div style="font-size:12px;color:var(--muted);">@${u.usuario} • ${u.tipo === 'admin' ? '👑 Admin' : '🔧 Técnico'}</div>
+            </div>
+            ${u.usuario !== 'admin' ? `<button class="btn-del" onclick="excluirUsuario(${u.id})">🗑️ Excluir</button>` : '<span style="font-size:12px;color:var(--muted);">Padrão</span>'}
+          </div>
+        `).join("")}
+      </div>`;
+    }
+
+    async function excluirUsuario(id) {
+      if (!isAdmin) return;
+      if (!confirm("⚠️ Deseja excluir este usuário?")) return;
+      await apiPost({ tipo: "excluir_usuario", id: String(id) });
+      toast("Usuário removido");
+      setTimeout(carregarTodosDados, 1500);
+    }
+
+    // ══════════════════════════════════════════════════
+    // ORDENS - CRIAÇÃO
+    // ══════════════════════════════════════════════════
     function atualizarSelects() {
       const clienteSelect = document.getElementById("osCliente");
       if (clienteSelect) {
@@ -1349,36 +2430,22 @@
     }
 
     function adicionarItemOS() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem adicionar itens.");
-        return;
-      }
-      
+      if (!isAdmin) { toast("Apenas administradores podem adicionar itens."); return; }
+
       const id = Number(document.getElementById("osItemSelect").value);
       const qtd = Number(document.getElementById("osItemQtd").value || 1);
       const item = dados.catalogo.find(i => Number(i.id) === id);
 
-      if (!item) {
-        alert("Selecione um item.");
-        return;
-      }
-
-      const tipo = item.tipoItem || item.tipo;
-
-      if (tipo === "material" && Number(item.estoque || 0) < qtd) {
-        alert("Estoque insuficiente.");
-        return;
-      }
+      if (!item) { alert("Selecione um item."); return; }
 
       const existente = osItensTemp.find(i => Number(i.id) === id);
-
       if (existente) {
         existente.quantidade += qtd;
         existente.subtotal = existente.quantidade * existente.valor;
       } else {
         osItensTemp.push({
           id: item.id,
-          tipo: tipo,
+          tipo: item.tipoItem || item.tipo,
           nome: item.nome,
           valor: Number(item.valor || 0),
           quantidade: qtd,
@@ -1401,21 +2468,24 @@
       if (!el) return;
 
       if (!osItensTemp.length) {
-        el.innerHTML = "<p>Nenhum item adicionado.</p>";
+        el.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px 0;">Nenhum item adicionado.</div>`;
         return;
       }
 
-      el.innerHTML = `<table class="table">
-        <thead><tr><th>Item</th><th>Qtd</th><th>Subtotal</th><th></th></tr></thead>
-        <tbody>
-          ${osItensTemp.map((i, index) => `<tr>
-            <td>${i.nome}</td>
-            <td>${i.quantidade}</td>
-            <td>${money.format(i.subtotal)}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="removerItemOS(${index})">Remover</button></td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
+      el.innerHTML = `<div style="display:grid;gap:6px;">
+        ${osItensTemp.map((i, index) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--slate-50);border-radius:var(--radius);border:1px solid var(--line);">
+            <div>
+              <strong>${i.nome}</strong>
+              <span style="font-size:12px;color:var(--muted);"> ${i.quantidade}x ${money.format(i.valor)}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-weight:700;">${money.format(i.subtotal)}</span>
+              <button class="btn-del" onclick="removerItemOS(${index})" style="padding:4px 8px;font-size:11px;">✕</button>
+            </div>
+          </div>
+        `).join("")}
+      </div>`;
     }
 
     function atualizarTotalOS() {
@@ -1423,68 +2493,17 @@
       const maoObra = Number(document.getElementById("osMaoObra")?.value || 0);
       const desconto = Number(document.getElementById("osDesconto")?.value || 0);
       const total = Math.max(0, itens + maoObra - desconto);
-
-      const totalItensEl = document.getElementById("totalItens");
-      const totalMaoObraEl = document.getElementById("totalMaoObra");
-      const totalDescontoEl = document.getElementById("totalDesconto");
-      const osTotalPreviewEl = document.getElementById("osTotalPreview");
-
-      if (totalItensEl) totalItensEl.textContent = money.format(itens);
-      if (totalMaoObraEl) totalMaoObraEl.textContent = money.format(maoObra);
-      if (totalDescontoEl) totalDescontoEl.textContent = `- ${money.format(desconto)}`;
-      if (osTotalPreviewEl) osTotalPreviewEl.textContent = money.format(total);
-
+      document.getElementById("osTotalPreview").textContent = money.format(total);
       return total;
     }
 
-    // ============================================
-    // CRIAR NOVA OS (APENAS ADMIN)
-    // ============================================
-    function criarNovaOS() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem criar ordens de serviço.");
-        return;
-      }
-      
-      // Limpa o formulário e ativa a aba de ordens
-      osItensTemp = [];
-      document.getElementById("osPrazo").value = "";
-      document.getElementById("osDescricao").value = "";
-      document.getElementById("osMaoObra").value = "0";
-      document.getElementById("osDesconto").value = "0";
-      document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
-      document.getElementById("osResponsavel").value = "";
-      renderItensOS();
-      atualizarTotalOS();
-      switchTab('ordens');
-      
-      // Scroll para o formulário
-      setTimeout(() => {
-        document.getElementById('adminOSForm').scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    }
-
-    // ============================================
-    // CRIAR OS (APENAS ADMIN)
-    // ============================================
     async function criarOS() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem criar ordens de serviço.");
-        return;
-      }
+      if (!isAdmin) { toast("Apenas administradores podem criar ordens."); return; }
 
       const clienteId = Number(document.getElementById("osCliente").value);
       const cliente = dados.clientes.find(c => Number(c.id) === clienteId);
-
-      if (!cliente) {
-        alert("Selecione um cliente.");
-        return;
-      }
-
-      if (!document.getElementById("osData").value) {
-        alert("Informe a data de abertura.");
-        return;
-      }
+      if (!cliente) { alert("Selecione um cliente."); return; }
+      if (!document.getElementById("osData").value) { alert("Informe a data de abertura."); return; }
 
       const osData = {
         tipo: "criar_os",
@@ -1501,15 +2520,12 @@
         usuarioResponsavel: document.getElementById("osResponsavel")?.value || usuarioAtual?.usuario || ""
       };
 
-      showLoading();
       const result = await apiPost(osData);
-      hideLoading();
-
       if (result && result.res === "ok") {
         toast("✅ Ordem de serviço criada!");
         osItensTemp = [];
         limparOS();
-        setTimeout(carregarTodosDados, 2000);
+        setTimeout(carregarTodosDados, 1500);
       } else {
         toast("❌ Erro ao criar OS.");
       }
@@ -1520,161 +2536,19 @@
       document.getElementById("osDescricao").value = "";
       document.getElementById("osMaoObra").value = "0";
       document.getElementById("osDesconto").value = "0";
+      document.getElementById("osResponsavel").value = "";
       osItensTemp = [];
       renderItensOS();
       atualizarTotalOS();
     }
 
-    // ============================================
-    // RENDERIZAR ORDENS (DASHBOARD - APENAS ADMIN)
-    // ============================================
-    function renderizarOrdens() {
-      if (!isAdmin) return;
-      
-      const filtro = document.getElementById("filtroStatusOS")?.value || "todos";
-      let ordens = dados.ordens || [];
-
-      if (filtro !== "todos") {
-        ordens = ordens.filter(os => os.status === filtro);
-      }
-
-      const el = document.getElementById("ordensList");
-
-      if (!ordens.length) {
-        el.innerHTML = `<div class="panel">Nenhuma ordem encontrada.</div>`;
-        return;
-      }
-
-      el.innerHTML = ordens.map(os => {
-        const idStr = String(os.id).trim();
-        const usuarioOS = os.usuarioResponsavel || "";
-        
-        let botoes = '';
-        
-        if (os.status !== 'concluida') {
-          botoes += `<button class="btn btn-green btn-sm" onclick="finalizarOS('${idStr}')">✅ Finalizar</button>`;
-        }
-        
-        botoes += `<button class="btn btn-light btn-sm" onclick="gerarPDF('${idStr}')">📄 PDF</button>`;
-        botoes += `<button class="btn btn-danger btn-sm" onclick="excluirOS('${idStr}')">🗑️ Excluir</button>`;
-
-        return `<article class="order-card ${os.status}">
-          <div class="order-top">
-            <span class="order-id">OS #${os.id}</span>
-            <span class="badge ${os.status}">${statusLabel(os.status)}</span>
-          </div>
-          <h4>${os.clienteNome || "-"} - ${os.descricao || "Atendimento técnico"}</h4>
-          <div class="order-meta">
-            <span>Abertura: ${formatDate(os.dataAbertura)}</span>
-            <span>Prazo: ${formatDate(os.prazo)}</span>
-            <span>${money.format(Number(os.valorTotal || 0))}</span>
-            ${usuarioOS ? `<span style="color:var(--teal)">Responsável: ${usuarioOS}</span>` : ''}
-          </div>
-          <div class="actions" style="justify-content:start;gap:6px">
-            ${botoes}
-          </div>
-        </article>`;
-      }).join("");
-    }
-
-    // ============================================
-    // RENDERIZAR ORDENS DO TÉCNICO
-    // ============================================
-    function renderizarOrdensTecnico() {
-      if (isAdmin) return;
-      
-      const filtro = document.getElementById("filtroStatusOSTecnico")?.value || "todos";
-      let ordens = dados.ordens || [];
-      
-      // Filtra apenas ordens do técnico atual
-      ordens = ordens.filter(os => {
-        const usuarioOS = os.usuarioResponsavel || "";
-        return !usuarioOS || usuarioOS === usuarioAtual?.usuario;
-      });
-
-      if (filtro !== "todos") {
-        ordens = ordens.filter(os => os.status === filtro);
-      }
-
-      const el = document.getElementById("tecnicoOrdensList");
-
-      if (!ordens.length) {
-        el.innerHTML = `
-          <div class="empty-state">
-            <h3>📋 Nenhuma ordem de serviço</h3>
-            <p>Você não possui ordens de serviço atribuídas a você no momento.</p>
-          </div>
-        `;
-        return;
-      }
-
-      el.innerHTML = ordens.map(os => {
-        const idStr = String(os.id).trim();
-        
-        let botoes = '';
-        if (os.status !== 'concluida') {
-          botoes += `<button class="btn btn-green btn-sm" onclick="finalizarOS('${idStr}')">✅ Finalizar</button>`;
-        }
-
-        return `<article class="order-card ${os.status}">
-          <div class="order-top">
-            <span class="order-id">OS #${os.id}</span>
-            <span class="badge ${os.status}">${statusLabel(os.status)}</span>
-          </div>
-          <h4>${os.clienteNome || "-"} - ${os.descricao || "Atendimento técnico"}</h4>
-          <div class="order-meta">
-            <span>Abertura: ${formatDate(os.dataAbertura)}</span>
-            <span>Prazo: ${formatDate(os.prazo)}</span>
-            <span style="color:var(--teal)">Responsável: Você</span>
-          </div>
-          <div class="actions" style="justify-content:start;gap:6px">
-            ${botoes}
-          </div>
-        </article>`;
-      }).join("");
-    }
-
-    function statusLabel(status) {
-      const labels = {
-        aberta: "Aberta",
-        em_andamento: "Em andamento",
-        concluida: "Concluída",
-        cancelada: "Cancelada"
-      };
-      return labels[status] || status;
-    }
-
-    // ============================================
-    // EXCLUIR OS
-    // ============================================
-    async function excluirOS(id) {
-      if (!isAdmin) {
-        toast("Apenas administradores podem excluir OS.");
-        return;
-      }
-
-      const idLimpo = String(id).trim();
-      if (!confirm(`⚠️ Deseja EXCLUIR a OS #${idLimpo}?`)) return;
-
-      showLoading();
-      await apiPost({ tipo: "excluir_os", id: idLimpo });
-      hideLoading();
-
-      toast("✅ OS removida");
-      setTimeout(carregarTodosDados, 2000);
-    }
-
-    // ============================================
-    // FINALIZAR OS
-    // ============================================
+    // ══════════════════════════════════════════════════
+    // FINALIZAR / EXCLUIR OS
+    // ══════════════════════════════════════════════════
     async function finalizarOS(id) {
       const idLimpo = String(id).trim();
       const os = dados.ordens.find(item => String(item.id).trim() === idLimpo);
-      
-      if (!os) {
-        toast("OS não encontrada");
-        return;
-      }
+      if (!os) { toast("OS não encontrada"); return; }
 
       const usuarioOS = os.usuarioResponsavel || "";
       if (!isAdmin && usuarioOS !== usuarioAtual?.usuario && usuarioOS !== "") {
@@ -1684,39 +2558,37 @@
 
       if (!confirm(`Finalizar a OS #${idLimpo}?`)) return;
 
-      showLoading();
       os.status = "concluida";
       os.dataConclusao = new Date().toISOString().slice(0, 10);
-      
-      await apiPost({ 
-        tipo: "finalizar_os", 
-        id: idLimpo, 
-        status: "concluida", 
+      await apiPost({
+        tipo: "finalizar_os",
+        id: idLimpo,
+        status: "concluida",
         dataConclusao: os.dataConclusao,
         observacoes: `Finalizada por ${usuarioAtual?.nome || usuarioAtual?.usuario}`
       });
-      hideLoading();
-
       toast("✅ OS finalizada!");
-      setTimeout(carregarTodosDados, 2000);
+      setTimeout(carregarTodosDados, 1500);
     }
 
-    // ============================================
-    // PDF PROFISSIONAL - ORDEM DE SERVIÇO (APENAS ADMIN)
-    // ============================================
+    async function excluirOS(id) {
+      if (!isAdmin) { toast("Apenas administradores podem excluir OS."); return; }
+      const idLimpo = String(id).trim();
+      if (!confirm(`⚠️ Deseja EXCLUIR a OS #${idLimpo}?`)) return;
+      await apiPost({ tipo: "excluir_os", id: idLimpo });
+      toast("✅ OS removida");
+      setTimeout(carregarTodosDados, 1500);
+    }
+
+    // ══════════════════════════════════════════════════
+    // PDF (ADMIN)
+    // ══════════════════════════════════════════════════
     function gerarPDF(id) {
-      if (!isAdmin) {
-        toast("Apenas administradores podem gerar PDF.");
-        return;
-      }
+      if (!isAdmin) { toast("Apenas administradores podem gerar PDF."); return; }
 
       const idLimpo = String(id).trim();
       const os = dados.ordens.find(item => String(item.id).trim() === idLimpo);
-      
-      if (!os) {
-        toast("OS não encontrada");
-        return;
-      }
+      if (!os) { toast("OS não encontrada"); return; }
 
       try {
         const { jsPDF } = window.jspdf;
@@ -1729,38 +2601,34 @@
 
         const corPrimaria = [15, 118, 110];
         const corSecundaria = [11, 31, 38];
-        const corCinza = [100, 116, 125];
 
+        // Cabeçalho
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
         doc.rect(0, 0, pageWidth, 45, 'F');
-
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
+        doc.setFontSize(20);
         doc.setFont('helvetica', 'bold');
         doc.text(cfg.empresaNome || "WR Manutenção e Serviços", margin, 18);
-
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.text(cfg.empresaEndereco || "", margin, 27);
         doc.text(`${cfg.empresaTelefone || ""} | ${cfg.empresaEmail || ""}`, margin, 33);
-        doc.text(cfg.empresaSite || "", margin, 39);
-
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         doc.text(`OS #${os.id}`, pageWidth - margin, 18, { align: 'right' });
 
         y = 52;
         doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
         doc.line(margin, y, pageWidth - margin, y);
         y += 8;
 
         doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         doc.text('ORDEM DE SERVIÇO', margin, y);
         y += 8;
 
+        // Status
         const statusMap = {
           'aberta': ['Aberta', [254, 243, 199], [146, 64, 14]],
           'em_andamento': ['Em Andamento', [219, 234, 254], [30, 64, 175]],
@@ -1768,53 +2636,52 @@
           'cancelada': ['Cancelada', [254, 226, 226], [153, 27, 27]]
         };
         const statusInfo = statusMap[os.status] || ['Desconhecido', [200, 200, 200], [100, 100, 100]];
-        
         doc.setFillColor(statusInfo[1][0], statusInfo[1][1], statusInfo[1][2]);
         doc.setTextColor(statusInfo[2][0], statusInfo[2][1], statusInfo[2][2]);
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         const statusText = `STATUS: ${statusInfo[0].toUpperCase()}`;
         const statusWidth = doc.getTextWidth(statusText) + 10;
         const statusX = pageWidth - margin - statusWidth;
         doc.rect(statusX, y - 6, statusWidth, 8, 'F');
         doc.text(statusText, statusX + 5, y);
-
         y += 10;
 
-        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-        doc.setFontSize(9);
+        // Dados do cliente
+        doc.setTextColor([100, 116, 125]);
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
         doc.text('DADOS DO CLIENTE', margin, y);
         y += 6;
-
         doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`Nome: ${os.clienteNome || "-"}`, margin, y);
         y += 6;
-        doc.text(`Data de Abertura: ${formatDate(os.dataAbertura)}`, margin, y);
+        doc.text(`Data: ${formatDate(os.dataAbertura)}`, margin, y);
         y += 6;
         doc.text(`Prazo: ${formatDate(os.prazo)}`, margin, y);
         y += 8;
 
+        // Descrição
         if (os.descricao) {
-          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-          doc.setFontSize(9);
+          doc.setTextColor([100, 116, 125]);
+          doc.setFontSize(8);
           doc.setFont('helvetica', 'bold');
-          doc.text('DESCRIÇÃO DO SERVIÇO', margin, y);
+          doc.text('DESCRIÇÃO', margin, y);
           y += 6;
-
           doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
-          doc.setFontSize(10);
+          doc.setFontSize(9);
           doc.setFont('helvetica', 'normal');
           const descLines = doc.splitTextToSize(os.descricao, pageWidth - margin * 2);
           doc.text(descLines, margin, y);
           y += descLines.length * 5 + 6;
         }
 
+        // Itens
         if (itens.length > 0) {
-          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-          doc.setFontSize(9);
+          doc.setTextColor([100, 116, 125]);
+          doc.setFontSize(8);
           doc.setFont('helvetica', 'bold');
           doc.text('MATERIAIS E SERVIÇOS', margin, y);
           y += 4;
@@ -1834,15 +2701,11 @@
             headStyles: {
               fillColor: corPrimaria,
               textColor: [255, 255, 255],
-              fontSize: 9,
+              fontSize: 8,
               fontStyle: 'bold',
               halign: 'center'
             },
-            styles: {
-              fontSize: 9,
-              cellPadding: 4,
-              valign: 'middle'
-            },
+            styles: { fontSize: 8, cellPadding: 4 },
             columnStyles: {
               0: { cellWidth: 'auto' },
               1: { cellWidth: 20, halign: 'center' },
@@ -1851,10 +2714,10 @@
             },
             margin: { left: margin, right: margin }
           });
-
           y = doc.lastAutoTable.finalY + 8;
         }
 
+        // Total
         const totalItens = itens.reduce((sum, i) => sum + Number(i.subtotal || 0), 0);
         const maoObra = Number(os.maoObra || 0);
         const desconto = Number(os.desconto || 0);
@@ -1862,20 +2725,16 @@
 
         const boxX = pageWidth - margin - 100;
         const boxY = y;
-        const boxW = 100;
-        let boxH = 50;
-
         doc.setFillColor(245, 248, 250);
         doc.setDrawColor(200, 200, 200);
-        doc.rect(boxX, boxY, boxW, boxH, 'FD');
+        doc.rect(boxX, boxY, 100, 45, 'FD');
 
         let lineY = boxY + 8;
-        doc.setFontSize(9);
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
+        doc.setTextColor([100, 116, 125]);
         doc.text('RESUMO FINANCEIRO', boxX + 5, lineY);
         lineY += 6;
-
         doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
         doc.text(`Itens: ${money.format(totalItens)}`, boxX + 5, lineY);
         lineY += 5;
@@ -1885,41 +2744,23 @@
           doc.text(`Desconto: -${money.format(desconto)}`, boxX + 5, lineY);
           lineY += 5;
         }
-
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
-        doc.rect(boxX, lineY, boxW, 12, 'F');
+        doc.rect(boxX, lineY, 100, 12, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.text(`TOTAL: ${money.format(valorTotal)}`, boxX + 5, lineY + 8);
-
-        const footerY = Math.max(y + 70, 280);
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.line(margin, footerY, pageWidth - margin, footerY);
-
-        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Documento gerado em ${new Date().toLocaleString('pt-BR')}`, margin, footerY + 6);
-        doc.text(`WR Manutenção e Serviços - Todos os direitos reservados`, pageWidth - margin, footerY + 6, { align: 'right' });
 
         doc.save(`OS_${os.id}.pdf`);
         toast("✅ PDF gerado com sucesso!");
-      } catch(e) {
+      } catch (e) {
         console.error("Erro ao gerar PDF:", e);
         alert("Erro ao gerar PDF: " + e.message);
       }
     }
 
-    // ============================================
-    // PDF - RESUMO COMPLETO (APENAS ADMIN)
-    // ============================================
     function exportarResumoPDF() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem gerar relatórios.");
-        return;
-      }
+      if (!isAdmin) { toast("Apenas administradores podem gerar relatórios."); return; }
 
       try {
         const { jsPDF } = window.jspdf;
@@ -1932,79 +2773,39 @@
 
         const corPrimaria = [15, 118, 110];
         const corSecundaria = [11, 31, 38];
-        const corCinza = [100, 116, 125];
 
         doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
         doc.rect(0, 0, pageWidth, 35, 'F');
-
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(20);
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.text(cfg.empresaNome || "WR Manutenção e Serviços", margin, 16);
-
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Relatório Gerencial - ${new Date().toLocaleDateString('pt-BR')}`, margin, 26);
+        doc.text(`Relatório - ${new Date().toLocaleDateString('pt-BR')}`, margin, 26);
 
         y = 45;
-
         doc.setTextColor(corSecundaria[0], corSecundaria[1], corSecundaria[2]);
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         doc.text('RESUMO DE ORDENS DE SERVIÇO', margin, y);
         y += 8;
 
         const total = ordens.length;
         const abertas = ordens.filter(o => o.status === "aberta").length;
-        const emAndamento = ordens.filter(o => o.status === "em_andamento").length;
+        const andamento = ordens.filter(o => o.status === "em_andamento").length;
         const concluidas = ordens.filter(o => o.status === "concluida").length;
         const canceladas = ordens.filter(o => o.status === "cancelada").length;
-        const faturamento = ordens.filter(o => o.status === "concluida").reduce((s, o) => s + Number(o.valorTotal || 0), 0);
 
-        const stats = [
-          ['Total de OS', total, corPrimaria],
-          ['Abertas', abertas, [217, 119, 6]],
-          ['Em Andamento', emAndamento, [37, 99, 235]],
-          ['Concluídas', concluidas, [5, 150, 105]],
-          ['Canceladas', canceladas, [220, 38, 38]]
-        ];
-
-        let statX = margin;
-        stats.forEach((stat, index) => {
-          const cardW = 35;
-          const cardH = 30;
-          const x = statX + (index * (cardW + 5));
-
-          doc.setFillColor(248, 250, 252);
-          doc.setDrawColor(200, 200, 200);
-          doc.rect(x, y, cardW, cardH, 'FD');
-
-          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-          doc.setFontSize(7);
-          doc.setFont('helvetica', 'bold');
-          doc.text(stat[0], x + cardW/2, y + 8, { align: 'center' });
-
-          doc.setTextColor(stat[2][0], stat[2][1], stat[2][2]);
-          doc.setFontSize(16);
-          doc.setFont('helvetica', 'bold');
-          doc.text(String(stat[1]), x + cardW/2, y + 23, { align: 'center' });
-        });
-
-        y += 38;
-
-        doc.setFillColor(corPrimaria[0], corPrimaria[1], corPrimaria[2]);
-        doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`FATURAMENTO TOTAL: ${money.format(faturamento)}`, pageWidth / 2, y + 8, { align: 'center' });
-        y += 20;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total: ${total}  |  Abertas: ${abertas}  |  Em andamento: ${andamento}  |  Concluídas: ${concluidas}  |  Canceladas: ${canceladas}`, margin, y);
+        y += 12;
 
         if (ordens.length > 0) {
-          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
           doc.setFontSize(9);
           doc.setFont('helvetica', 'bold');
-          doc.text('LISTA DE ORDENS DE SERVIÇO', margin, y);
+          doc.text('LISTA DE ORDENS', margin, y);
           y += 4;
 
           const tableData = ordens.map(os => {
@@ -2031,14 +2832,11 @@
             headStyles: {
               fillColor: corPrimaria,
               textColor: [255, 255, 255],
-              fontSize: 8,
+              fontSize: 7,
               fontStyle: 'bold',
               halign: 'center'
             },
-            styles: {
-              fontSize: 8,
-              cellPadding: 3
-            },
+            styles: { fontSize: 7, cellPadding: 3 },
             columnStyles: {
               0: { cellWidth: 30 },
               1: { cellWidth: 'auto' },
@@ -2046,83 +2844,23 @@
               3: { cellWidth: 25, halign: 'center' },
               4: { cellWidth: 30, halign: 'right' }
             },
-            didParseCell: function(data) {
-              if (data.section === 'body' && data.column.index === 3) {
-                const status = data.cell.raw;
-                const colors = {
-                  'Aberta': { bg: [254, 243, 199], text: [146, 64, 14] },
-                  'Em Andamento': { bg: [219, 234, 254], text: [30, 64, 175] },
-                  'Concluída': { bg: [209, 250, 229], text: [6, 95, 70] },
-                  'Cancelada': { bg: [254, 226, 226], text: [153, 27, 27] }
-                };
-                const color = colors[status] || { bg: [200, 200, 200], text: [100, 100, 100] };
-                data.cell.styles.fillColor = color.bg;
-                data.cell.styles.textColor = color.text;
-                data.cell.styles.fontStyle = 'bold';
-                data.cell.styles.halign = 'center';
-              }
-            },
             margin: { left: margin, right: margin }
           });
-
-          y = doc.lastAutoTable.finalY + 10;
-        } else {
-          doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'italic');
-          doc.text('Nenhuma ordem de serviço encontrada.', margin, y);
-          y += 10;
         }
 
-        const footerY = Math.max(y + 10, 280);
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.line(margin, footerY, pageWidth - margin, footerY);
-
-        doc.setTextColor(corCinza[0], corCinza[1], corCinza[2]);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Relatório gerado em ${new Date().toLocaleString('pt-BR')}`, margin, footerY + 6);
-        doc.text(`WR Manutenção e Serviços - Todos os direitos reservados`, pageWidth - margin, footerY + 6, { align: 'right' });
-
         doc.save(`Resumo_OS_WR.pdf`);
-        toast("✅ Resumo PDF gerado com sucesso!");
-      } catch(e) {
-        console.error("Erro ao gerar resumo PDF:", e);
-        alert("Erro ao gerar resumo PDF: " + e.message);
+        toast("✅ Resumo PDF gerado!");
+      } catch (e) {
+        console.error("Erro ao gerar resumo:", e);
+        alert("Erro ao gerar resumo: " + e.message);
       }
     }
 
-    // ============================================
-    // DASHBOARD (APENAS ADMIN)
-    // ============================================
-    function atualizarDashboard() {
-      if (!isAdmin) return;
-      
-      const ordens = dados.ordens || [];
-      const abertas = ordens.filter(o => o.status === "aberta").length;
-      const andamento = ordens.filter(o => o.status === "em_andamento").length;
-      const concluidas = ordens.filter(o => o.status === "concluida").length;
-      const faturamento = ordens.filter(o => o.status === "concluida").reduce((sum, o) => sum + Number(o.valorTotal || 0), 0);
-
-      document.getElementById("statTotal").textContent = ordens.length;
-      document.getElementById("statAbertas").textContent = abertas;
-      document.getElementById("statAndamento").textContent = andamento;
-      document.getElementById("statConcluidas").textContent = concluidas;
-      document.getElementById("statFaturamento").textContent = money.format(faturamento);
-      document.getElementById("resumoReceita").textContent = money.format(faturamento);
-      document.getElementById("resumoClientes").textContent = dados.clientes.length;
-      document.getElementById("resumoCatalogo").textContent = dados.catalogo.length;
-    }
-
-    // ============================================
-    // CONFIGURAÇÕES (APENAS ADMIN)
-    // ============================================
+    // ══════════════════════════════════════════════════
+    // CONFIGURAÇÕES (ADMIN)
+    // ══════════════════════════════════════════════════
     function salvarConfiguracoes() {
-      if (!isAdmin) {
-        toast("Apenas administradores podem salvar configurações.");
-        return;
-      }
+      if (!isAdmin) { toast("Apenas administradores podem salvar configurações."); return; }
 
       dados.configuracoes = {
         empresaNome: document.getElementById("configEmpresaNome").value,
@@ -2138,7 +2876,23 @@
       toast("Configurações salvas");
     }
 
-    function carregarConfiguracoesForm() {
+    // ══════════════════════════════════════════════════
+    // RENDERIZAÇÃO COMPLETA
+    // ══════════════════════════════════════════════════
+    function renderAll() {
+      if (isAdmin) {
+        atualizarSelects();
+        renderClientes();
+        renderCatalogo();
+        renderUsuarios();
+        renderItensOS();
+        atualizarTotalOS();
+      }
+      renderizarOrdens();
+      atualizarDashboard();
+      atualizarGraficos();
+
+      // Carrega configurações no form
       const cfg = dados.configuracoes || {};
       document.getElementById("configEmpresaNome").value = cfg.empresaNome || "WR Manutenção e Serviços";
       document.getElementById("configEmpresaCnpj").value = cfg.empresaCnpj || "";
@@ -2148,87 +2902,10 @@
       document.getElementById("configEmpresaEndereco").value = cfg.empresaEndereco || "";
     }
 
-    // ============================================
-    // UTILITÁRIOS
-    // ============================================
-    function formatDate(date) {
-      if (!date) return "-";
-      const [year, month, day] = date.split("-");
-      return `${day}/${month}/${year}`;
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll(".tab").forEach(section => {
-        section.classList.remove("active");
-      });
-
-      const targetTab = document.querySelector(`#tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-      if (targetTab) {
-        targetTab.classList.add("active");
-      }
-
-      document.querySelectorAll("[data-tab]").forEach(button => {
-        button.classList.toggle("active", button.dataset.tab === tab);
-      });
-
-      // Atualiza também os botões do mobile nav
-      document.querySelectorAll("#mobileNav button").forEach(button => {
-        button.classList.toggle("active", button.dataset.tab === tab);
-      });
-
-      if (tab === "ordens") {
-        if (isAdmin) {
-          atualizarSelects();
-          renderItensOS();
-          atualizarTotalOS();
-        } else {
-          renderizarOrdensTecnico();
-        }
-      } else if (tab === "dashboard" && isAdmin) {
-        atualizarDashboard();
-        renderizarOrdens();
-      } else if (tab === "usuarios" && isAdmin) {
-        renderUsuarios();
-      }
-    }
-
-    // ============================================
-    // RENDERIZAÇÃO COMPLETA
-    // ============================================
-    function renderAll() {
-      if (isAdmin) {
-        atualizarSelects();
-        renderClientes();
-        renderCatalogo();
-        renderItensOS();
-        atualizarTotalOS();
-        renderUsuarios();
-        atualizarDashboard();
-        renderizarOrdens();
-      } else {
-        renderizarOrdensTecnico();
-      }
-      carregarConfiguracoesForm();
-    }
-
-    // ============================================
-    // EVENTOS
-    // ============================================
+    // ══════════════════════════════════════════════════
+    // INICIALIZAÇÃO
+    // ══════════════════════════════════════════════════
     document.addEventListener("DOMContentLoaded", function() {
-      // Eventos para sidebar
-      document.querySelectorAll("#mainNav [data-tab]").forEach(button => {
-        button.addEventListener("click", function() {
-          switchTab(this.dataset.tab);
-        });
-      });
-
-      // Eventos para mobile nav
-      document.querySelectorAll("#mobileNav [data-tab]").forEach(button => {
-        button.addEventListener("click", function() {
-          switchTab(this.dataset.tab);
-        });
-      });
-
       const session = localStorage.getItem("wrSession");
       if (session) {
         try {
@@ -2241,11 +2918,13 @@
       }
     });
 
-    // ============================================
-    // EXPORTA FUNÇÕES PARA O GLOBAL
-    // ============================================
-    window.realizarLogin = realizarLogin;
+    // ══════════════════════════════════════════════════
+    // EXPORTA FUNÇÕES
+    // ══════════════════════════════════════════════════
+    window.verificarLogin = verificarLogin;
     window.fazerLogout = fazerLogout;
+    window.mudarTab = mudarTab;
+    window.toggleSenha = toggleSenha;
     window.cadastrarCliente = cadastrarCliente;
     window.excluirCliente = excluirCliente;
     window.cadastrarItem = cadastrarItem;
@@ -2253,15 +2932,13 @@
     window.adicionarItemOS = adicionarItemOS;
     window.removerItemOS = removerItemOS;
     window.criarOS = criarOS;
-    window.criarNovaOS = criarNovaOS;
+    window.limparOS = limparOS;
     window.finalizarOS = finalizarOS;
     window.excluirOS = excluirOS;
     window.gerarPDF = gerarPDF;
     window.exportarResumoPDF = exportarResumoPDF;
     window.salvarConfiguracoes = salvarConfiguracoes;
-    window.switchTab = switchTab;
     window.renderizarOrdens = renderizarOrdens;
-    window.renderizarOrdensTecnico = renderizarOrdensTecnico;
     window.atualizarTotalOS = atualizarTotalOS;
     window.cadastrarUsuario = cadastrarUsuario;
     window.excluirUsuario = excluirUsuario;
