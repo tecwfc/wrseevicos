@@ -4,22 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>WR Manutenção - Ordens de Serviço</title>
+  
+  <!-- ══════════════════════════════════════════════════
+     PWA - META TAGS
+     ══════════════════════════════════════════════════ -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icon-192x192.png">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WR OS">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="WR Manutenção">
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-  <!-- ══════════════════════════════════════════════════
-     PWA - META TAGS
-     ══════════════════════════════════════════════════ -->
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="assets/icon-192x192.png">
-<meta name="theme-color" content="#0f766e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WR OS">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="WR Manutenção">
 
   <style>
     /* ══════════════════════════════════════════════════
@@ -1745,6 +1746,47 @@
     </nav>
   </div>
 
+  <!-- ══════════════════════════════════════════════════
+     REGISTRO DO SERVICE WORKER (PWA)
+     ══════════════════════════════════════════════════ -->
+  <script>
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js')
+          .then(function(registration) {
+            console.log('✅ Service Worker registrado com sucesso!', registration);
+            
+            // Verifica atualizações
+            registration.addEventListener('updatefound', function() {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', function() {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('🔄 Nova versão disponível!');
+                  // Mostra notificação para o usuário
+                  const updateBtn = document.createElement('div');
+                  updateBtn.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.3);font-size:14px;cursor:pointer;';
+                  updateBtn.textContent = '🔄 Nova versão disponível - Clique para atualizar';
+                  updateBtn.onclick = function() {
+                    window.location.reload();
+                  };
+                  document.body.appendChild(updateBtn);
+                  setTimeout(() => {
+                    if (updateBtn.parentNode) updateBtn.remove();
+                  }, 10000);
+                }
+              });
+            });
+          })
+          .catch(function(error) {
+            console.log('❌ Falha ao registrar Service Worker:', error);
+          });
+      });
+    } else {
+      console.log('❌ Service Worker não suportado neste navegador.');
+    }
+  </script>
+
   <script>
     // ══════════════════════════════════════════════════
     // CONFIGURAÇÃO
@@ -3232,46 +3274,5 @@
     window.exportarFaturamentoPDF = exportarFaturamentoPDF;
     window.irParaNovaOS = irParaNovaOS;
   </script>
-
-
-<!-- ══════════════════════════════════════════════════
-     REGISTRO DO SERVICE WORKER (PWA)
-     ══════════════════════════════════════════════════ -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('./sw.js')
-        .then(function(registration) {
-          console.log('✅ Service Worker registrado com sucesso!', registration);
-          
-          // Verifica atualizações
-          registration.addEventListener('updatefound', function() {
-            const newWorker = registration.installing;
-            newWorker.addEventListener('statechange', function() {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('🔄 Nova versão disponível!');
-                // Mostra notificação para o usuário
-                const updateBtn = document.createElement('div');
-                updateBtn.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.3);font-size:14px;cursor:pointer;';
-                updateBtn.textContent = '🔄 Nova versão disponível - Clique para atualizar';
-                updateBtn.onclick = function() {
-                  window.location.reload();
-                };
-                document.body.appendChild(updateBtn);
-                setTimeout(() => {
-                  if (updateBtn.parentNode) updateBtn.remove();
-                }, 10000);
-              }
-            });
-          });
-        })
-        .catch(function(error) {
-          console.log('❌ Falha ao registrar Service Worker:', error);
-        });
-    });
-  } else {
-    console.log('❌ Service Worker não suportado neste navegador.');
-  }
-</script>
 </body>
 </html>
