@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WR Manutenção - Ar condicionado</title>
+  <title>WR Manutenção - Ar Condicionado</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -349,7 +349,32 @@
 
     .loading.active { display: flex; }
 
-    .mobile-nav { display: none; }
+    .mobile-nav { 
+      display: none; 
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      background: #fff;
+      border-top: 1px solid var(--line);
+    }
+    
+    .mobile-nav button {
+      min-height: 62px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .mobile-nav button.active { 
+      color: var(--teal); 
+      background: var(--soft-teal); 
+    }
 
     .user-info { 
       display: flex; 
@@ -404,37 +429,35 @@
     .empty-state h3 { font-size: 18px; color: var(--ink); margin-bottom: 8px; }
     .empty-state p { font-size: 14px; }
 
+    /* ============================================
+       RESPONSIVIDADE MOBILE
+    ============================================ */
     @media (max-width: 1080px) {
       .login-screen { grid-template-columns: 1fr; }
       .login-hero { min-height: 330px; }
       .app.active { display: block; }
       .sidebar { display: none; }
       .layout { grid-template-columns: 1fr; }
-      .mobile-nav {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 30;
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        background: #fff;
-        border-top: 1px solid var(--line);
+      
+      .mobile-nav { 
+        display: flex !important;
+        justify-content: space-around;
       }
-      .mobile-nav button {
-        min-height: 62px;
-        background: #fff;
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 900;
-      }
-      .mobile-nav button.active { color: var(--teal); background: var(--soft-teal); }
+      
       .main { padding-bottom: 86px; }
       .stats { grid-template-columns: repeat(2, 1fr); }
       
-      /* Mobile nav para técnico - apenas 2 botões */
+      /* Mobile nav - oculta botões admin para técnico */
+      .user-tecnico .mobile-nav .admin-only { 
+        display: none !important; 
+      }
+      
+      /* Mobile nav - mostra apenas botões disponíveis para técnico */
       .user-tecnico .mobile-nav {
-        grid-template-columns: repeat(2, 1fr);
+        justify-content: center;
+      }
+      .user-tecnico .mobile-nav button {
+        max-width: 50%;
       }
     }
 
@@ -463,8 +486,8 @@
 
       <div>
         <span class="eyebrow">Sistema profissional de OS</span>
-        <h1>Multi-usuário com controle de permissões.</h1>
-        <p>Administradores veem tudo. Técnicos veem apenas suas OS em aberto e podem finalizar os serviços.</p>
+        <!-- <h1>Multi-usuário com controle de permissões.</h1> -->
+        <!-- <p>Administradores veem tudo. Técnicos veem apenas suas OS em aberto e podem finalizar os serviços.</p> -->
       </div>
     </div>
 
@@ -637,6 +660,7 @@
                   <div class="field"><label>Status</label><select class="input" id="osStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></div>
                   <div class="field"><label>Prazo</label><input class="input" type="date" id="osPrazo"></div>
                   <div class="field full"><label>Descrição do serviço</label><textarea class="input" id="osDescricao" placeholder="Descreva o serviço a realizar..."></textarea></div>
+                  <div class="field full"><label>Responsável (técnico)</label><input class="input" id="osResponsavel" placeholder="Nome do técnico responsável"></div>
                 </div>
               </section>
 
@@ -791,8 +815,8 @@
 
   <!-- MOBILE NAV -->
   <nav class="mobile-nav" id="mobileNav">
-    <button class="active admin-only" data-tab="dashboard">📊</button>
-    <button data-tab="ordens">📝</button>
+    <button class="active admin-only" data-tab="dashboard">📊 Dashboard</button>
+    <button data-tab="ordens">📝 OS</button>
     <button class="admin-only" data-tab="clientes">👤</button>
     <button class="admin-only" data-tab="catalogo">📦</button>
     <button class="admin-only" data-tab="config">⚙️</button>
@@ -941,8 +965,16 @@
       const app = document.getElementById("app");
       if (!isAdmin) {
         app.classList.add("user-tecnico");
+        // Esconde botões admin no mobile nav também via JS
+        document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
+          el.style.display = 'none';
+        });
       } else {
         app.classList.remove("user-tecnico");
+        // Mostra botões admin no mobile nav
+        document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
+          el.style.display = '';
+        });
       }
       
       document.getElementById("userNome").textContent = usuarioAtual.nome || usuarioAtual.usuario;
@@ -958,12 +990,20 @@
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         document.getElementById('tabOrdens').classList.add('active');
         
+        // Atualiza botão ativo no mobile nav
+        document.querySelectorAll('#mobileNav button').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('#mobileNav button[data-tab="ordens"]')?.classList.add('active');
+        
         // Atualiza a lista de OS do técnico
         setTimeout(renderizarOrdensTecnico, 500);
       } else {
         // Admin - ativa dashboard
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         document.getElementById('tabDashboard').classList.add('active');
+        
+        // Atualiza botão ativo no mobile nav
+        document.querySelectorAll('#mobileNav button').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('#mobileNav button[data-tab="dashboard"]')?.classList.add('active');
       }
       
       document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
@@ -1012,8 +1052,14 @@
             const app = document.getElementById("app");
             if (!isAdmin) {
               app.classList.add("user-tecnico");
+              document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
+                el.style.display = 'none';
+              });
             } else {
               app.classList.remove("user-tecnico");
+              document.querySelectorAll('#mobileNav .admin-only').forEach(el => {
+                el.style.display = '';
+              });
             }
           }
         }
@@ -1407,6 +1453,7 @@
       document.getElementById("osMaoObra").value = "0";
       document.getElementById("osDesconto").value = "0";
       document.getElementById("osData").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("osResponsavel").value = "";
       renderItensOS();
       atualizarTotalOS();
       switchTab('ordens');
@@ -2124,6 +2171,11 @@
         button.classList.toggle("active", button.dataset.tab === tab);
       });
 
+      // Atualiza também os botões do mobile nav
+      document.querySelectorAll("#mobileNav button").forEach(button => {
+        button.classList.toggle("active", button.dataset.tab === tab);
+      });
+
       if (tab === "ordens") {
         if (isAdmin) {
           atualizarSelects();
@@ -2163,7 +2215,15 @@
     // EVENTOS
     // ============================================
     document.addEventListener("DOMContentLoaded", function() {
-      document.querySelectorAll("[data-tab]").forEach(button => {
+      // Eventos para sidebar
+      document.querySelectorAll("#mainNav [data-tab]").forEach(button => {
+        button.addEventListener("click", function() {
+          switchTab(this.dataset.tab);
+        });
+      });
+
+      // Eventos para mobile nav
+      document.querySelectorAll("#mobileNav [data-tab]").forEach(button => {
         button.addEventListener("click", function() {
           switchTab(this.dataset.tab);
         });
